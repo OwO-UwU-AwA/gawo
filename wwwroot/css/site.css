@@ -1,5 +1,6 @@
 .points_table
 {
+  width: 100%;
   border-collapse: collapse;
   border-color: var(--light-black);
   border-spacing:0; 
@@ -60,6 +61,7 @@
 
 .org_points_table
 {
+  width: 100%;
   border-collapse: collapse;
   border-color: var(--light-black);
   border-spacing: 0;

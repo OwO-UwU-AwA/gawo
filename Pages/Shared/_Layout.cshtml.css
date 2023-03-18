@@ -83,6 +83,7 @@
   position: absolute;
   top: 2.25%;
   left: 20%;
+  width: calc(100% - 22%);
 }
 
 #footer
