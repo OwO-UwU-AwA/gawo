@@ -1,0 +1,186 @@
+﻿@page
+@model PointsModel
+@{
+  ViewData["Title"] = $"Punktetabelle {DateTime.Now.ToString("yyyy")}";
+}
+
+<h2 style="font-weight: bold;" id="header" class="bs-dark">Punktetabelle</h2>
+
+<div class="content text-wrap" style="display: flex; flex-direction: column;">
+
+<table class="points_table">
+<thead>
+  <tr>
+    <th class="tg-baqh">Dauer in Minuten</th>
+    <th class="tg-baqh">45</th>
+    <th class="tg-baqh">90</th>
+    <th class="tg-baqh">135</th>
+    <th class="tg-baqh">180</th>
+    <th class="tg-baqh">240</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td title="Vortrag" class="tg-baqh">V</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Gastvortrag" class="tg-baqh">G-V<br></td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3<br></td>
+    <td class="tg-baqh">4<br></td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Fremdsprachenvortrag" class="tg-baqh">FS-V</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Facharbeitsverteidigung" class="tg-baqh">FaV-G</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td tag="Wettbewerb" class="tg-baqh">WB</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+  </tr>
+  <tr>
+    <td title="Workshop" class="tg-baqh">WS</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+  </tr>
+  <tr>
+    <td title="Q/F" class="tg-baqh">Q/F</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Sportveranstaltung" class="tg-baqh">SP</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="ELMOS" class="tg-baqh">EL</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+</tbody>
+</table>
+
+<h2 style="font-weight: bold;" id="header" class="bs-dark">Veranstalterpunkte</h2>
+
+<table class="org_points_table">
+<thead>
+  <tr>
+    <th class="tg-baqh">Dauer in Minuten</th>
+    <th class="tg-baqh">45</th>
+    <th class="tg-baqh">90</th>
+    <th class="tg-baqh">135</th>
+    <th class="tg-baqh">180</th>
+    <th class="tg-baqh">240</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td title="Vortrag" class="tg-baqh">V</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3<br></td>
+    <td class="tg-baqh">4<br></td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Gastvortrag" class="tg-baqh">G-V<br></td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Fremdsprachenvortrag" class="tg-baqh">FS-V</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Facharbeitverteidigung" class="tg-baqh">FaV-G</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Wettbewerb" class="tg-baqh">WB</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">6</td>
+  </tr>
+  <tr>
+    <td title="Workshop" class="tg-baqh">WS</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">6</td>
+  </tr>
+  <tr>
+    <td title="Q/F" class="tg-baqh">Q/F</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="Sportveranstaltung" class="tg-baqh">SP</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">4</td>
+    <td class="tg-baqh">5</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+  <tr>
+    <td title="ELMOS" class="tg-baqh">EL</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+    <td class="tg-baqh">-</td>
+  </tr>
+</tbody>
+</table>
+</div>

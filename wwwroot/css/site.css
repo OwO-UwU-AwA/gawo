@@ -1,0 +1,115 @@
+.points_table
+{
+  border-collapse: collapse;
+  border-color: #aabcfe;
+  border-spacing:0; 
+}
+
+.points_table td
+{
+  background-color: #e8edff;
+  border-color: #aabcfe;
+  border-style: solid;
+  border-width: 1px;
+  color: #669;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  padding: 5px 20px;
+  word-break: normal;
+}
+
+.points_table th
+{
+  background-color: #b9c9fe;
+  border-color: #aabcfe;
+  border-style: solid;
+  border-width: 1px;
+  color: #039;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  overflow: hidden;
+  padding: 5px 20px;
+  word-break: normal;
+}
+
+.points_table .tg-baqh
+{
+  text-align: center;
+  vertical-align: top
+}
+
+
+@media screen and (max-width: 767px)
+{
+  .points_table
+  {
+    width: auto !important;
+  }
+  .points_table col
+  {
+    width: auto !important;
+  }
+  .tg-wrap
+  {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.org_points_table
+{
+  border-collapse: collapse;
+  border-color: #aabcfe;
+  border-spacing: 0;
+}
+.org_points_table td
+{
+  background-color: #e8edff;
+  border-color: #aabcfe;
+  border-style: solid;
+  border-width: 1px;
+  color: #669;
+  font-family:Arial, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  padding: 5px 20px;
+  word-break: normal;
+}
+.org_points_table th
+{
+  background-color: #b9c9fe;
+  border-color: #aabcfe;
+  border-style: solid;
+  border-width: 1px;
+  color: #039;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  overflow: hidden;
+  padding: 5px 20px;
+  word-break: normal;
+}
+.org_points_table .tg-baqh
+{
+  text-align: center;
+  vertical-align: top
+}
+
+@media screen and (max-width: 767px)
+{
+  .org_points_table
+  {
+    width: auto !important;
+  }
+  .org_points_table col
+  {
+    width: auto !important;
+  }
+  .tg-wrap
+  {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

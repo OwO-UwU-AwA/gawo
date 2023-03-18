@@ -1,0 +1,50 @@
+﻿@{
+  var currentPage = Context.Request.Path;
+}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/gawo.styles.css" asp-append-version="true" />
+  </head>
+
+
+  <body style="background-color: var(--background-2)">
+  
+    <div class="offcanvas offcanvas-start show" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1" id="sidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title"><a href="/" style="text-decoration: none; color: unset;">Gaußwoche @DateTime.Now.Year</a></h5>
+      </div>
+      <div class="offcanvas-body">
+        <div class="d-grid gap-2">
+          <button type="button" onclick="window.location.href='/';" class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'>Home</button>
+          <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>Profil</button>
+          <button type="button" onclick="window.location.href='/Points';" class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'>Punkte</button>
+          <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>Meine Veranstaltungen</button>
+          <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>Besuchte Veranstaltungen</button>
+          <button type="button" onclick="window.location.href='/Logout';" class="btn btn-danger btn-block">Abmelden</button>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="width: calc(100% - 400px); max-width: 100%; margin-left: 400px;">
+      <main role="main" class="pb-3">
+        @RenderBody()
+      </main>
+      
+    </div>
+
+    <footer class="border-top fixed-bottom" id="footer">
+      &copy; @DateTime.Now.Year - Made With Hate - <a href="/Contact">Kontakt</a> - <a href="/Help">Hilfe</a> - <a href="mailto:nobody@example.com">Quellcode verfügbar</a>
+    </footer>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+  </body>
+</html>
