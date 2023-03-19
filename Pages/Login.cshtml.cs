@@ -13,12 +13,10 @@ public class LoginModel : PageModel
     private readonly ILogger<LoginModel> _logger;
 
     [BindProperty]
-    public string? Username { get; set; }
+    public string Username { get; set; } = string.Empty;
 
     [BindProperty]
-    public string? Password { get; set; }
-
-    private readonly GawoDbContext _dbContext;
+    public string Password { get; set; } = string.Empty;
 
     public LoginModel(ILogger<LoginModel> logger)
     {
@@ -41,9 +39,12 @@ public class LoginModel : PageModel
             return Page();
         }
 
+        if (Username == null)
+            ModelState.AddModelError("", "Username NULL");
+
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, Username)
+            new Claim(ClaimTypes.Name, Username!)
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -57,7 +58,7 @@ public class LoginModel : PageModel
     {        
     }
 
-    public bool VerifyPassword(string? password, string? username)
+    public bool VerifyPassword(string password, string username)
     {
         string? hashedPassword = null;
 
@@ -81,7 +82,7 @@ public class LoginModel : PageModel
         return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
     }
 
-    public bool VerifyUsername(string? username)
+    public bool VerifyUsername(string username)
     {
         bool x = true;
         using (var connection = new SQLiteConnection("Data Source=/home/fedora/Programming/gawo/users.db"))
