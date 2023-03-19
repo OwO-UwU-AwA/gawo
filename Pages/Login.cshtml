@@ -4,8 +4,6 @@
   ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
-<hr />
-
 <h2 style="font-weight: bold;" id="header">Login</h2>
 
 <div class="content text-wrap" style="display: flex;">
@@ -18,9 +16,7 @@
   <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
     <label for="password">Password:</label>
     <input type="password" class="form-control" id="password" name="password" required>
-    <button type="submit" class="btn btn-success" style="margin-top: 5%;">Login</button>
+    <button type="submit" class="btn btn-success" style="margin-top: 5%;" onsubmit="@Model.Login()">Login</button>
   </div>
-  
 </form>
-
 </div>
