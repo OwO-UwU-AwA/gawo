@@ -4,6 +4,26 @@
   ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
-<h2 style="font-weight: bold;" id="header" class="bs-dark">Gaußwoche @DateTime.Now.Year</h2>
+<h2>@Request.HttpContext.User.Identity.Name</h2>
+<hr>
 
-<button type="button" class="btn btn-danger" onclick="location.href='/Logout'">Logout</button>
+<div class="content text-wrap" style="display: flex;">
+
+<form method="post" asp-page-handler="ChangePassword">
+  <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
+    <label asp-for="CurrentPassword">Derzeitiges Passwort</label>
+    <input type="password" class="form-control" id="currentpassword" name="currentpassword" required>
+  </div>
+  <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+    <label asp-for="NewPassword">Neues Passwort</label>
+    <input type="password" class="form-control" id="newpassword" name="newpassword" required>
+  </div>
+  <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+    <label asp-for="NewPasswordConf">Neues Passwort Bestätigen</label>
+    <input type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" required>
+    <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort Ändern</button>
+  </div>
+</form>
+
+<h3 class="text-danger">@Model.ValidationErrorMessage</h3>
+</div>

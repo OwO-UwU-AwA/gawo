@@ -4,19 +4,30 @@
   ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
-<h2 style="font-weight: bold;" id="header">Login</h2>
+<h2 style="font-weight: bold;" class="header">Login</h2>
+<hr>
 
+@if (!Request.HttpContext.User.Identity!.IsAuthenticated)
+{
 <div class="content text-wrap" style="display: flex;">
 
 <form method="post">
   <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
-    <label for="username">Username:</label>
+    <label for="username">Benutzername:</label>
     <input type="text" class="form-control" id="username" name="username" required>
   </div>
   <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-    <label for="password">Password:</label>
+    <label for="password">Passwort:</label>
     <input type="password" class="form-control" id="password" name="password" required>
-    <button type="submit" class="btn btn-success" style="margin-top: 5%;" onsubmit="@Model.Login()">Login</button>
+    <button type="submit" class="btn btn-success" style="margin-top: 5%;" onsubmit="@Model.Login()">Anmelden</button>
   </div>
 </form>
 </div>
+}
+else
+{
+<h3 class="text-danger">@(Request.HttpContext.User.Identity.IsAuthenticated ? "Bereits Angemeldet" : "")</h3>
+<button class="btn btn-success" style="width: 250px;" onclick="location.href='/Profile'">Profil</button>
+<br>
+<button class="btn btn-danger" style="width: 250px; margin-top: .5%;" onclick="location.href='/Logout'">Abmelden</button>
+}

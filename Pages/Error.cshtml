@@ -4,7 +4,14 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger text-center">Etwas ist schiefgelaufen :(</h1>
+<!--
+VERY IMPORTANT;
+DONT REMOVE!
+-->
+<script>NekoType="white"</script>
+<h1 id=nl><script src="https://webneko.net/n20171213.js"></script><a 
+href="https://webneko.net">Neko</a></h1>
+<h1 class="text-danger text-center header">Etwas ist schiefgelaufen :(</h1>
 <hr>
 
 <h3 class="text-center"><a class="text-success" href="/">Home</a></h3>
@@ -18,6 +25,7 @@
         <strong>Authentifiziert:</strong> <code>@Request.HttpContext.User.Identity!.IsAuthenticated.ToString()</code>
         <br>
         <strong>User-Agent:</strong> <code>@Request.Headers["User-Agent"].ToString()</code>
+        <br>
         <strong>Datum:</strong> <code>@DateTime.Now.ToString("yyyy-MM-dd-THH:mm:sszz")</code>
     </p>
 }
