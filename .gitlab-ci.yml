@@ -8,6 +8,8 @@
 stages:
 - test
 sast:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
