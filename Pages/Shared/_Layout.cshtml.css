@@ -11,6 +11,11 @@
   --light-beige: #FFFFEF;
 }
 
+body
+{
+  background-color: var(--light-beige);
+}
+
 @media only screen and (max-width: 1010px)
 {
   #sidebar
@@ -51,6 +56,11 @@
   --dark-cyan: #A4D8D8;
   --dark-white: #C5C8C6;
   --dark-background: #000000;
+  }
+  body
+  {
+    background-color: black !important;
+    color: white !important;
   }
 }
 

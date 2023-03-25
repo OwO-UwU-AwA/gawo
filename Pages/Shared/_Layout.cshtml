@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
   var currentPage = Context.Request.Path;
 }
 <!DOCTYPE html>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="~/gawo.styles.css" asp-append-version="true" />
   </head>
 
-  <body style="background-color: var(--background-2)">
+  <body>
     <div class="container">
 
       <button class="btn btn-outline-primary toggle-sidebar" onclick="toggleSidebar()" style="z-index: 1025;">Menü</button>
@@ -26,8 +26,10 @@
             <button type="button" onclick="window.location.href='/';" class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'>Home</button>
             <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>Profil</button>
             <button type="button" onclick="window.location.href='/Points';" class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'>Punkte</button>
+            <button type="button" onclick="window.location.href='/AddEvent';" class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'>Veranstaltung Anmelden</button>
             <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>Meine Veranstaltungen</button>
             <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>Besuchte Veranstaltungen</button>
+            <button type="button" class="btn btn-outline-primary" id="btnSwitch">Thema-Switch</button>
             <button type="button" onclick="window.location.href='/Logout';" class="btn btn-danger btn-block">Abmelden</button>
           </div>
         </div>
@@ -61,6 +63,14 @@
           toggle = 1;
         }
       }
+
+      document.getElementById("btnSwitch").addEventListener('click', () =>
+      {
+        if (document.documentElement.getAttribute('data-bs-theme') == 'dark')
+          document.documentElement.setAttribute('data-bs-theme', 'light');
+        else
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+      });
     </script>
 
 
