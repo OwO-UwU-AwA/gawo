@@ -5,76 +5,88 @@
 }
 
 <div style="display: flex; flex-direction: column;">
-<form>
-  <label for="name">Name:</label>
-  <input type="text" class="form-control" id="name" name="name" maxlength="32" required>
+<form method="post" asp-page-handler="AddEvent">
+  <div style="margin-bottom: 1%;">
+  <label for="name" class="form-label" asp-for="Name">Name:</label>
+  <input type="text" class="form-control" id="name" name="name" maxlength="64" required>
+  </div>
 
-  <label for="description">Description:</label>
-  <input type="text" class="form-control" id="description" name="description" maxlength="128" required>
+  <div style="margin-bottom: 1%;">
+  <label asp-for="Description">Beschreibung:</label>
+  <input type="text" class="form-control" id="description" name="description" maxlength="256" required>
+  </div>
 
-  <label for="date">Date:</label>
-  <select class="form-select" id="date" name="date" required>
-    <option value="">Select a date</option>
-    <option value="Monday">Monday</option>
-    <option value="Tuesday">Tuesday</option>
-    <option value="Wednesday">Wednesday</option>
-    <option value="Thursday">Thursday</option>
-    <option value="Friday">Friday</option>
+  <div style="margin-bottom: 1%;">
+  <label for="label" class="form-label" asp-for="Date">Date:</label>
+  <select class="form-select" id="date" name="date" asp-for="Date" required>
+    <option value="">Datum Auswählen</option>
+    <option value="0">Montag</option>
+    <option value="1">Dienstag</option>
+    <option value="2">Mittwoch</option>
+    <option value="3">Donnerstag</option>
+    <option value="4">Freitag</option>
   </select>
+  </div>
 
-  <label for="room">Raum:</label>
+  <div style="margin-bottom: 1%;">
+  <label for="room" class="form-label" asp-for="Room">Raum:</label>
   <select class="form-select" id="room" name="room" required>
     <option value="">Raum Auswählen</option>
-    <option value="SPORT">Sporthalle</option>
-    <option value="UG13">UG 13</option>
-    <option value="UG14">UG 14</option>
-    <option value="UG15">UG 15</option>
-    <option value="UG16">UG 16</option>
-    <option value="UG17">UG 17</option>
-    <option value="UG18">UG 18</option>
-    <option value="UG19">UG 19</option>
-    <option value="UG20">UG 20</option>
-    <option value="UG21">UG 21</option>
-    <option value="UG22">UG 22</option>
-    <option value="UG23">UG 23</option>
-    <option value="UG24">UG 24</option>
-    <option value="UG25">UG 25</option>
-    <option value="UG26">UG 26</option>
-    <option value="UG27">UG 27</option>
-    <option value="UG28">UG 28</option>
-    <option value="UG29">UG 29</option>
-    <option value="UG30">UG 30</option>
-    <option value="UG31">UG 31</option>
-    <option value="UG32">UG 32</option>
-    <option value="UG33">UG 33</option>
-    <option value="UG34">UG 34</option>
-    <option value="UG35">UG 35</option>
+    @{
+      foreach(string line in System.IO.File.ReadLines("rooms"))
+      {
+        <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
+      }
+    }
   </select>
+  </div>
 
-  <label for="picture">Picture:</label>
-  <input type="file" class="form-control" id="picture" name="picture" accept="image/*">
+  <div style="margin-bottom: 1%;">
+  <label for="picture" class="form-label" asp-for="Picture">Optionales bild:</label>
+  <input type="file" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
+  </div>
 
-  <label for="capacity">Capacity:</label>
-  <input type="number" class="form-control" id="capacity" name="capacity" required>
+  <div style="margin-bottom: 1%;">
+  <label for="capacity" class="form-label" asp-for="Capacity">Kapazität:</label>
+  <input type="number" min="0" max="1024" class="form-control" id="capacity" name="capacity" required>
+  </div>
 
-  <label for="duration">Duration:</label>
+  <div style="margin-bottom: 1%;">
+  <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
   <select class="form-select" id="duration" name="duration" required>
-    <option value="">Select a duration</option>
-    <option value="1">1 hour</option>
-    <option value="2">2 hours</option>
-    <option value="3">3 hours</option>
+    <option value="0">Dauer Auswählen</option>
+    <option value="45">45 Minuten</option>
+    <option value="90">90 Minuten</option>
+    <option value="135">135 Minuten</option>
+    <option value="180">180 Minuten</option>
+    <option value="240">240 Minuten</option>
   </select>
+  </div>
+  
+  <div style="margin-bottom: 1%;">
+  <input type="checkbox" class="form-check-input" id="grade7" name="grades" value="GRADE07">
+  <label for="grade7" class="form-check-label">7</label>
 
-  <label for="grades">Grades:</label>
-  <input type="checkbox" class="form-check-input" id="grade1" name="grades" value="Grade 1">
-  <label for="grade1">Grade 1</label>
-  <input type="checkbox" class="form-check-input" id="grade2" name="grades" value="Grade 2">
-  <label for="grade2">Grade 2</label>
-  <input type="checkbox" class="form-check-input" id="grade3" name="grades" value="Grade 3">
-  <label for="grade3">Grade 3</label>
-  <br>
-  <label for="notes">Notes:</label>
-  <input type="text" class="form-control" id="notes" name="notes" maxlength="32">
+  <input type="checkbox" class="form-check-input" id="grade8" name="grades" value="GRADE08">
+  <label for="grade8" class="form-check-label">8</label>
+
+  <input type="checkbox" class="form-check-input" id="grade9" name="grades" value="GRADE09">
+  <label for="grade9" class="form-check-label">9</label>
+
+  <input type="checkbox" class="form-check-input" id="grade10" name="grades" value="GRADE10">
+  <label for="grade10" class="form-check-label">10</label>
+    
+  <input type="checkbox" class="form-check-input" id="grade11" name="grades" value="GRADE11">
+  <label for="grade11" class="form-check-label">11</label>
+    
+  <input type="checkbox" class="form-check-input" id="grade12" name="grades" value="GRADE12">
+  <label for="grade12" class="form-check-label">12</label>
+  </div>
+
+  <div style="margin-bottom: 1%;">
+  <textarea class="form-control" placeholder="Notiz" id="notes" style="height: 100px;"></textarea>
+  </div>
+
   <div class="d-grid gap-2">
     <input type="submit" class="btn btn-success" value="Submit">
   </div>
