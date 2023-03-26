@@ -1,5 +1,4 @@
-﻿using System.Data.SQLite;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -22,8 +21,6 @@ public class AddEventModel : PageModel
 
     public IActionResult AddEvent()
     {
-        Console.WriteLine("B");
-        Console.WriteLine($"{Request.Form["type"]}");
         return Page();
     }
 }

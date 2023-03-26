@@ -120,7 +120,7 @@ public class ProfileModel : PageModel
                 ValidationErrorMessage = "Passwörter Stimmen Nicht überein.";
                 return Page();
             }
-            using (var connection = new SQLiteConnection("Data Source=/home/fedora/Programming/gawo/users.db"))
+            using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
             {
                 connection.Open();
                 string query = "UPDATE users SET password = @hash WHERE username = @username";

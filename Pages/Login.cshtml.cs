@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SQLite;
@@ -20,6 +19,8 @@ public class LoginModel : PageModel
 
     public string ValidationErrorMessage { get; set; } = string.Empty;
 
+    public string ReturnUrl { get; set; } = string.Empty;
+
     public LoginModel(ILogger<LoginModel> logger)
     {
         _logger = logger;
@@ -30,11 +31,11 @@ public class LoginModel : PageModel
         // First Check if Username Exists; Then If Password Matches User
         if (VerifyUsername(Username) == false || VerifyPassword(Password, Username) == false)
         {
-            // Error
             ValidationErrorMessage = "Benutzername Oder Passwort Inkorrekt.";
             return Page();
         }
-
+        else
+        {
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, Username!)
@@ -43,12 +44,21 @@ public class LoginModel : PageModel
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        
+        ReturnUrl = (TempData["ReturnUrl"] as string)!;
+        TempData.Remove("ReturnUrl");
 
-        return Redirect("/Profile");
+        if (ReturnUrl != null)
+            return Redirect(ReturnUrl);
+        return Redirect("/");
+        }
     }
 
     public void OnGet()
-    {        
+    {
+        // Ugly Solution Please Fix
+        ReturnUrl = Request.Query["ReturnUrl"]!;
+        TempData["ReturnUrl"] = ReturnUrl;
     }
 
     public bool VerifyPassword(string password, string username)

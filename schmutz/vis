@@ -1,0 +1,47 @@
+Database-Layout Idee
+====================
+
+User
+===
+Outdated AF
+- id : INT PRIMARY KEY
+- name : VARCHAR(32)
+- class : VARCHAR(5)
+- is_teacher : BOOL
+- is_admin : BOOL
+- is_guest : BOOL
+- absent: INT (0000 0000 (nicht abwesend), 0000 0001 (Montag abwesend), 0001 0001 (Freitag und Montag abwesend), usw.)
+
+Events
+=======
+Outdated AF
+- organiser : INT UNIQUE
+- organiser : FOREIGN KEY (organiser) REFERENCES users(id)
+- co_organisers : INT
+- co_organisers : FOREIGN KEY (co_organiser) REFERENCES users(id)
+- room : VARCHAR(16)
+- capacity : INT
+- duration : INT
+- attendees : INT
+- attendees : FOREIGN KEY (attendees) REFERENCES users(id)
+- grades : TEXT (Komma-separierte Liste von Klassen, welche die Veranstaltungen besuchen können)
+- picture : BLOB    
+
+Schmutz
+=======
+
+- [ ] Benachrichtigung von Mitveranstaltern und Betreuern bei Awesenheit + Zurückgabe der Karten für diesen Tag
+- [ ] 35 Wochenstunden Limit bis eine Merheit diese haben
+- [X] Auth-Cookie läuft nach 3 Stunden ab
+- [ ] Bestätigungs-Email nach Änderung dieser (Zurücksetzung der Änderung falls diese nach 3 Stunden nicht bestätigt wurde)
+- [ ] Standardpasswort **muss** nach erstem Anmelden geändert werden, ansonsten wird der Account gesperrt und muss von Befugten entsperrt werden
+- [ ] Passwort - Mindensten 8 Zeichen, Alphanumerisch Pflicht
+
+Layout
+======
+- [ ] (fancy shit) mehr Sachen klappen ein und werden zusammengefasst
+- [ ] PDF Plan unter Besuchte Veranstaltungen /VisitedEvents
+- [ ] Logos für Veranstaltungen / ((Logos für fachbereiche ?????)) (wenn kein eigenes Bild => Standard Bild)
+- [ ] Responsive CSS @media
+- [ ] Farben lassen aber mehr Vielfalt und schönerer (Verlauf, Absstimmung, Position, etc.)
+- ([X]) Dark Mode (und mehr Themes) (via data-bs-theme) Bootstrap Schmutz
