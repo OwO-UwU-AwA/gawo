@@ -52,10 +52,26 @@ public class AddEventModel : PageModel
     [BindProperty]
     public int Duration { get; set; } = -1;
     [BindProperty]
-    public int Grades { get; set; } = -1;
+    public string Grade7 { get; set; } = string.Empty;
+    [BindProperty]
+    public string Grade8 { get; set; } = string.Empty;
+    [BindProperty]
+    public string Grade9 { get; set; } = string.Empty;
+    [BindProperty]
+    public string Grade10 { get; set; } = string.Empty;
+    [BindProperty]
+    public string Grade11 { get; set; } = string.Empty;
+    [BindProperty]
+    public string Grade12 { get; set; } = string.Empty;
     [BindProperty]
     public string Notes { get; set; } = string.Empty;
+    [BindProperty]
+    public string? Organiser { get; set; }
+    [BindProperty]
+    public string CoOrganisers { get; set; } = string.Empty;
+
     public AddEventModel(ILogger<AddEventModel> logger)
+    
     {
         _logger = logger;
     }
@@ -67,7 +83,7 @@ public class AddEventModel : PageModel
 
     public IActionResult OnPostAddEvent()
     {
-        Console.WriteLine($"{Room}");
+        Console.WriteLine($"{Name} : {Description} : {Organiser} : {CoOrganisers} : {Date} : {Room} : {Picture} : {Capacity} : {Duration} : {Grade10} : {Notes}");
         return Page();
     }
 }

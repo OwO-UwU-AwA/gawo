@@ -6,18 +6,60 @@
 
 <div style="display: flex; flex-direction: column;">
 <form method="post" asp-page-handler="AddEvent">
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label for="name" class="form-label" asp-for="Name">Name:</label>
-  <input type="text" class="form-control" id="name" name="name" maxlength="64" required>
+  <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
   </div>
 
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label asp-for="Description">Beschreibung:</label>
-  <input type="text" class="form-control" id="description" name="description" maxlength="256" required>
+  <input type="text" class="form-control" id="description" name="description" maxlength="256" placeholder="Beschreibung Der Veranstaltung (Maximal 256 Zeichen)" required>
   </div>
 
-  <div style="margin-bottom: 1%;">
-  <label for="label" class="form-label" asp-for="Date">Date:</label>
+  @{
+    bool admin = false;
+    var configuration = new ConfigurationBuilder()
+      .AddJsonFile("appsettings.json")
+      .Build();
+    using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+    {
+      connection.Open();
+      string query = "SELECT is_admin FROM users WHERE username = @username";
+      using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+      {
+        command.Parameters.AddWithValue("@username", HttpContext.User.Identity!.Name);
+        using (var reader = command.ExecuteReader())
+        {
+          if (reader.Read())
+            admin = reader.GetBoolean(0);
+        }
+      }
+      connection.Close();
+    }
+    if (admin)
+    {
+      <div style="margin-bottom: .5%;">
+        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
+        <input type="text" class="form-control" id="organiser" name="organiser" placeholder="Benutzername">
+      </div>
+    }
+    else
+    {
+      <div style="margin-bottom: .5%;">
+        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
+        <input type="text" class="form-control" id="organiser" name="organiser" disabled value="@HttpContext.User.Identity.Name" placeholder="@HttpContext.User.Identity.Name">
+        <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
+      </div>
+    }
+  }
+
+  <div style="margin-bottom: .5%:">
+    <label for="coorganiser" class="form-label" asp-for="CoOrganisers">Mitorganisatoren:</label>
+    <input type="text" class="form-control" id="coorganiser" name="coorganiser" placeholder="Kommagetrennte Liste der Benutzernamen">
+  </div>
+
+  <div style="margin-bottom: .5%;">
+  <label for="date" class="form-label" asp-for="Date">Datum:</label>
   <select class="form-select" id="date" name="date" asp-for="Date" required>
     <option value="">Datum Auswählen</option>
     <option value="0">Montag</option>
@@ -28,7 +70,7 @@
   </select>
   </div>
 
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label for="room" class="form-label" asp-for="Room">Raum:</label>
   <select class="form-select" id="room" name="room" required>
     <option value="">Raum Auswählen</option>
@@ -41,17 +83,17 @@
   </select>
   </div>
 
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label for="picture" class="form-label" asp-for="Picture">Optionales bild:</label>
-  <input type="file" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
+  <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
   </div>
 
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label for="capacity" class="form-label" asp-for="Capacity">Kapazität:</label>
-  <input type="number" min="0" max="1024" class="form-control" id="capacity" name="capacity" required>
+  <input type="number" min="0" max="1024" class="form-control" id="capacity" name="capacity" placeholder="Anzahl Der Zugelassenen Besucher" required>
   </div>
 
-  <div style="margin-bottom: 1%;">
+  <div style="margin-bottom: .5%;">
   <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
   <select class="form-select" id="duration" name="duration" required>
     <option value="0">Dauer Auswählen</option>
@@ -63,28 +105,28 @@
   </select>
   </div>
   
-  <div style="margin-bottom: 1%;">
-  <input type="checkbox" class="form-check-input" id="grade7" name="grades" value="GRADE07">
+  <div style="margin-bottom: .5%;">
+  <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
   <label for="grade7" class="form-check-label">7</label>
 
-  <input type="checkbox" class="form-check-input" id="grade8" name="grades" value="GRADE08">
+  <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
   <label for="grade8" class="form-check-label">8</label>
 
-  <input type="checkbox" class="form-check-input" id="grade9" name="grades" value="GRADE09">
+  <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
   <label for="grade9" class="form-check-label">9</label>
 
-  <input type="checkbox" class="form-check-input" id="grade10" name="grades" value="GRADE10">
+  <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
   <label for="grade10" class="form-check-label">10</label>
     
-  <input type="checkbox" class="form-check-input" id="grade11" name="grades" value="GRADE11">
+  <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
   <label for="grade11" class="form-check-label">11</label>
     
-  <input type="checkbox" class="form-check-input" id="grade12" name="grades" value="GRADE12">
+  <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
   <label for="grade12" class="form-check-label">12</label>
   </div>
 
-  <div style="margin-bottom: 1%;">
-  <textarea class="form-control" placeholder="Notiz" id="notes" style="height: 100px;"></textarea>
+  <div style="margin-bottom: .5%;">
+  <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz An Das GaWo-Team" id="notes" style="height: 100px;"></textarea>
   </div>
 
   <div class="d-grid gap-2">
