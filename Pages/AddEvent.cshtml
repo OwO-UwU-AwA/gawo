@@ -5,10 +5,11 @@
 }
 
 <div style="display: flex; flex-direction: column;">
+<h3 class="text-danger">@Model.ErrorString</h3>
 <form method="post" asp-page-handler="AddEvent">
   <div style="margin-bottom: .5%;">
   <label for="name" class="form-label" asp-for="Name">Name:</label>
-  <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
+  <input type="text" asp-for="Name" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
   </div>
 
   <div style="margin-bottom: .5%;">
@@ -40,7 +41,7 @@
     {
       <div style="margin-bottom: .5%;">
         <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-        <input type="text" class="form-control" id="organiser" name="organiser" placeholder="Benutzername">
+        <input type="text" class="form-control" id="organiser" name="organiser" placeholder="Benutzername" required>
       </div>
     }
     else
@@ -54,19 +55,19 @@
   }
 
   <div style="margin-bottom: .5%:">
-    <label for="coorganiser" class="form-label" asp-for="CoOrganisers">Mitorganisatoren:</label>
-    <input type="text" class="form-control" id="coorganiser" name="coorganiser" placeholder="Kommagetrennte Liste der Benutzernamen">
+      <label for="coorganisers" class="form-label" asp-for="CoOrganisers">Mitorganisator:</label>
+      <input type="text" class="form-control" id="coorganisers" name="coorganisers" placeholder="Benutzernamen">
   </div>
 
   <div style="margin-bottom: .5%;">
   <label for="date" class="form-label" asp-for="Date">Datum:</label>
   <select class="form-select" id="date" name="date" asp-for="Date" required>
     <option value="">Datum Auswählen</option>
-    <option value="0">Montag</option>
-    <option value="1">Dienstag</option>
-    <option value="2">Mittwoch</option>
-    <option value="3">Donnerstag</option>
-    <option value="4">Freitag</option>
+    <option value="MONDAY">Montag</option>
+    <option value="TUESDAY">Dienstag</option>
+    <option value="WEDNESDAY">Mittwoch</option>
+    <option value="THURSDAY">Donnerstag</option>
+    <option value="FRIDAY">Freitag</option>
   </select>
   </div>
 
@@ -96,7 +97,7 @@
   <div style="margin-bottom: .5%;">
   <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
   <select class="form-select" id="duration" name="duration" required>
-    <option value="0">Dauer Auswählen</option>
+    <option value="">Dauer Auswählen</option>
     <option value="45">45 Minuten</option>
     <option value="90">90 Minuten</option>
     <option value="135">135 Minuten</option>
@@ -106,27 +107,28 @@
   </div>
   
   <div style="margin-bottom: .5%;">
-  <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
-  <label for="grade7" class="form-check-label">7</label>
+    <label class="form-label">Jahrgangsstufen:</label> 
+    <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
+    <label for="grade7" class="form-check-label">7</label>
 
-  <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
-  <label for="grade8" class="form-check-label">8</label>
+    <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
+    <label for="grade8" class="form-check-label">8</label>
 
-  <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
-  <label for="grade9" class="form-check-label">9</label>
+    <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
+    <label for="grade9" class="form-check-label">9</label>
 
-  <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
-  <label for="grade10" class="form-check-label">10</label>
+    <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
+    <label for="grade10" class="form-check-label">10</label>
     
-  <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
-  <label for="grade11" class="form-check-label">11</label>
+    <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
+    <label for="grade11" class="form-check-label">11</label>
     
-  <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
-  <label for="grade12" class="form-check-label">12</label>
+    <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
+    <label for="grade12" class="form-check-label">12</label>
   </div>
 
   <div style="margin-bottom: .5%;">
-  <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz An Das GaWo-Team" id="notes" style="height: 100px;"></textarea>
+  <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz An Das GaWo-Team" id="notes" style="height: 70px; resize: none;"></textarea>
   </div>
 
   <div class="d-grid gap-2">

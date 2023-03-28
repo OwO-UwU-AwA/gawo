@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Data.SQLite;
 
 namespace gawo.Pages;
 
@@ -52,23 +53,24 @@ public class AddEventModel : PageModel
     [BindProperty]
     public int Duration { get; set; } = -1;
     [BindProperty]
-    public string Grade7 { get; set; } = string.Empty;
+    public bool Grade7 { get; set; } = false;
     [BindProperty]
-    public string Grade8 { get; set; } = string.Empty;
+    public bool Grade8 { get; set; } = false;
     [BindProperty]
-    public string Grade9 { get; set; } = string.Empty;
+    public bool Grade9 { get; set; } = false;
     [BindProperty]
-    public string Grade10 { get; set; } = string.Empty;
+    public bool Grade10 { get; set; } = false;
     [BindProperty]
-    public string Grade11 { get; set; } = string.Empty;
+    public bool Grade11 { get; set; } = false;
     [BindProperty]
-    public string Grade12 { get; set; } = string.Empty;
+    public bool Grade12 { get; set; } = false;
     [BindProperty]
     public string Notes { get; set; } = string.Empty;
     [BindProperty]
-    public string? Organiser { get; set; }
+    public string Organiser { get; set; } = string.Empty;
     [BindProperty]
     public string CoOrganisers { get; set; } = string.Empty;
+    public string ErrorString { get; set; } = string.Empty;
 
     public AddEventModel(ILogger<AddEventModel> logger)
     
@@ -83,7 +85,216 @@ public class AddEventModel : PageModel
 
     public IActionResult OnPostAddEvent()
     {
-        Console.WriteLine($"{Name} : {Description} : {Organiser} : {CoOrganisers} : {Date} : {Room} : {Picture} : {Capacity} : {Duration} : {Grade10} : {Notes}");
-        return Page();
+        // PLEASE FOR THE LOVE OF GOD REFACTOR THIS INTO SMALL NEAT FUNCTIONS
+
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+        using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+        {
+            // Ignore Standard Value
+            if (Notes == "Notiz")
+                Notes = null!;
+
+            // Really Ugly Way To Store Grades
+            string Grades = string.Empty;
+
+            if (Grade7)
+                Grades += "7,";
+            if (Grade8)
+                Grades += "8,";
+            if (Grade9)
+                Grades += "9,";
+            if (Grade10)
+                Grades += "10,";
+            if (Grade11)
+                Grades += "11,";
+            if (Grade12)
+                Grades += "12,";
+
+            if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty)
+            {
+                ErrorString = "Unvollständige Angaben (Standardwert Oder NULL)";
+                return Page();
+            }
+
+            // Verify CoOrganiser Before We Create The Event
+            if (CoOrganisers != null)
+            {
+                foreach (string username in CoOrganisers.Split(','))
+                {
+                    int user_id = -1;
+                    
+                    // Get User ID
+                    // BEGIN
+                    connection.Open();
+                    string _query = "SELECT id FROM users WHERE username = @username";
+                    using (var command = new SQLiteCommand(_query, connection))
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                user_id = reader.GetInt16(0);
+                            }
+                        }
+                    }
+                    connection.Close();
+                    // END
+
+                    if (user_id == -1)
+                    {
+                        ErrorString = $"{username} Ist Kein Benutzername.";
+                        return Page();
+                    }
+                }
+            }
+
+            // Remove Trailing Comma After We Assure That We Have Valid Input (Grades Could Be NULL)
+            Grades = Grades.Substring(0, Grades.Length - 1);
+
+            // Will Become The ID Of The Event
+            int id = 0;
+
+            // Be Careful With Database Operations !
+            
+            // Get The Organisers ID
+            // BEGIN
+            connection.Open();
+            string query = "SELECT id FROM users WHERE username = @username";
+            using (var command = new SQLiteCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@username", Organiser);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        // Read The ID Of The User As An Int16 Then Parse It To String
+                        Organiser = reader.GetInt16(0).ToString();
+                    }
+                }
+            }
+            connection.Close();
+            // END
+            
+            try
+            {
+                // SQL Returns The Username If The User Doesnt Exist
+                // Check If We Got An ID Or A Username
+                int.Parse(Organiser);
+            }
+            catch
+            {
+                // If We Got A FormatException Return Error
+                ErrorString = "Organisator/Benutzer Mit Diesem Namen Nicht Vorhanden.";
+                return Page();
+            }
+
+            // Get The Amount Of Events + 1 For The New Event
+            // BEGIN
+            connection.Open();
+            query = "SELECT COUNT(*) FROM events";
+            using (var command = new SQLiteCommand(query, connection))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        // Current ID
+                        id = reader.GetInt16(0);
+                        // 0 = No Entries
+                        if (id == 0)
+                            id = 1;
+                        else
+                            id += 1;
+                    }
+                }
+            }
+            connection.Close();
+            // END
+
+            // Insert Formatted Data Into `events` Table
+            // BEGIN
+            connection.Open();
+            query = "INSERT INTO events (id, name, description, date, room, picture, capacity, duration, grades, notes, organiser) VALUES (@id, @name, @description, @date, @room, @picture, @capacity, @duration, @grades, @notes, @organiser)";
+            using (var command = new SQLiteCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@name", Name);
+                command.Parameters.AddWithValue("@description", Description);
+                command.Parameters.AddWithValue("@date", Date);
+
+                // Get The Actual Name Not The Index Of The Enum Item (Actually Pretty Cool That This Works)
+                command.Parameters.AddWithValue("@room", Room.ToString());
+                command.Parameters.AddWithValue("@picture", Picture);
+                command.Parameters.AddWithValue("@capacity", Capacity);
+                command.Parameters.AddWithValue("@duration", Duration);
+                command.Parameters.AddWithValue("@grades", Grades);
+                command.Parameters.AddWithValue("@notes", Notes);
+                command.Parameters.AddWithValue("@organiser", Organiser);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        // Do Nothing I Guess??
+                        // OK
+                    }
+                }
+            }
+            connection.Close();
+            // END
+
+            if (CoOrganisers != null)
+            {
+                foreach (string username in CoOrganisers.Split(','))
+                {
+                    int user_id = -1;
+                    
+                    // Get User ID
+                    // BEGIN
+                    connection.Open();
+                    query = "SELECT id FROM users WHERE username = @username";
+                    using (var command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                user_id = reader.GetInt16(0);
+                            }
+                        }
+                    }
+                    connection.Close();
+                    // END
+
+                    // Can Skip Checks Here Because We Verified CoOrganisers Before
+
+                    // Insert Formatted Data Into `co_organisers` Table
+                    // BEGIN
+                    connection.Open();
+                    query = "INSERT INTO co_organisers (event_id, user_id) VALUES (@event_id, @user_id)";
+                    using (var command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@event_id", id);
+                        command.Parameters.AddWithValue("@user_id", user_id);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                // Do Nothing I Guess??
+                                // OK
+                            }
+                        }
+                    }
+                    connection.Close();
+                    // END
+                }
+            }
+        }
+        // Reset Old ErrorStrign Value
+        ErrorString = string.Empty;
+        return Redirect("/AddEvent");
     }
 }
