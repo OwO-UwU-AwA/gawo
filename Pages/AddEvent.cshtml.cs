@@ -47,7 +47,7 @@ public class AddEventModel : PageModel
     [BindProperty]
     public Rooms Room { get; set; } = Rooms.NULL;
     [BindProperty]
-    public byte[]? Picture { get; set; }
+    public byte[]? Picture { get; set; } = {0x0};
     [BindProperty]
     public int Capacity { get; set; } = -1;
     [BindProperty]
@@ -70,8 +70,13 @@ public class AddEventModel : PageModel
     public string Organiser { get; set; } = string.Empty;
     [BindProperty]
     public string CoOrganisers { get; set; } = string.Empty;
+
     public string ErrorString { get; set; } = string.Empty;
 
+    public IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+    // Really Ugly Way To Store Grades
+    private string Grades = string.Empty;
     public AddEventModel(ILogger<AddEventModel> logger)
     
     {
@@ -85,80 +90,25 @@ public class AddEventModel : PageModel
 
     public IActionResult OnPostAddEvent()
     {
-        // PLEASE FOR THE LOVE OF GOD REFACTOR THIS INTO SMALL NEAT FUNCTIONS
+        // Execute Pre-Setup-Steps And Check For Errors
+        if (PreSetup() == -1)
+            return Error("Unvollständige Angaben (Standardwert Oder NULL)");
+        
+        // Verify All CoOrganisers
+        var tmp = CoOrganisersCheck();
+        if (tmp.Item1 == -1)
+            return Error($"{tmp.Item2} Ist Kein Benutzername.");
 
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
+
         using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
         {
-            // Ignore Standard Value
-            if (Notes == "Notiz")
-                Notes = null!;
-
-            // Really Ugly Way To Store Grades
-            string Grades = string.Empty;
-
-            if (Grade7)
-                Grades += "7,";
-            if (Grade8)
-                Grades += "8,";
-            if (Grade9)
-                Grades += "9,";
-            if (Grade10)
-                Grades += "10,";
-            if (Grade11)
-                Grades += "11,";
-            if (Grade12)
-                Grades += "12,";
-
-            if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty)
-            {
-                ErrorString = "Unvollständige Angaben (Standardwert Oder NULL)";
-                return Page();
-            }
-
-            // Verify CoOrganiser Before We Create The Event
-            if (CoOrganisers != null)
-            {
-                foreach (string username in CoOrganisers.Split(','))
-                {
-                    int user_id = -1;
-                    
-                    // Get User ID
-                    // BEGIN
-                    connection.Open();
-                    string _query = "SELECT id FROM users WHERE username = @username";
-                    using (var command = new SQLiteCommand(_query, connection))
-                    {
-                        command.Parameters.AddWithValue("@username", username);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                user_id = reader.GetInt16(0);
-                            }
-                        }
-                    }
-                    connection.Close();
-                    // END
-
-                    if (user_id == -1)
-                    {
-                        ErrorString = $"{username} Ist Kein Benutzername.";
-                        return Page();
-                    }
-                }
-            }
-
+            
             // Remove Trailing Comma After We Assure That We Have Valid Input (Grades Could Be NULL)
             Grades = Grades.Substring(0, Grades.Length - 1);
 
             // Will Become The ID Of The Event
             int id = 0;
 
-            // Be Careful With Database Operations !
-            
             // Get The Organisers ID
             // BEGIN
             connection.Open();
@@ -187,8 +137,7 @@ public class AddEventModel : PageModel
             catch
             {
                 // If We Got A FormatException Return Error
-                ErrorString = "Organisator/Benutzer Mit Diesem Namen Nicht Vorhanden.";
-                return Page();
+                return Error("Organisator/Benutzer Mit Diesem Namen Existiert Nicht.");
             }
 
             // Get The Amount Of Events + 1 For The New Event
@@ -296,5 +245,75 @@ public class AddEventModel : PageModel
         // Reset Old ErrorStrign Value
         ErrorString = string.Empty;
         return Redirect("/AddEvent");
+    }
+
+    private IActionResult Error(string message)
+    {
+        ErrorString = message;
+        return Page();
+    }
+
+    private int PreSetup()
+    {
+        // Ignore Standard Value
+        if (Notes == "Notiz")
+            Notes = null!;
+
+        if (Grade7)
+            Grades += "7,";
+        if (Grade8)
+            Grades += "8,";
+        if (Grade9)
+            Grades += "9,";
+        if (Grade10)
+            Grades += "10,";
+        if (Grade11)
+            Grades += "11,";
+        if (Grade12)
+            Grades += "12,";
+
+        if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty)
+        {
+            return -1;
+        }
+        return 0;
+    }
+    private (int, string) CoOrganisersCheck()
+    {
+        using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+        {
+            // Verify CoOrganiser Before We Create The Event
+            if (CoOrganisers != null)
+            {
+                foreach (string username in CoOrganisers.Split(','))
+                {
+                    int user_id = -1;
+                    
+                    // Get User ID
+                    // BEGIN
+                    connection.Open();
+                    string _query = "SELECT id FROM users WHERE username = @username";
+                    using (var command = new SQLiteCommand(_query, connection))
+                    {
+                        command.Parameters.AddWithValue("@username", username);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                user_id = reader.GetInt16(0);
+                            }
+                        }
+                    }
+                    connection.Close();
+                    // END
+
+                    if (user_id == -1)
+                    {
+                        return (-1, username);
+                    }
+                }
+            }
+        }
+        return (0, "");
     }
 }
