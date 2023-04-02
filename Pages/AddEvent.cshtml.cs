@@ -47,7 +47,7 @@ public class AddEventModel : PageModel
     [BindProperty]
     public Rooms Room { get; set; } = Rooms.NULL;
     [BindProperty]
-    public byte[]? Picture { get; set; } = {0x0};
+    public byte[]? Picture { get; set; } = (byte[])null!;
     [BindProperty]
     public int Capacity { get; set; } = -1;
     [BindProperty]
@@ -70,7 +70,10 @@ public class AddEventModel : PageModel
     public string Organiser { get; set; } = string.Empty;
     [BindProperty]
     public string CoOrganisers { get; set; } = string.Empty;
-
+    [BindProperty]
+    public string Type { get; set; } = string.Empty;
+    [BindProperty]
+    public int Teacher { get; set; } = -1;
     public string ErrorString { get; set; } = string.Empty;
 
     public IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
@@ -166,7 +169,7 @@ public class AddEventModel : PageModel
             // Insert Formatted Data Into `events` Table
             // BEGIN
             connection.Open();
-            query = "INSERT INTO events (id, name, description, date, room, picture, capacity, duration, grades, notes, organiser) VALUES (@id, @name, @description, @date, @room, @picture, @capacity, @duration, @grades, @notes, @organiser)";
+            query = "INSERT INTO events (id, name, description, date, room, picture, capacity, duration, grades, notes, organiser, type) VALUES (@id, @name, @description, @date, @room, @picture, @capacity, @duration, @grades, @notes, @organiser, @type)";
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
@@ -182,6 +185,7 @@ public class AddEventModel : PageModel
                 command.Parameters.AddWithValue("@grades", Grades);
                 command.Parameters.AddWithValue("@notes", Notes);
                 command.Parameters.AddWithValue("@organiser", Organiser);
+                command.Parameters.AddWithValue("@type", Type);
                 using (var reader = command.ExecuteReader())
                 {
                     if (reader.Read())
@@ -272,7 +276,7 @@ public class AddEventModel : PageModel
         if (Grade12)
             Grades += "12,";
 
-        if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty)
+        if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty || Type == "NULL")
         {
             return -1;
         }

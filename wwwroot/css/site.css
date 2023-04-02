@@ -4,6 +4,7 @@
   border-collapse: collapse;
   border-color: var(--light-black);
   border-spacing:0; 
+  margin-bottom: 1.5%;
 }
 
 .points_table td
@@ -47,6 +48,7 @@
   .points_table
   {
     width: auto !important;
+
   }
   .points_table col
   {
@@ -99,7 +101,7 @@
   vertical-align: top
 }
 
-@media screen and (max-width: 767px)
+@media screen and (max-width: 1010px)
 {
   .org_points_table
   {
@@ -114,4 +116,9 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+.header
+{
+  font-weight: bold;
 }
