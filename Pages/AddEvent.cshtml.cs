@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SQLite;
@@ -88,7 +88,6 @@ public class AddEventModel : PageModel
 
     public void OnGet()
     {        
-
     }
 
     public IActionResult OnPostAddEvent()
