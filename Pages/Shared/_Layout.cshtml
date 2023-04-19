@@ -2,7 +2,7 @@
   var currentPage = Context.Request.Path;
 }
 <!DOCTYPE html>
-<html lang="en" onloadstart="color_scheme('get')">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,8 +11,47 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/gawo.styles.css" asp-append-version="true" />
   </head>
+  <script>
+    function togglec(name)
+    {
+      var cookie = get(name);
+      if (cookie == "")
+      {
+        set(name, "dark");
+        const body = document.body;
+        body.setAttribute("data-bs-theme", "dark");
+      }
+      else
+      {
+        var _new = (cookie == "dark") ? "light" : "dark";
+        const body = document.body;
+        body.setAttribute("data-bs-theme", (_new == "light") ? "light" : "dark");
+        set(name, _new);
+      }
+    }
 
-  <body class="overflow-scroll">
+    function get(name)
+    {
+      var value = "";
+      var cookies = document.cookie.split(";");
+      for (var i = 0; i < cookies.length; i++)
+      {
+        var cookie = cookies[i].trim();
+        if (cookie.indexOf(name + "=") == 0)
+        {
+          value = cookie.substring((name + "=").length, cookie.length);
+          break;
+        }
+      }
+      return value;
+    }
+    function set(name, value)
+    {
+      document.cookie = name + "=" + value + ";";
+    }
+  </script>
+
+  <body class="overflow-scroll" onload="var _ = get('dm'); document.body.setAttribute('data-bs-theme', _);">
     <div class="container">
 
       <button class="btn btn-outline-primary toggle-sidebar" onclick="toggleSidebar()" style="z-index: 1025;">Menü</button>
@@ -30,6 +69,7 @@
             <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>Meine Veranstaltungen</button>
             <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>Besuchte Veranstaltungen</button>
             <button type="button" onclick="window.location.href='/Logout';" class="btn btn-danger btn-block">Abmelden</button>
+            <button type="button" onclick=togglec('dm'); class="btn btn-outline-primary btn-block">Thema-Switch</button>
           </div>
         </div>
       </div>
