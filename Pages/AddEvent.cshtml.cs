@@ -14,9 +14,6 @@ public class AddEventModel : PageModel
     public string Name { get; set; } = string.Empty;
     [BindProperty]
     public string Description { get; set; } = string.Empty;
-    [BindProperty]
-    public string Date { get; set; } = string.Empty;
-
     public enum Rooms {
         NULL,
         SPORT,
@@ -174,7 +171,6 @@ public class AddEventModel : PageModel
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@name", Name);
                 command.Parameters.AddWithValue("@description", Description);
-                command.Parameters.AddWithValue("@date", Date);
 
                 // Get The Actual Name Not The Index Of The Enum Item (Actually Pretty Cool That This Works)
                 command.Parameters.AddWithValue("@room", Room.ToString());
@@ -275,7 +271,7 @@ public class AddEventModel : PageModel
         if (Grade12)
             Grades += "12,";
 
-        if (Name == null || Description == null || Organiser == null || Date == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty || Type == "NULL")
+        if (Name == null || Description == null || Organiser == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty || Type == "NULL")
         {
             return -1;
         }

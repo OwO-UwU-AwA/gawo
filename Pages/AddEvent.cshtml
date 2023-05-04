@@ -75,7 +75,33 @@
     {
       <div class="spacer">
         <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-        <input type="text" class="form-control" id="organiser" name="organiser" placeholder="Benutzername" required>
+        <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
+          <option value="NULL">Organisator Auswählen</option>
+          @{
+            int _id = -1;
+            string _fname = string.Empty;
+            string _lname = string.Empty;
+
+            using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+            {
+              connection.Open();
+              string query = "SELECT id,first_name,last_name FROM users";
+              using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+              {
+                using (var reader = command.ExecuteReader())
+                {
+                  while (reader.Read())
+                  {
+                    _id = reader.GetInt32(0);
+                    _fname = reader.GetString(1);
+                    _lname = reader.GetString(2);
+                    <option value="@_id">@_fname @_lname</option>
+                  }
+                }
+              }
+            }
+          }
+        </select>
       </div>
     }
     else
@@ -90,7 +116,7 @@
 
   <div class="spacer">
     <label for="teacher" class="form-label" asp-for="Teacher">Betreuer</label>
-    <select class="form-select" id="date" name="date" asp-for="Date" required>
+    <select class="form-select" id="teacher" name="teacher" asp-for="Teacher" required>
       <option value="NULL">Betreuer Auswählen</option>
       @{
         int id = -1;
@@ -122,18 +148,6 @@
   <div class="spacer">
     <label for="coorganisers" class="form-label" asp-for="CoOrganisers">Mitorganisator:</label>
     <input type="text" class="form-control" id="coorganisers" name="coorganisers" placeholder="Kommaseparierte Benutzernamen">
-  </div>
-
-  <div class="spacer">
-    <label for="date" class="form-label" asp-for="Date">Datum:</label>
-    <select class="form-select" id="date" name="date" asp-for="Date" required>
-      <option value="">Datum Auswählen</option>
-      <option value="MONDAY">Montag</option>
-      <option value="TUESDAY">Dienstag</option>
-      <option value="WEDNESDAY">Mittwoch</option>
-      <option value="THURSDAY">Donnerstag</option>
-      <option value="FRIDAY">Freitag</option>
-    </select>
   </div>
 
   <div class="spacer">
