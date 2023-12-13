@@ -1,4 +1,7 @@
 using System.Data.SQLite;
+using System.Net.Mail;
+using System.Runtime.ExceptionServices;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,6 +19,8 @@ public class ProfileModel : PageModel
     public string NewPassword { get; set; } = string.Empty;
     [BindProperty]
     public string NewPasswordConf { get; set; } = string.Empty;
+    [BindProperty]
+    public string CurrentEmail { get; set; } = string.Empty;
     [BindProperty]
     public string NewEmail { get; set; } = string.Empty;
 
@@ -90,6 +95,9 @@ public class ProfileModel : PageModel
 
         ValidationErrorMessage = string.Empty;
         string? hashedPassword = null;
+        string? email = null;
+        string? first = null;
+        string? last = null;
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
@@ -97,7 +105,7 @@ public class ProfileModel : PageModel
         using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
         {
             connection.Open();
-            string query = "SELECT password FROM users WHERE username = @username";
+            string query = "SELECT password,email,first_name,last_name FROM users WHERE username = @username";
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@username", User.Identity!.Name);
@@ -106,6 +114,9 @@ public class ProfileModel : PageModel
                     if (reader.Read())
                     {
                         hashedPassword = reader.GetString(0);
+                        email = reader.GetString(1);
+                        first = reader.GetString(2);
+                        last = reader.GetString(3);
                     }
                 }
             }
@@ -132,6 +143,7 @@ public class ProfileModel : PageModel
                 }
                 connection.Close();
                 ValidationErrorMessage = string.Empty;
+                sendNotificationEmail("GAWO Passwortänderung", "", email!, last + ", " + first);
                 return Page();
             }
         }
@@ -140,5 +152,26 @@ public class ProfileModel : PageModel
             ValidationErrorMessage = "Falsches Passwort.";
         }
         return Page();
+    }
+
+    public void sendNotificationEmail(string title, string content, string email, string name)
+    {
+        SmtpClient client = new SmtpClient("localhost", 1025);
+        client.UseDefaultCredentials = true;
+
+        MailAddress from = new MailAddress("gawo@gauss-gymnasium.de", "GAWO-Team");
+        MailAddress to = new MailAddress(email, name);
+
+        MailMessage message = new MailMessage(from, to);
+
+        message.Subject = title;
+        message.SubjectEncoding = Encoding.UTF8;
+
+        message.Body = "<b>Ihr GAWO-Passwort wurde geändert!<br>Falls Sie dies nicht waren, wenden Sie sich an das <a href=\"mailto:gawo@gauss-gymnasium.de?subject=Ungewöhnliche Kontoaktivitäten\">GAWO-Team</a>, andernfalls können Sie diese E-Mail ignorieren.</b>";
+        message.BodyEncoding = Encoding.UTF8;
+
+        message.IsBodyHtml = true;
+
+        client.Send(message);
     }
 }

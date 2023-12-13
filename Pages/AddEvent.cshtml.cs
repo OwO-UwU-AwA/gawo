@@ -72,6 +72,8 @@ public class AddEventModel : PageModel
     [BindProperty]
     public int Teacher { get; set; } = -1;
     public string ErrorString { get; set; } = string.Empty;
+    [BindProperty]
+    public bool Accepted { get; set; } = false;
 
     public IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
@@ -165,7 +167,7 @@ public class AddEventModel : PageModel
             // Insert Formatted Data Into `events` Table
             // BEGIN
             connection.Open();
-            query = "INSERT INTO events (id, name, description, date, room, picture, capacity, duration, grades, notes, organiser, type) VALUES (@id, @name, @description, @date, @room, @picture, @capacity, @duration, @grades, @notes, @organiser, @type)";
+            query = "INSERT INTO events (id, name, description, room, picture, capacity, duration, grades, notes, organiser, type, accepted) VALUES (@id, @name, @description, @room, @picture, @capacity, @duration, @grades, @notes, @organiser, @type, @accepted)";
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
@@ -181,6 +183,7 @@ public class AddEventModel : PageModel
                 command.Parameters.AddWithValue("@notes", Notes);
                 command.Parameters.AddWithValue("@organiser", Organiser);
                 command.Parameters.AddWithValue("@type", Type);
+                command.Parameters.AddWithValue("@accepted", Accepted);
                 using (var reader = command.ExecuteReader())
                 {
                     if (reader.Read())

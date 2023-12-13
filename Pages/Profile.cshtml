@@ -7,10 +7,10 @@
 <h2>@Request.HttpContext.User.Identity!.Name</h2>
 <hr class="border border-primary opacity-50">
 
-<div class="content text-wrap" style="display: flex; flex-direction: column; align-items: baseline;">
+<div class="content text-wrap" style="display: flex; flex-direction: row; align-items: baseline;">
 
-  <form method="post" asp-page-handler="ChangePassword">
-    <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
+  <form method="post" asp-page-handler="ChangePassword" style="margin-top: 5%; margin-bottom: 5%; margin-right: 2%;">
+    <div class="form-group">
       <label asp-for="CurrentPassword">Derzeitiges Passwort</label>
       <input type="password" class="form-control" id="currentpassword" name="currentpassword" required>
     </div>
@@ -27,10 +27,14 @@
 
   <form method="post" asp-page-handler="ChangeEmail">
     <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewEmail">Neue Email</label>
-      <input type="email" class="form-control" id="newemail" name="newemail" required>
-      <button type="submit" class="btn btn-success" style="margin-top: 5%;">Email Ändern</button>
+      <label asp-for="CurrentEmail">Derzeitige E-Mail-Adresse</label>
+      <input type="email" class="form-control" id="currentemail" name="currentemail" required>
     </div>
+    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+      <label asp-for="NewEmail">Neue E-Mail-Adresse</label>
+      <input type="email" class="form-control" id="newemail" name="newemail" required>
+    </div>
+      <button type="submit" class="btn btn-success" style="margin-top: 5%; width: 100%;">Email Ändern</button>
   </form>
 
 <h3 class="text-danger">@Model.ValidationErrorMessage</h3>
