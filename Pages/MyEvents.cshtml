@@ -1,4 +1,4 @@
-page
+@page
 @model MyEventsModel
 @{
   ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
@@ -8,30 +8,5 @@ page
 <hr class="border border-primary opacity-50">
 
 <div class="content text-wrap" style="display: flex; flex-direction: column; align-items: baseline;">
-
-  <form method="post" asp-page-handler="ChangePassword">
-    <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
-      <label asp-for="CurrentPassword">Derzeitiges Passwort</label>
-      <input type="password" class="form-control" id="currentpassword" name="currentpassword" required>
-    </div>
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewPassword">Neues Passwort</label>
-      <input type="password" class="form-control" id="newpassword" name="newpassword" required>
-    </div>
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewPasswordConf">Neues Passwort Bestätigen</label>
-      <input type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" required>
-      <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort Ändern</button>
-    </div>
-  </form>
-
-  <form method="post" asp-page-handler="ChangeEmail">
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewEmail">Neue Email</label>
-      <input type="email" class="form-control" id="newemail" name="newemail" required>
-      <button type="submit" class="btn btn-success" style="margin-top: 5%;">Email Ändern</button>
-    </div>
-  </form>
-
-<h3 class="text-danger">@Model.ValidationErrorMessage</h3>
+  AAAA
 </div>

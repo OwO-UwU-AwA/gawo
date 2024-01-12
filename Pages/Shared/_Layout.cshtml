@@ -14,16 +14,16 @@
   <script>
     function setTheme()
     {
-      const dm = document.cookie.replace(/(?:(?:^|.*;\s*)dm\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      const dm = document.cookie.replace(/(?:(?:^|.*;\s*)theme\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       const html = document.querySelector("html");
       html.setAttribute("data-bs-theme", dm == "dark" ? "dark" : "light");
     }
     function toggleTheme()
     {
-      const dm = document.cookie.replace(/(?:(?:^|.*;\s*)dm\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      const dm = document.cookie.replace(/(?:(?:^|.*;\s*)theme\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       
       const newDm = dm == "dark" ? "light" : "dark";
-      document.cookie = `dm=${newDm}; path=/;`;
+      document.cookie = `theme=${newDm}; path=/;`;
 
       setTheme();
     }
@@ -34,11 +34,12 @@
   <body class="overflow-scroll">
     <div class="container">
 
-      <button class="btn btn-outline-primary toggle-sidebar" onclick="toggleSidebar()" style="z-index: 1025;">Menü</button>
+      <button class="btn btn-outline-primary toggle-sidebar" data-bs-toggle="offcanvas" data-bs-target="#sidebar" style="z-index: 1025;">Menü</button>
 
-      <div class="offcanvas offcanvas-start show" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="-1" id="sidebar">
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title"><a class="home" href="/">Gaußwoche @DateTime.Now.Year</a></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
           <div class="d-grid gap-2">
@@ -49,7 +50,7 @@
             <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>Meine Veranstaltungen</button>
             <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>Besuchte Veranstaltungen</button>
             <button type="button" onclick="window.location.href='/SiteMap';" class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'>Sitemap</button>
-            <button type="button" onclick="window.location.href='/Logout';" class="btn btn-danger btn-block">Abmelden</button>
+            <button type="button" onclick="window.location.href='/Logout';" class="btn btn-outline-danger btn-block">Abmelden</button>
             <button type="button" onclick=toggleTheme() class="btn btn-outline-primary btn-block">Thema-Switch</button>
           </div>
         </div>
@@ -82,9 +83,7 @@
       }
     </script>
 
-
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/jquery-3.7.1.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 

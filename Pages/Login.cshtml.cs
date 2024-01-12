@@ -2,8 +2,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SQLite;
 using System.Security.Claims;
+using Newtonsoft.Json;
+
+using SurrealDb.Net.Models.Auth;
+using SurrealDb.Net;
+
+using System.Text.Json.Nodes;
 
 namespace gawo.Pages;
 
@@ -29,22 +34,23 @@ public class LoginModel : PageModel
     public async Task<IActionResult> OnPostLogin()
     {
         // First Check if Username Exists; Then If Password Matches User
-        if (VerifyUsername(Username) == false || VerifyPassword(Password, Username) == false)
+        if (await VerifyUsername(Username) == false || await VerifyPassword(Password, Username) == false)
         {
             ValidationErrorMessage = "Benutzername Oder Passwort Inkorrekt.";
             return Page();
         }
         else
         {
-        var claims = new[]
+
+        Claim[] claims = new[]
         {
-            new Claim(ClaimTypes.Name, Username!)
+            new Claim(ClaimTypes.Name, Username)
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
-        
+
         ReturnUrl = (TempData["ReturnUrl"] as string)!;
         TempData.Remove("ReturnUrl");
 
@@ -61,52 +67,39 @@ public class LoginModel : PageModel
         TempData["ReturnUrl"] = ReturnUrl;
     }
 
-    public bool VerifyPassword(string password, string username)
+    public async Task<bool> VerifyPassword(string password, string username)
     {
-        string? hashedPassword = null;
+        // Connect to local SurrealDB
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
 
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-        {
-            connection.Open();
-            string query = "SELECT password FROM users WHERE username = @username";
-            using (var command = new SQLiteCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@username", username);
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        hashedPassword = reader.GetString(0);
-                    }
-                }
-            }
-            connection.Close();
-        }
-        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        var query = await db.Query($"SELECT password FROM Users WHERE username = '{username}';");
+
+        List<dynamic> x = JsonConvert.DeserializeObject<List<dynamic>>(query.GetValue<JsonValue>(0)!.ToJsonString())!;
+
+        return BCrypt.Net.BCrypt.Verify(password, x[0].password.ToString());
     }
 
-    public bool VerifyUsername(string username)
+    public async Task<bool> VerifyUsername(string username)
     {
-        bool x = true;
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
-            .Build();
-        using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-        {
-            connection.Open();
-            string query = "SELECT COUNT(*) FROM users WHERE username = @username";
-            using (var command = new SQLiteCommand(query, connection))
+        // Connect to local SurrealDB
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
+        
+        // Returns a JSON array:
+        /*
+        [
             {
-                command.Parameters.AddWithValue("@username", username);
-                int count = Convert.ToInt32(command.ExecuteScalar());
-                if (count == 0)
-                    x = false;
+                "count": <>
             }
-            connection.Close();
-        }
-        return x;
+        ]
+        */
+        var query = await db.Query($"SELECT count() FROM Users WHERE username = '{username}';");
+
+        List<dynamic> x = JsonConvert.DeserializeObject<List<dynamic>>(query.GetValue<JsonArray>(0)!.ToString())!;
+
+        return x[0].count > 0;
     }
 }

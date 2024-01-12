@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.IdentityModel.Tokens;
 using System.Data.SQLite;
+using System.Diagnostics;
 
 namespace gawo.Pages;
 
@@ -14,41 +16,22 @@ public class AddEventModel : PageModel
     public string Name { get; set; } = string.Empty;
     [BindProperty]
     public string Description { get; set; } = string.Empty;
-    public enum Rooms {
-        NULL,
-        SPORT,
-        UG13,
-        UG14,
-        UG15,
-        UG16,
-        UG17,
-        UG18,
-        UG19,
-        UG20,
-        UG21,
-        UG22,
-        UG23,
-        UG24,
-        UG25,
-        UG26,
-        UG27,
-        UG28,
-        UG29,
-        UG30,
-        UG31,
-        UG32,
-        UG33,
-        UG34,
-        UG35,
-    };
     [BindProperty]
-    public Rooms Room { get; set; } = Rooms.NULL;
-    [BindProperty]
-    public byte[]? Picture { get; set; } = (byte[])null!;
+    public byte[]? Picture { get; set; } = null;
     [BindProperty]
     public int Capacity { get; set; } = -1;
     [BindProperty]
     public int Duration { get; set; } = -1;
+    [BindProperty]
+    public byte Grades { get; set; } = 0;
+    [BindProperty]
+    public string Notes { get; set; } = string.Empty;
+    [BindProperty]
+    public string Organiser { get; set; } = string.Empty;
+    [BindProperty]
+    public string Type { get; set; } = "NULL";
+    [BindProperty]
+    public int Teacher { get; set; } = -1;
     [BindProperty]
     public bool Grade7 { get; set; } = false;
     [BindProperty]
@@ -61,32 +44,15 @@ public class AddEventModel : PageModel
     public bool Grade11 { get; set; } = false;
     [BindProperty]
     public bool Grade12 { get; set; } = false;
-    [BindProperty]
-    public string Notes { get; set; } = string.Empty;
-    [BindProperty]
-    public string Organiser { get; set; } = string.Empty;
-    [BindProperty]
-    public string CoOrganisers { get; set; } = string.Empty;
-    [BindProperty]
-    public string Type { get; set; } = string.Empty;
-    [BindProperty]
-    public int Teacher { get; set; } = -1;
+
     public string ErrorString { get; set; } = string.Empty;
-    [BindProperty]
-    public bool Accepted { get; set; } = false;
 
     public IConfigurationRoot configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-    // Really Ugly Way To Store Grades
-    private string Grades = string.Empty;
     public AddEventModel(ILogger<AddEventModel> logger)
     
     {
         _logger = logger;
-    }
-
-    public void OnGet()
-    {        
     }
 
     public IActionResult OnPostAddEvent()
@@ -95,18 +61,9 @@ public class AddEventModel : PageModel
         if (PreSetup() == -1)
             return Error("Unvollständige Angaben (Standardwert Oder NULL)");
         
-        // Verify All CoOrganisers
-        var tmp = CoOrganisersCheck();
-        if (tmp.Item1 == -1)
-            return Error($"{tmp.Item2} Ist Kein Benutzername.");
-
-
         using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
         {
             
-            // Remove Trailing Comma After We Assure That We Have Valid Input (Grades Could Be NULL)
-            Grades = Grades.Substring(0, Grades.Length - 1);
-
             // Will Become The ID Of The Event
             int id = 0;
 
@@ -129,18 +86,6 @@ public class AddEventModel : PageModel
             connection.Close();
             // END
             
-            try
-            {
-                // SQL Returns The Username If The User Doesnt Exist
-                // Check If We Got An ID Or A Username
-                int.Parse(Organiser);
-            }
-            catch
-            {
-                // If We Got A FormatException Return Error
-                return Error("Organisator/Benutzer Mit Diesem Namen Existiert Nicht.");
-            }
-
             // Get The Amount Of Events + 1 For The New Event
             // BEGIN
             connection.Open();
@@ -167,15 +112,13 @@ public class AddEventModel : PageModel
             // Insert Formatted Data Into `events` Table
             // BEGIN
             connection.Open();
-            query = "INSERT INTO events (id, name, description, room, picture, capacity, duration, grades, notes, organiser, type, accepted) VALUES (@id, @name, @description, @room, @picture, @capacity, @duration, @grades, @notes, @organiser, @type, @accepted)";
+            query = "INSERT INTO events (id, name, description, picture, capacity, duration, grades, notes, organiser, type, accepted) VALUES (@id, @name, @description, @picture, @capacity, @duration, @grades, @notes, @organiser, @type, @accepted)";
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@name", Name);
                 command.Parameters.AddWithValue("@description", Description);
 
-                // Get The Actual Name Not The Index Of The Enum Item (Actually Pretty Cool That This Works)
-                command.Parameters.AddWithValue("@room", Room.ToString());
                 command.Parameters.AddWithValue("@picture", Picture);
                 command.Parameters.AddWithValue("@capacity", Capacity);
                 command.Parameters.AddWithValue("@duration", Duration);
@@ -183,70 +126,16 @@ public class AddEventModel : PageModel
                 command.Parameters.AddWithValue("@notes", Notes);
                 command.Parameters.AddWithValue("@organiser", Organiser);
                 command.Parameters.AddWithValue("@type", Type);
-                command.Parameters.AddWithValue("@accepted", Accepted);
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        // Do Nothing I Guess??
-                        // OK
-                    }
-                }
+                command.Parameters.AddWithValue("@accepted", false);
+
+                command.ExecuteNonQuery();
             }
             connection.Close();
             // END
-
-            if (CoOrganisers != null)
-            {
-                foreach (string username in CoOrganisers.Split(','))
-                {
-                    int user_id = -1;
-                    
-                    // Get User ID
-                    // BEGIN
-                    connection.Open();
-                    query = "SELECT id FROM users WHERE username = @username";
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@username", username);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                user_id = reader.GetInt16(0);
-                            }
-                        }
-                    }
-                    connection.Close();
-                    // END
-
-                    // Can Skip Checks Here Because We Verified CoOrganisers Before
-
-                    // Insert Formatted Data Into `co_organisers` Table
-                    // BEGIN
-                    connection.Open();
-                    query = "INSERT INTO co_organisers (event_id, user_id) VALUES (@event_id, @user_id)";
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@event_id", id);
-                        command.Parameters.AddWithValue("@user_id", user_id);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                // Do Nothing I Guess??
-                                // OK
-                            }
-                        }
-                    }
-                    connection.Close();
-                    // END
-                }
-            }
         }
-        // Reset Old ErrorStrign Value
+        // Reset Old ErrorString Value
         ErrorString = string.Empty;
-        return Redirect("/AddEvent");
+        return RedirectToPage();
     }
 
     private IActionResult Error(string message)
@@ -262,60 +151,24 @@ public class AddEventModel : PageModel
             Notes = null!;
 
         if (Grade7)
-            Grades += "7,";
+            Grades |= 1 << 0;
         if (Grade8)
-            Grades += "8,";
+            Grades |= 1 << 1;
         if (Grade9)
-            Grades += "9,";
+            Grades |= 1 << 2;
         if (Grade10)
-            Grades += "10,";
+            Grades |= 1 << 3;
         if (Grade11)
-            Grades += "11,";
+            Grades |= 1 << 4;
         if (Grade12)
-            Grades += "12,";
+            Grades |= 1 << 5;
 
-        if (Name == null || Description == null || Organiser == null || Room == Rooms.NULL || Capacity <= 0 || Duration <= 0 || Grades == string.Empty || Type == "NULL")
+        Console.WriteLine($"{Name} {Description} {Organiser} {Capacity} {Duration} {Grades} {Type}");
+
+        if (Name.IsNullOrEmpty() == true || Description.IsNullOrEmpty() == true || Organiser.IsNullOrEmpty() == true || Capacity < 0 || Duration <= 0 || Grades == 0 || Type == "NULL")
         {
             return -1;
         }
         return 0;
-    }
-    private (int, string) CoOrganisersCheck()
-    {
-        using (var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-        {
-            // Verify CoOrganiser Before We Create The Event
-            if (CoOrganisers != null)
-            {
-                foreach (string username in CoOrganisers.Split(','))
-                {
-                    int user_id = -1;
-                    
-                    // Get User ID
-                    // BEGIN
-                    connection.Open();
-                    string _query = "SELECT id FROM users WHERE username = @username";
-                    using (var command = new SQLiteCommand(_query, connection))
-                    {
-                        command.Parameters.AddWithValue("@username", username);
-                        using (var reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                user_id = reader.GetInt16(0);
-                            }
-                        }
-                    }
-                    connection.Close();
-                    // END
-
-                    if (user_id == -1)
-                    {
-                        return (-1, username);
-                    }
-                }
-            }
-        }
-        return (0, "");
     }
 }

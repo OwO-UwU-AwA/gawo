@@ -26,70 +26,25 @@ html, body
   height: 100%;
 }
 
-body
-{
-  background-color: var(--light-beige);
-}
-
-@media only screen and (max-width: 1010px)
-{
-  #sidebar
-  {
-    display: none
-  }
-  .content
-  {
-    margin-left: 5% !important;
-    left: 0 !important;
-  }
-  
-  .toggle-sidebar
-  {
-    position: absolute;
-    display: block !important;
-    top: 0 !important;
-    right: 0 !important;
-  }
-  .content
-  {
-    transform: scale(0.97);
-    transform-origin: center top;
-  }
-}
-
-.sidebar
-{
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 250px;
-  z-index: 1040;
-  overflow-y: scroll;
-  outline: 0;
-}
-
 .home
 {
-  color: var(--dark-blue);
   text-decoration: none;
 }
 
-#sidebar
+.toggle-sidebar
 {
-  width: 20%;
+  position: absolute;
+  top: 3%;
+  width: 6%;
+  height: 4%;
 }
+
 
 .content
 {
   margin-left: 1%;
   position: absolute;
   top: 2.25%;
-  left: 20%;
-  width: calc(100% - 22%);
-}
-
-.toggle-sidebar
-{
-  display: none;
+  left: 7%;
+  width: 91%;
 }
