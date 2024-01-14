@@ -42,10 +42,23 @@ public class LoginModel : PageModel
         else
         {
 
-        Claim[] claims = new[]
+        Claim[] claims;
+
+        if (await GetPermissions(Username) == 3)
         {
-            new Claim(ClaimTypes.Name, Username)
-        };
+            claims = new[] {
+                new Claim(ClaimTypes.Name, Username),
+                new Claim(ClaimTypes.Role, "Admin")
+            };
+        }
+        else
+        {
+            claims = new[] {
+                new Claim(ClaimTypes.Name, Username),
+            };
+        }
+
+        
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -65,6 +78,20 @@ public class LoginModel : PageModel
         // Ugly Solution Please Fix
         ReturnUrl = Request.Query["ReturnUrl"]!;
         TempData["ReturnUrl"] = ReturnUrl;
+    }
+
+    public async Task<int> GetPermissions(string username)
+    {
+        // Connect to local SurrealDB
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
+
+        var query = await db.Query($"SELECT permissions FROM Users WHERE username = '{username}';");
+
+        List<dynamic> x = JsonConvert.DeserializeObject<List<dynamic>>(query.GetValue<JsonValue>(0)!.ToJsonString())!;
+
+        return x[0].permissions;
     }
 
     public async Task<bool> VerifyPassword(string password, string username)

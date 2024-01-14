@@ -1,4 +1,4 @@
-using HotChocolate.Execution;
+using GraphQL.AspNet.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +10,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Login";
         options.LogoutPath = "/Logout";
         options.AccessDeniedPath = "/Error";
+        }
+    );
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("AdminOnly", policy => {
+        policy.RequireRole("Admin");
+    });
 });
 
-builder.Services.AddAuthorization();
 
 builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromHours(3);
@@ -22,17 +28,20 @@ builder.Services.AddSession(options => {
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddGraphQLServer().AddQueryType<QueryType>();
+builder.Services.AddGraphQL(options => {
+    options.AuthorizationOptions.Method = GraphQL.AspNet.Security.AuthorizationMethod.PerRequest;
+});
 
 var app = builder.Build();
 
 app.UseRouting();
 
-app.MapGraphQL("/Api");
 app.MapGraphQLPlayground("/Playground");
 
 app.UseSession();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -44,6 +53,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
+
+app.UseGraphQL();
 
 app.Run();

@@ -28,7 +28,15 @@
       connection.Close();
     }
   }
-  /*
-    @count has events pending review
-  */
+  @if (@count > 1)
+  {
+    <pre>@count events pending review</pre>
+  }
+  else
+  {
+    <pre>@count event pending review</pre>
+  }
+  
 </div>
+    @User.IsInRole("Admin")
+    @Model.IsLucky
