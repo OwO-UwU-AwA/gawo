@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.Json.Nodes;
 using GraphQL.AspNet.Attributes;
 using GraphQL.AspNet.Controllers;
@@ -11,9 +12,19 @@ using SurrealDb.Net.Models.Response;
 
 public class UserController : GraphController
 {
+
+    [Description("Update A User Record")]
+    [Authorize(Policy = "AdminOnly")]
+    [MutationRoot("setUser")]
+    public int setUser(string? username, string? id)
+    {
+        return -1;
+    }
+
+    [Description("Retrieve A User Record From The Database")]
     [Authorize(Policy = "AdminOnly")]
     [QueryRoot("getUser")]
-    public User GetUserById(string? username, string? id)
+    public User GetUser(string? username, string? id)
     {
         return GetUserDB(username, id).Result;
     }
@@ -29,12 +40,12 @@ public class UserController : GraphController
 
         if (!username.IsNullOrEmpty())
         {
-            query = await Db.Query($"SELECT * FROM Users WHERE username = '{username}';").ConfigureAwait(false);
+            query = await Db.Query($"SELECT * FROM Users WHERE username = type::string($username);", new Dictionary<string, object>{{"username", username!}}).ConfigureAwait(false);
         }
         else if (!id.IsNullOrEmpty())
         {
             var t = new Thing("Users", id!);
-            query = await Db.Query($"SELECT * FROM Users WHERE id = '{t}';").ConfigureAwait(false);
+            query = await Db.Query($"SELECT * FROM Users WHERE id = type::thing($thing);", new Dictionary<string, object>{{"thing", t}}).ConfigureAwait(false);
         }
         else
         {
