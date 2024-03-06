@@ -1,7 +1,23 @@
 using GraphQL.AspNet.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Resources;
+using OpenTelemetry.ResourceDetectors.Container;
+using OpenTelemetry.ResourceDetectors.Host;
+using OpenTelemetry.Logs;
+
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+
+Action<ResourceBuilder> appResourceBuilder = resource => resource.AddDetector(new ContainerResourceDetector()).AddDetector(new HostDetector());
+
+builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithTracing(tracerBuilder => tracerBuilder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddGrpcClientInstrumentation().AddOtlpExporter());
+
+builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithMetrics(meterBuilder => meterBuilder.AddProcessInstrumentation().AddRuntimeInstrumentation().AddAspNetCoreInstrumentation().AddOtlpExporter().AddPrometheusExporter());
+
+builder.Logging.AddOpenTelemetry(options => options.AddOtlpExporter());
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
@@ -19,7 +35,6 @@ builder.Services.AddAuthorization(options => {
     });
 });
 
-
 builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromHours(3);
     options.Cookie.IsEssential = true;
@@ -33,6 +48,8 @@ builder.Services.AddGraphQL(options => {
 });
 
 var app = builder.Build();
+
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.UseRouting();
 
@@ -58,4 +75,4 @@ app.UseStaticFiles();
 
 app.UseGraphQL();
 
-app.Run();
+await app.RunAsync();

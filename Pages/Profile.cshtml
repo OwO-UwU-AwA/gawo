@@ -4,6 +4,10 @@
   ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
+@{
+  Model.UserStruct = new ProfileModel.GawoUser(User.Identity.Name);
+}
+
 <h2>@Model.UserStruct!.FirstName @Model.UserStruct.LastName</h2>
 <hr class="border border-primary opacity-50">
 
@@ -40,29 +44,29 @@ Rolle:
   // TODO: Clean Up This Mess
   if ((Model.UserStruct.Absence & (1 << 0)) != 0)
   {
-    absent[0] = "Montag";
+    absent[0] = days[0];
   }
   if ((Model.UserStruct.Absence & (1 << 1)) != 0)
   {
-    absent[1] = "Dienstag";
+    absent[1] = days[1];
   }
   if ((Model.UserStruct.Absence & (1 << 2)) != 0)
   {
-    absent[2] = "Mittwoch";
+    absent[2] = days[2];
   }
   if ((Model.UserStruct.Absence & (1 << 3)) != 0)
   {
-    absent[3] = "Donnerstag";
+    absent[3] = days[3];
   }
   if ((Model.UserStruct.Absence & (1 << 4)) != 0)
   {
-    absent[4] = "Freitag";
+    absent[4] = days[4];
   }
 
-  // Remove all days not absent
+  // Remove All Days Not Absent
   absent = absent.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
-  // for every day absent: add a comma after it and print it except for the last day which does not have a comma following
+  // For Every Day Absent: Add A Comma After It And Print It Except For The Last Day Which Does Not Have A Comma Following
   for (int i = 0; i < absent.Length; i++)
   {
     if (i != absent.Length - 1)
@@ -73,34 +77,43 @@ Rolle:
   }
 }
 
-<div class="content text-wrap" style="display: flex; flex-direction: row; align-items: baseline;">
+@if (Model.Error.Item1 == true)
+{
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </symbol>
+  </svg>
+  <div class="alert alert-warning d-flex align-items-center" style="margin-top: 1em; margin-bottom: -2em;" role="alert">
+    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+    <div>
+      @Model.Error.Item2
+    </div>
+  </div>
+}
 
-  <form method="post" asp-page-handler="ChangePassword" style="margin-top: 5%; margin-bottom: 5%; margin-right: 2%;">
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="CurrentPassword">Derzeitiges Passwort</label>
-      <input type="password" class="form-control" id="currentpassword" name="currentpassword" required>
-    </div>
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewPassword">Neues Passwort</label>
-      <input type="password" class="form-control" id="newpassword" name="newpassword" required>
-    </div>
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewPasswordConf">Neues Passwort Bestätigen</label>
-      <input type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" required>
-      <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort Ändern</button>
-    </div>
-  </form>
+<div class="content text-wrap" style="display: flex; flex-direction: row; align-items: baseline;">
 
   <form method="post" asp-page-handler="ChangeEmail">
     <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="CurrentEmail">Derzeitige E-Mail-Adresse</label>
-      <input type="email" class="form-control" id="currentemail" name="currentemail" required>
+      <input asp-for="NewEmail" type="email" class="form-control" id="newemail" name="newemail" placeholder="Neue E-Email Adresse" required>
+    </div>
+      <button type="submit" class="btn btn-success" style="width: 100%;">Email Ändern<i class="fas fa-save" style="
+      margin-left: 0.5em"></i></button>
+  </form>
+
+  <form method="post" asp-page-handler="ChangePassword" style="margin-top: 5%; margin-bottom: 5%; margin-left: 2%;">
+    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+      <input asp-for="CurrentPassword" type="password" class="form-control" id="currentpassword" name="currentpassword" placeholder="Derzeitiges Passwort" required>
     </div>
     <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="NewEmail">Neue E-Mail-Adresse</label>
-      <input type="email" class="form-control" id="newemail" name="newemail" required>
+      <input asp-for="NewPassword" type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Neues Passwort" required>
     </div>
-      <button type="submit" class="btn btn-success" style="margin-top: 10%; width: 100%;">Email Ändern</button>
+    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+      <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" placeholder="Passwort bestätigen" required>
+      <button type="submit" onsubmit="checkPassword()" class="btn btn-success" style="margin-top: 5%;">Passwort Ändern <i class="fas fa-save" style="
+      margin-left: 0.5em"></i></button>
+    </div>
   </form>
 
 <style>
@@ -149,12 +162,22 @@ Rolle:
             <input value="5" type="checkbox" class="form-check-input" id="friday" name="friday">
         </div>
     </div>
-    <button type="submit" class="btn btn-success" style="margin-top: 10%; width: 100%;">Speichern</button>
+    <button type="submit" class="btn btn-success" style="margin-top: 10%; width: 100%;">Abwesenheit speichern<i class="fas fa-save" style="margin-left: 0.5em;"></i></button>
 </form>
 
 
-
-
-
-<h3 class="text-danger">@Model.ValidationErrorMessage</h3>
+<div class="modal fade" id="errormodal" tabindex="-1" aria-labelledby="errormodallabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+      <h5 class="modal-title" id="errormodallabel">Fehler</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
 </div>

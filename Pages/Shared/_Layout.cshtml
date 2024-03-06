@@ -34,8 +34,7 @@
   <body class="overflow-scroll">
     <div class="container">
 
-      <button class="btn btn-outline-primary toggle-sidebar" data-bs-toggle="offcanvas" data-bs-target="#sidebar" style="z-index: 1025;">Menü</button>
-
+      <button class="btn btn-outline-primary toggle-sidebar" data-bs-toggle="offcanvas" data-bs-target="#sidebar" style="z-index: 1025;"><i class="fa-solid fa-bars"></i></button>
       <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title"><a class="home" href="/">Gaußwoche @DateTime.Now.Year</a></h5>
@@ -43,15 +42,15 @@
         </div>
         <div class="offcanvas-body">
           <div class="d-grid gap-2">
-            <button type="button" onclick="window.location.href='/';" class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'>Home</button>
-            <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>Profil</button>
-            <button type="button" onclick="window.location.href='/Points';" class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'>Punkte</button>
-            <button type="button" onclick="window.location.href='/AddEvent';" class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'>Veranstaltung Anmelden</button>
-            <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>Meine Veranstaltungen</button>
-            <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>Besuchte Veranstaltungen</button>
-            <button type="button" onclick="window.location.href='/SiteMap';" class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'>Sitemap</button>
-            <button type="button" onclick="window.location.href='/Logout';" class="btn btn-outline-danger btn-block">Abmelden</button>
-            <button type="button" onclick=toggleTheme() class="btn btn-outline-primary btn-block">Thema-Switch</button>
+            <button type="button" onclick="window.location.href='/';" class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'><i class="fa-solid fa-house icon"></i>Home</button>
+            <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>@if (Context.User.Identity!.IsAuthenticated){<i class="fa-solid fa-user icon"></i>}else{<i class="fa-solid fa-right-to-bracket icon"></i>}Profil</button>
+            <button type="button" onclick="window.location.href='/Points';" class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'><i class="fa-solid fa-table icon"></i>Punkte</button>
+            <button type="button" onclick="window.location.href='/AddEvent';" class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'><i class="fa-solid fa-file-pen icon"></i>Veranstaltung Anmelden</button>
+            <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'><i class="fa-solid fa-calendar-days icon"></i>Meine Veranstaltungen</button>
+            <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'><i class="fa-solid fa-list-check icon"></i>Besuchte Veranstaltungen</button>
+            <button type="button" onclick="window.location.href='/SiteMap';" class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'><i class="fa-solid fa-map icon"></i>Sitemap</button>
+            <button type="button" onclick="window.location.href='/Logout';" class="btn btn-outline-danger btn-block"><i class="fa-solid fa-right-from-bracket icon"></i>Abmelden</button>
+            <button type="button" onclick="toggleTheme();location.reload()" class="btn btn-outline-primary btn-block">@if (Context.Request.Cookies["theme"] == "dark"){<i class="fa-solid fa-sun icon"></i>}else{<i class="fa-solid fa-moon icon"></i>}Thema-Switch</button>
           </div>
         </div>
       </div>
@@ -86,6 +85,7 @@
     <script src="~/lib/jquery/jquery-3.7.1.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://kit.fontawesome.com/30e7a8a3a1.js" crossorigin="anonymous"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
   </body>

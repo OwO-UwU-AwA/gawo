@@ -31,12 +31,17 @@ html, body
   text-decoration: none;
 }
 
+.icon
+{
+  margin-right: 0.5em;
+}
+
 .toggle-sidebar
 {
   position: absolute;
   top: 3%;
   width: 6%;
-  height: 4%;
+  height: 6%;
 }
 
 
