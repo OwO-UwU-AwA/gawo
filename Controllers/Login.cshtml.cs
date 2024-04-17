@@ -5,37 +5,29 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 using SurrealDb.Net;
 using SurrealDb.Net.Models.Auth;
-using Microsoft.IdentityModel.Tokens;
 
-namespace gawo.Pages;
+namespace GaWo.Controllers;
 
 public class LoginModel : PageModel
 {
-    private readonly ILogger<LoginModel> _logger;
+    [BindProperty] public string Username { get; set; } = string.Empty;
 
-    [BindProperty]
-    public string Username { get; set; } = string.Empty;
+    [BindProperty] public string Password { get; set; } = string.Empty;
 
-    [BindProperty]
-    public string Password { get; set; } = string.Empty;
+    public bool Error { get; set; }
 
-    public bool Error { get; set; } = false;
-
-    public string ReturnUrl { get; set; } = string.Empty;
+    public string? ReturnUrl { get; set; } = string.Empty;
 
     public static SurrealDbClient? Db { get; set; }
 
-    public LoginModel(ILogger<LoginModel> logger)
-    {
-        _logger = logger;
-    }
-
+    
+    
+    // TODO : MAKE THIS FASTER OwO
     public async Task<IActionResult> OnPostLogin()
     {
         // Connect to local SurrealDB
-        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc", configureJsonSerializerOptions: options => {
-            options.PropertyNameCaseInsensitive = true;
-        });
+        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
+            configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
         await Db.SignIn(new RootAuth { Username = "root", Password = "root" });
         await Db.Use("main", "main");
 
@@ -45,38 +37,31 @@ public class LoginModel : PageModel
             Error = true;
             return Page();
         }
-        else
-        {
 
         Claim[] claims;
 
         if (await GetPermissions(Username, Db) == 3)
-        {
-            claims = new[] {
+            claims =
+            [
                 new Claim(ClaimTypes.Name, Username),
                 new Claim(ClaimTypes.Role, "Admin")
-            };
-        }
+            ];
         else
-        {
-            claims = new[] {
-                new Claim(ClaimTypes.Name, Username),
-            };
-        }
+            claims =
+            [
+                new Claim(ClaimTypes.Name, Username)
+            ];
 
-        
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(identity));
 
-        ReturnUrl = (TempData["ReturnUrl"] as string);
+        ReturnUrl = TempData["ReturnUrl"] as string;
         TempData.Remove("ReturnUrl");
 
-        if (ReturnUrl != null)
-            return Redirect(ReturnUrl);
-        return Redirect("/");
-        }
+        return Redirect(ReturnUrl ?? "/");
     }
 
     public void OnGet()
@@ -87,24 +72,30 @@ public class LoginModel : PageModel
         TempData["ReturnUrl"] = ReturnUrl;
     }
 
-    public async Task<int> GetPermissions(string username, SurrealDbClient Db)
+    public async Task<int> GetPermissions(string username, SurrealDbClient db)
     {
         // Get Permission Bitfield
-        var query = await Db.Query("RETURN array::at((SELECT permissions FROM Users WHERE username = type::string($username)).permissions, 0);", new Dictionary<string, object>{{ "username", username }});
+        var query = await db.Query(
+            "RETURN array::at((SELECT permissions FROM Users WHERE username = type::string($username)).permissions, 0);",
+            new Dictionary<string, object> { { "username", username } });
 
         return query.GetValue<int>(0);
     }
 
-    public async Task<bool> VerifyPassword(string password, string username, SurrealDbClient Db)
+    public async Task<bool> VerifyPassword(string password, string username, SurrealDbClient db)
     {
-        var query = await Db.Query("RETURN array::at((SELECT password FROM Users WHERE username = type::string($username)).password, 0);", new Dictionary<string, object>{{ "username", username }});
+        var query = await db.Query(
+            "RETURN array::at((SELECT password FROM Users WHERE username = type::string($username)).password, 0);",
+            new Dictionary<string, object> { { "username", username } });
 
         return BCrypt.Net.BCrypt.Verify(password, query.GetValue<string>(0));
     }
 
-    public async Task<bool> VerifyUsername(string username, SurrealDbClient Db)
+    public async Task<bool> VerifyUsername(string username, SurrealDbClient db)
     {
-        var query = await Db.Query("RETURN array::at((SELECT count() FROM Users WHERE username = type::string($username)).count, 0);", new Dictionary<string, object>{{ "username", username }});
+        var query = await db.Query(
+            "RETURN array::at((SELECT count() FROM Users WHERE username = type::string($username)).count, 0);",
+            new Dictionary<string, object> { { "username", username } });
 
         return query.GetValue<int?>(0) > 0;
     }

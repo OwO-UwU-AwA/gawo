@@ -1,136 +1,125 @@
 @font-family
 {
-  font-family "BlexMono Nerd Font"
-  src: local('/ttf/BlexMonoNerdFontMono-Regular.ttf');
-  font-weight: normal;
+    font-family "BlexMono Nerd Font"
+    src: local('/ttf/BlexMonoNerdFontMono-Regular.ttf');
+    font-weight: normal;
 }
 
-*
-{
-  font-family: 'BlexMono Nerd Font';  
+* {
+    font-family: 'BlexMono Nerd Font';
 }
 
-.points_table
-{
-  width: 100%;
-  border-collapse: collapse;
-  border-color: var(--light-black);
-  border-spacing:0; 
-  margin-bottom: 1.5%;
+.points_table {
+    width: 100%;
+    border-collapse: collapse;
+    border-color: var(--light-black);
+    border-spacing: 0;
+    margin-bottom: 1.5%;
 }
 
-.points_table td
-{
-  background-color: var(--light-beige);
-  border-color: var(--light-black);
-  border-style: solid;
-  border-width: 1px;
-  color: var(--light-black);
-  font-family: BlexMono Nerd Font, sans-serif;
-  font-size: 14px;
-  overflow: hidden;
-  padding: 5px 20px;
-  word-break: normal;
+.points_table td {
+    background-color: var(--light-beige);
+    border-color: var(--light-black);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--light-black);
+    font-family: BlexMono Nerd Font, sans-serif;
+    font-size: 14px;
+    overflow: hidden;
+    padding: 5px 20px;
+    word-break: normal;
 }
 
-.points_table th
-{
-  background-color: calc(var(--light-beige) + 30);
-  border-color: var(--light-black);
-  border-style: solid;
-  border-width: 1px;
-  color: var(--light-black);
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  overflow: hidden;
-  padding: 5px 20px;
-  word-break: normal;
+.points_table th {
+    background-color: calc(var(--light-beige) + 30);
+    border-color: var(--light-black);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--light-black);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    overflow: hidden;
+    padding: 5px 20px;
+    word-break: normal;
 }
 
-.points_table .tg-baqh
-{
-  text-align: center;
-  vertical-align: top
+.points_table .tg-baqh {
+    text-align: center;
+    vertical-align: top
 }
 
 
-@media screen and (max-width: 767px)
-{
-  .points_table
-  {
-    width: auto !important;
+@media screen and (max-width: 767px) {
+    .points_table {
+        width: auto !important;
 
-  }
-  .points_table col
-  {
-    width: auto !important;
-  }
-  .tg-wrap
-  {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+    }
+
+    .points_table col {
+        width: auto !important;
+    }
+
+    .tg-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
-.org_points_table
-{
-  width: 100%;
-  border-collapse: collapse;
-  border-color: var(--light-black);
-  border-spacing: 0;
-}
-.org_points_table td
-{
-  background-color: var(--light-beige);
-  border-color: var(--light-black);
-  border-style: solid;
-  border-width: 1px;
-  color: var(--light-black);
-  font-family:Arial, sans-serif;
-  font-size: 14px;
-  overflow: hidden;
-  padding: 5px 20px;
-  word-break: normal;
-}
-.org_points_table th
-{
-  background-color: calc(var(--light-beige) + 30);
-  border-color: var(--light-black);
-  border-style: solid;
-  border-width: 1px;
-  color: var(--light-black);
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  overflow: hidden;
-  padding: 5px 20px;
-  word-break: normal;
-}
-.org_points_table .tg-baqh
-{
-  text-align: center;
-  vertical-align: top
+.org_points_table {
+    width: 100%;
+    border-collapse: collapse;
+    border-color: var(--light-black);
+    border-spacing: 0;
 }
 
-@media screen and (max-width: 1010px)
-{
-  .org_points_table
-  {
-    width: auto !important;
-  }
-  .org_points_table col
-  {
-    width: auto !important;
-  }
-  .tg-wrap
-  {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+.org_points_table td {
+    background-color: var(--light-beige);
+    border-color: var(--light-black);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--light-black);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    overflow: hidden;
+    padding: 5px 20px;
+    word-break: normal;
 }
 
-.header
-{
-  font-weight: bold;
+.org_points_table th {
+    background-color: calc(var(--light-beige) + 30);
+    border-color: var(--light-black);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--light-black);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    overflow: hidden;
+    padding: 5px 20px;
+    word-break: normal;
+}
+
+.org_points_table .tg-baqh {
+    text-align: center;
+    vertical-align: top
+}
+
+@media screen and (max-width: 1010px) {
+    .org_points_table {
+        width: auto !important;
+    }
+
+    .org_points_table col {
+        width: auto !important;
+    }
+
+    .tg-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+.header {
+    font-weight: bold;
 }

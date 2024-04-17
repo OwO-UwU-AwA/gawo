@@ -1,7 +1,7 @@
 @page
-@model PointsModel
+@model GaWo.Controllers.PointsModel
 @{
-  ViewData["Title"] = $"Punktetabelle {DateTime.Now.ToString("yyyy")}";
+    ViewData["Title"] = $"Punktetabelle {DateTime.Now:yyyy}";
 }
 
 <h2 class="header">Punktetabelle</h2>
@@ -9,180 +9,180 @@
 
 <div class="content text-wrap" style="display: flex; flex-direction: column;">
 
-<table class="table table-striped table-hover">
-<thead>
-  <tr>
-    <th scope="row">Dauer in Minuten</th>
-    <th scrope="row">45</th>
-    <th scope="row">90</th>
-    <th scope="row">135</th>
-    <th scope="row">180</th>
-    <th scope="row">240</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>Vortrag</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Gastvortrag</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Fremdsprachenvortrag</td>
-    <td>1</td>
-    <td>2</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Facharbeitverteidigung</td>
-    <td>1</td>
-    <td>2</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Wettbewerb</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-  </tr>
-  <tr>
-    <td>Workshop</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-  </tr>
-  <tr>
-    <td>Q/F</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Sportveranstaltung</td>
-    <td>1</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>ELMOS</td>
-    <td>1</td>
-    <td>2</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-</tbody>
-</table>
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th scope="row">Dauer in Minuten</th>
+            <th scrope="row">45</th>
+            <th scope="row">90</th>
+            <th scope="row">135</th>
+            <th scope="row">180</th>
+            <th scope="row">240</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Vortrag</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Gastvortrag</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Fremdsprachenvortrag</td>
+            <td>1</td>
+            <td>2</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Facharbeitverteidigung</td>
+            <td>1</td>
+            <td>2</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Wettbewerb</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>Workshop</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>Q/F</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Sportveranstaltung</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ELMOS</td>
+            <td>1</td>
+            <td>2</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        </tbody>
+    </table>
 
-<h2 class="header">Veranstalterpunkte</h2>
-<hr class="border border-primary  opacity-50">
+    <h2 class="header">Veranstalterpunkte</h2>
+    <hr class="border border-primary  opacity-50">
 
-<table class="table table-hover table-striped">
-<thead>
-  <tr>
-    <th>Dauer in Minuten</th>
-    <th>45</th>
-    <th>90</th>
-    <th>135</th>
-    <th>180</th>
-    <th>240</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>Vortrag</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Gastvortrag</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Fremdsprachenvortrag</td>
-    <td>2</td>
-    <td>3</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Facharbeitverteidigung</td>
-    <td>2</td>
-    <td>3</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Wettbewerb</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>6</td>
-  </tr>
-  <tr>
-    <td>Workshop</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>6</td>
-  </tr>
-  <tr>
-    <td>Q/F</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Sportveranstaltung</td>
-    <td>2</td>
-    <td>3</td>
-    <td>4</td>
-    <td>5</td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>ELMOS</td>
-    <td>2</td>
-    <td>3</td>
-    <td>-</td>
-    <td>-</td>
-    <td>-</td>
-  </tr>
-</tbody>
-</table>
+    <table class="table table-hover table-striped">
+        <thead>
+        <tr>
+            <th>Dauer in Minuten</th>
+            <th>45</th>
+            <th>90</th>
+            <th>135</th>
+            <th>180</th>
+            <th>240</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Vortrag</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Gastvortrag</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Fremdsprachenvortrag</td>
+            <td>2</td>
+            <td>3</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Facharbeitverteidigung</td>
+            <td>2</td>
+            <td>3</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Wettbewerb</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td>Workshop</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td>Q/F</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>Sportveranstaltung</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ELMOS</td>
+            <td>2</td>
+            <td>3</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        </tbody>
+    </table>
 </div>

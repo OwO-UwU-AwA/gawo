@@ -6,44 +6,80 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.ResourceDetectors.Container;
 using OpenTelemetry.ResourceDetectors.Host;
 using OpenTelemetry.Logs;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
 
-Action<ResourceBuilder> appResourceBuilder = resource => resource.AddDetector(new ContainerResourceDetector()).AddDetector(new HostDetector());
+///////// BEGIN PROMETHEUS METRICS
 
-builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithTracing(tracerBuilder => tracerBuilder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddGrpcClientInstrumentation().AddOtlpExporter());
+Action<ResourceBuilder> appResourceBuilder = resource =>
+    resource.AddDetector(new ContainerResourceDetector()).AddDetector(new HostDetector());
 
-builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithMetrics(meterBuilder => meterBuilder.AddProcessInstrumentation().AddRuntimeInstrumentation().AddAspNetCoreInstrumentation().AddOtlpExporter().AddPrometheusExporter());
+
+builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithTracing(tracerBuilder =>
+    tracerBuilder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddGrpcClientInstrumentation()
+        .AddOtlpExporter());
+
+builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithMetrics(meterBuilder =>
+    meterBuilder.AddProcessInstrumentation().AddRuntimeInstrumentation().AddAspNetCoreInstrumentation()
+        .AddOtlpExporter().AddPrometheusExporter());
 
 builder.Logging.AddOpenTelemetry(options => options.AddOtlpExporter());
 
+///////// END PROMETHEUS METRICS
+
+
+///////// BEGIN AUTH
+
+// Needed If Running In A Docker Container
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("temp-keys")).UseCryptographicAlgorithms(
+    new AuthenticatedEncryptorConfiguration
+    {
+        EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+        ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+    });
+
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options => {
-        options.Cookie.Name = "AuthCookie";
-        options.ExpireTimeSpan = TimeSpan.FromHours(3);
-        options.LoginPath = "/Login";
-        options.LogoutPath = "/Logout";
-        options.AccessDeniedPath = "/Error";
+    .AddCookie(options =>
+        {
+            options.Cookie.Name = "AuthCookie";
+            // Change This As Required
+            options.ExpireTimeSpan = TimeSpan.FromHours(3);
+            // This Cookies Is Required For Any Kind Of Authentication
+            options.Cookie.IsEssential = true;
+            options.LoginPath = "/Login";
+            options.LogoutPath = "/Logout";
+            options.AccessDeniedPath = "/Error";
         }
     );
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy("AdminOnly", policy => {
+builder.Services.AddAuthorizationBuilder()
+    // Allows Marking Entire Pages As AdminOnly
+    .AddPolicy("AdminOnly", policy =>
+    {
         policy.RequireRole("Admin");
+        policy.RequireAuthenticatedUser();
     });
-});
 
-builder.Services.AddSession(options => {
+builder.Services.AddSession(options =>
+{
+    // Change This As Required
     options.IdleTimeout = TimeSpan.FromHours(3);
     options.Cookie.IsEssential = true;
+    // Change This To Match The Actual Domain
     options.Cookie.Domain = "gauss-gymnasium.de/gawo";
 });
 
+///////// END AUTH
+
 builder.Services.AddRazorPages();
 
-builder.Services.AddGraphQL(options => {
+builder.Services.AddGraphQL(options =>
+{
     options.AuthorizationOptions.Method = GraphQL.AspNet.Security.AuthorizationMethod.PerRequest;
 });
 

@@ -1,153 +1,117 @@
-using System.Data.SQLite;
 using System.Net.Mail;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
 using SurrealDb.Net;
 using SurrealDb.Net.Models;
 using SurrealDb.Net.Models.Auth;
 
-using Database;
-
-namespace gawo.Pages;
+namespace GaWo.Controllers;
 
 [Authorize]
 public class ProfileModel : PageModel
 {
-    private readonly ILogger<ProfileModel> _logger;
+    public GawoUser? UserStruct { get; set; }
 
     public (bool, string) Error { get; set; } = (false, string.Empty);
 
-    [BindProperty]
-    public string CurrentPassword { get; set; } = string.Empty;
-    [BindProperty]
-    public string NewPassword { get; set; } = string.Empty;
-    [BindProperty]
-    public string NewPasswordConf { get; set; } = string.Empty;
-    [BindProperty]
-    public string NewEmail { get; set; } = string.Empty;
-    [BindProperty]
-    public string Monday { get; set; } = string.Empty;
-    [BindProperty]
-    public string Tuesday { get; set; } = string.Empty;
-    [BindProperty]
-    public string Wednesday { get; set; } = string.Empty;
-    [BindProperty]
-    public string Thursday { get; set; } = string.Empty;
-    [BindProperty]
-    public string Friday { get; set; } = string.Empty;
-    public GawoUser? UserStruct { get; set; }
-    public static SurrealDbClient? Db { get; set; }
+    [BindProperty] public string CurrentPassword { get; set; } = string.Empty;
 
-    public class GawoUser : Record
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string MasterPassword { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Class { get; set; } = string.Empty;
-        /*
-            Teacher: 0000 0001
-            Admin:   0000 0010
-            Guest:   0000 0100
+    // (New, Confirmation)
+    [BindProperty] public string NewPassword { get; set; } = string.Empty;
 
-            Teacher+Admin: 0000 0011
-        */
-        public byte Permissions { get; set; } = 0;
+    [BindProperty] public string NewPasswordConf { get; set; } = string.Empty;
 
-        public byte Absence { get; set; } = 0;
+    [BindProperty] public string NewEmail { get; set; } = string.Empty;
 
-        public GawoUser(string username)
-        {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
+    [BindProperty] public byte Monday { get; set; }
 
-            using var connection = new SQLiteConnection(configuration.GetConnectionString("GawoDbContext"));
-            connection.Open();
-            string query = "SELECT first_name,last_name,username,email,class,is_teacher,is_admin,is_guest,absent,password FROM users WHERE username = @username";
-            using var command = new SQLiteCommand(query, connection);
-            command.Parameters.AddWithValue("@username", username);
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                FirstName = reader.GetString(0);
-                LastName = reader.GetString(1);
-                UserName = reader.GetString(2);
-                Email = reader.GetString(3);
-                Class = reader.GetValue(4).ToString();
-                Class = Class.IsNullOrEmpty() ? "keine" : Class;
-                Permissions = Convert.ToByte((reader.GetInt16(5) == 1 ? (0 | (1 << 0)) : Permissions) | (reader.GetInt16(6) == 1 ? (0 | (1 << 1)) : Permissions) | (reader.GetInt16(7) == 1 ? (0 | (1 << 2)) : Permissions));
-                Absence = Convert.ToByte(reader.GetInt16(8));
-                Password = reader.GetString(9);
-            }
-        }
-    }
-    public ProfileModel(ILogger<ProfileModel> logger)
-    {
-        _logger = logger;
-    }
+    [BindProperty] public byte Tuesday { get; set; } = 0;
+
+    [BindProperty] public byte Wednesday { get; set; } = 0;
+
+    [BindProperty] public byte Thursday { get; set; } = 0;
+
+    [BindProperty] public byte Friday { get; set; } = 0;
 
     public void OnGet()
     {
-        UserStruct = new GawoUser(HttpContext.User.Identity.Name);
+    }
+
+    public async Task<GawoUser> FillUser()
+    {
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
+
+        var query = await db.Query(
+            "RETURN array::at((SELECT id FROM Users WHERE username = type::string($username)).id, 0);",
+            new Dictionary<string, object> { { "username", HttpContext.User.Identity!.Name! } });
+
+        var thing = new Thing(query.GetValue<string>(0)!);
+
+        return (await db.Select<GawoUser>(thing))!;
     }
 
     public async Task<IActionResult> SyncDatabase(GawoUser user)
     {
         // Connect to local SurrealDB
-        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc", configureJsonSerializerOptions: options => {
-            options.PropertyNamingPolicy = new Database.LowerCaseNamingPolicy();
-        });
-        await Db.SignIn(new RootAuth { Username = "root", Password = "root" });
-        await Db.Use("main", "main");
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
 
-        var query = await Db.Query($"RETURN array::at((SELECT id FROM Users WHERE username = type::string($username)).id, 0);", new Dictionary<string, object>{{ "username", user.UserName }});
+        var query = await db.Query(
+            "RETURN array::at((SELECT id FROM Users WHERE username = type::string($username)).id, 0);",
+            new Dictionary<string, object> { { "username", user.Username } });
 
-        user.Id = new Thing(query.GetValue<string>(0));
+        user.Id = new Thing(query.GetValue<string>(0)!);
 
-	    await Db.Upsert(user);
+        await db.Upsert(user);
 
         return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostChangeEmail()
     {
-        GawoUser user = new(HttpContext.User.Identity.Name);
-
-        // Disregard Nonsensical Change
-        if (!user.Email.Equals(NewEmail))
-        {
-            user.Email = NewEmail;
-            await SyncDatabase(user);
-        }
         return RedirectToPage();
     }
 
     // TODO REWRITE THIS IMMEDIATELY
-    public IActionResult OnPostChangePassword()
+    public async Task<IActionResult> OnPostChangePassword()
     {
-        if (NewPassword == CurrentPassword)
+
+        if (NewPassword != NewPasswordConf)
         {
-            Error = (true, "Passwort nicht geändert.");
+            Error = (true, "Passwörter stimmen nicht miteinander überein.");
             return Page();
         }
+
+        if (CurrentPassword == NewPassword)
+        {
+            Error = (true, "Neues Passwort identisch zu derzeitigem Passwort.");
+            return Page();
+        }
+
+        if (NewPassword.Length < 8 || !NewPassword.Any(char.IsDigit) || !NewPassword.Any(char.IsUpper) || !NewPassword.Any(char.IsLower))
+        {
+            Error = (true, "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
+            return Page();
+        }
+        
+        // Change the password and send an email with a rollback link;
+
         return RedirectToPage();
     }
-
+    
     public void SendNotificationEmail(string title, string content, string email, string name)
     {
-        SmtpClient client = new(host: "localhost", port: 1025)
+        SmtpClient client = new("localhost", 1025)
         {
             UseDefaultCredentials = true
         };
 
-        MailAddress from = new(address: "gawo@gauss-gymnasium.de", displayName: "GAWO-Team");
+        MailAddress from = new("gawo@gauss-gymnasium.de", "GAWO-Team");
         MailAddress to = new(email, name);
 
         MailMessage message = new(from, to)
@@ -166,35 +130,19 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostChangeAbsence()
     {
-        UserStruct = new GawoUser(HttpContext.User.Identity.Name);
         byte bitfield = 0;
 
-        if (!Monday.IsNullOrEmpty())
-        {
-            bitfield |= (1 << 0);
-        }
-        if (!Tuesday.IsNullOrEmpty())
-        {
-            bitfield |= (1 << 1);
-        }
-        if (!Wednesday.IsNullOrEmpty())
-        {
-            bitfield |= (1 << 2);
-        }
-        if (!Thursday.IsNullOrEmpty())
-        {
-            bitfield |= (1 << 3);
-        }
-        if (!Friday.IsNullOrEmpty())
-        {
-            bitfield |= (1 << 4);
-        }
+        if (Monday != 0) bitfield |= 1 << 0;
+        if (Tuesday != 0) bitfield |= 1 << 1;
+        if (Wednesday != 0) bitfield |= 1 << 2;
+        if (Thursday != 0) bitfield |= 1 << 3;
+        if (Friday != 0) bitfield |= 1 << 4;
 
-        GawoUser user = UserStruct;
-        user.Absence = bitfield;
+        UserStruct = await FillUser();
+        UserStruct.Absence = bitfield;
 
-        await SyncDatabase(user);
-        
+        await SyncDatabase(UserStruct);
+
         return RedirectToPage();
     }
 }

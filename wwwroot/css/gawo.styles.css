@@ -1,0 +1,15 @@
+@media only screen and (max-width: 600px)
+{
+    .toggle-sidebar
+    {
+        display: none;
+    }
+}
+
+.toggle-sidebar
+{
+    position: relative;
+    left: 2%;
+    width: 5%;
+    height: 5%;
+}

@@ -1,23 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace gawo.Pages;
+namespace GaWo.Controllers;
 
 public class AdminModel : PageModel
 {
     public bool IsLucky { get; set; }
-    private readonly ILogger<AdminModel> _logger;
-    private readonly IAuthorizationService authorization;
+    private readonly IAuthorizationService _authorization;
 
-    public AdminModel(ILogger<AdminModel> logger, IAuthorizationService authorization)
+    public AdminModel(IAuthorizationService authorization)
     {
-        _logger = logger;
-        this.authorization = authorization;
+        _authorization = authorization;
     }
 
     public async void OnGet()
-    {        
-        var res = await authorization.AuthorizeAsync(User, "AdminOnly");
+    {
+        var res = await _authorization.AuthorizeAsync(User, "AdminOnly");
         IsLucky = res.Succeeded;
     }
 }

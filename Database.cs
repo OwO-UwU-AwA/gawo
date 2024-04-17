@@ -1,55 +1,69 @@
+using System.Text.Json.Serialization;
+using gawo.GraphQL;
 using SurrealDb.Net.Models;
-using System.Text.Json;
 
-namespace Database
+namespace GaWo;
+
+public class GawoUser : Record
 {
+    [JsonPropertyName("firstname")] public string FirstName { get; set; } = string.Empty;
 
-  public class User : Record
-  {
-      public int Absence { get; set; }
-      public int Permissions { get; set; }
-      public string? Firstname { get; set; }
-      public string? Lastname { get; set; }
-      public string? Username { get; set; }
-      public string? Email { get; set; }
-      public string? Password { get; set; }
-      public string? Class { get; set; }
-      public string? Masterpassword { get; set; }
-  };
+    [JsonPropertyName("lastname")] public string LastName { get; set; } = string.Empty;
 
-  public class Event : Record
-  {
-    public bool Accepted { get; set; }
-    public int Capacity { get; set; }
-    public DateTime Date { get; set; }
-    public string? Description { get; set; }
-    public string? Name { get; set; }
-    public int Duration { get; set; }
-    public int Grades { get; set; }
-    public string? Notes { get; set; }
-    public User? Organiser { get; set; }
-    public byte[]? Picture { get; set; }
-    public string? Room { get; set; }
-    public User? Teacher { get; set; }
-    public string? Type { get; set; }
-  };
+    [JsonPropertyName("masterpassword")] public string MasterPassword { get; set; } = string.Empty;
 
-  public class Surreal
-  {
-    public static string ToJsonString(object? o)
-    {
-      return JsonSerializer.Serialize(o, new JsonSerializerOptions
-      {
-        WriteIndented = true,
-      });
-    }
-  };
+    [JsonPropertyName("password")] public string Password { get; set; } = string.Empty;
 
-  public class LowerCaseNamingPolicy : JsonNamingPolicy
-  {
-    public override string ConvertName(string name)
-    {
-      return name.ToLower();
-    }
-  }
+    [JsonPropertyName("username")] public string Username { get; set; } = string.Empty;
+
+    [JsonPropertyName("email")] public string Email { get; set; } = string.Empty;
+
+    [JsonPropertyName("class")] public string? Class { get; set; } = string.Empty;
+
+    /*
+        Teacher: 0000 0001
+        Admin:   0000 0010
+        Guest:   0000 0100
+
+        Teacher+Admin: 0000 0011
+    */
+    [JsonPropertyName("permissions")] public byte Permissions { get; set; }
+
+    /*
+        Monday:     0000 0001
+        Tuesday:    0000 0010
+        Wednesday:  0000 0100
+        Thursday:   0000 1000
+        Friday:     0001 0000
+     */
+    [JsonPropertyName("absence")] public byte Absence { get; set; }
 }
+
+public class Event : Record
+{
+    [JsonPropertyName("accepted")] public bool Accepted { get; set; }
+
+    [JsonPropertyName("capacity")] public int Capacity { get; set; }
+
+    [JsonPropertyName("date")] public DateTime Date { get; set; }
+
+    [JsonPropertyName("description")] public string? Description { get; set; }
+
+    [JsonPropertyName("name")] public string? Name { get; set; }
+
+    [JsonPropertyName("duration")] public int Duration { get; set; }
+
+    [JsonPropertyName("grades")] public int Grades { get; set; }
+
+    [JsonPropertyName("notes")] public string? Notes { get; set; }
+
+    [JsonPropertyName("organiser")] public User? Organiser { get; set; }
+
+    [JsonPropertyName("picture")] public string? Picture { get; set; }
+
+    [JsonPropertyName("room")] public string? Room { get; set; }
+
+    [JsonPropertyName("teacher")] public User? Teacher { get; set; }
+
+    [JsonPropertyName("type")] public string? Type { get; set; }
+};

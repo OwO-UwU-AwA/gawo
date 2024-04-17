@@ -1,113 +1,118 @@
 @page
-@model AddEventModel
+@model GaWo.Controllers.AddEventModel
 @{
-  ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
 @{
-  // Are we registration phase yet ?
+    // Are we registration phase yet ?
 
-  string phase = string.Empty;
-  bool disabled = false;
+    var phase = string.Empty;
+    var disabled = false;
 
-  var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
-  using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-  {
-    connection.Open();
-    string query = "SELECT register_phase FROM misc";
-    using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+    var configuration = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .Build();
+    await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
     {
-      using (var reader = command.ExecuteReader())
-      {
-        if (reader.Read())
+        connection.Open();
+        const string query = "SELECT register_phase FROM misc";
+        await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
         {
-          phase = reader.GetString(0);
+            await using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    phase = reader.GetString(0);
+                }
+            }
         }
-      }
+
+        connection.Close();
     }
-  connection.Close();
-  }
 
-  phase = phase.Split("=")[0];
+    phase = phase.Split("=")[0];
 
-  if (DateTime.TryParseExact(phase, "yyyy-MM-ddTHHmm", null, System.Globalization.DateTimeStyles.None, out DateTime firstDate))
-  {
-    DateTime current = DateTime.Now;
-
-    if (DateTime.Compare(firstDate, current) != 0)
+    if (DateTime.TryParseExact(phase, "yyyy-MM-ddTHHmm", null, System.Globalization.DateTimeStyles.None, out var firstDate))
     {
-      disabled = false;
+        var current = DateTime.Now;
+
+        if (DateTime.Compare(firstDate, current) != 0)
+        {
+            disabled = false;
+        }
     }
-  }
 }
 
 <div class="content">
-<h2 class="header">Anmeldung</h2>
-<hr class="border border-primary opacity-50">
+    <h2 class="header">Anmeldung</h2>
+    <hr class="border border-primary opacity-50">
 
-<h3 class="text-danger">@Model.ErrorString</h3>
+    <h3 class="text-danger">@Model.ErrorString</h3>
 
-  <form method="post" asp-page-handler="AddEvent" class="row g-3">
-    
-    <div class="col-md-6">
-      <fieldset id="leftcol" @if (disabled) { <text>disabled</text> }>
-      <label for="name" class="form-label" asp-for="Name">Name</label>
-      <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
-      <br>
+    <form method="post" asp-page-handler="AddEvent" class="row g-3">
 
-      <label for="description" class="form-label" asp-for="Description">Beschreibung</label>
-      <textarea class="form-control" name="description" id="description" cols="30" rows="5" style="resize: none;" required></textarea>
-      <br>
+        <div class="col-md-6">
+            <fieldset id="leftcol"
+                      @if (disabled)
+                      {
+                          <text>disabled</text>
+                      }>
+                <label for="name" class="form-label" asp-for="Name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
+                <br>
 
-      <label for="capacity" class="form-label" asp-for="Capacity">Teilnehmeranzahl</label>
-      <input class="form-control" type="number" min="0" max="200" name="capacity" id="capacity" required>
-      <br>
+                <label for="description" class="form-label" asp-for="Description">Beschreibung</label>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="5" style="resize: none;" required></textarea>
+                <br>
 
-      <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
-      <select class="form-select" id="duration" name="duration" required disabled>
-      <script>
+                <label for="capacity" class="form-label" asp-for="Capacity">Teilnehmeranzahl</label>
+                <input class="form-control" type="number" min="0" max="200" name="capacity" id="capacity" required>
+                <br>
+
+                <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
+                <select class="form-select" id="duration" name="duration" required disabled>
+                    <script>
         function durationReload()
         {
           // This Is Ugly
-          var selected = document.getElementById('type').value;
-          var target = document.getElementById('duration');
+          let selected = document.getElementById('type').value;
+          let target = document.getElementById('duration');
 
           while (target.options.length > 0)
-            target.remove(0);
+            target.remove();
 
             switch (selected)
             {
               case 'WORKSHOP':
               case 'COMPETITION':
               {
-                var zero = document.createElement('option');
+                let zero = document.createElement('option');
                 zero.value = '';
                 zero.text = 'Dauer Auswählen';
                 target.add(zero);
 
-                var one = document.createElement('option');
+                let one = document.createElement('option');
                 one.value = '45';
                 one.text = '45 Minuten';
                 target.add(one);
 
-                var two = document.createElement('option');
+                let two = document.createElement('option');
                 two.value = '90';
                 two.text = '90 Minuten';
                 target.add(two);
 
-                var three = document.createElement('option');
+                let three = document.createElement('option');
                 three.value = '135';
                 three.text = '135 Minuten';
                 target.add(three);
 
-                var four = document.createElement('option');
+                let four = document.createElement('option');
                 four.value = '180';
                 four.text = '180 Minuten';
                 target.add(four);
 
-                var five = document.createElement('option');
+                let five = document.createElement('option');
                 five.value = '240';
                 five.text = '240 Minuten';
                 target.add(five);
@@ -117,17 +122,17 @@
               case 'THESISDEF':
               case 'FLANGPRESENTATION':
               {
-                var zero = document.createElement('option');
+                let zero = document.createElement('option');
                 zero.value = '';
                 zero.text = 'Dauer Auswählen';
                 target.add(zero);
 
-                var one = document.createElement('option');
+                let one = document.createElement('option');
                 one.value = '45';
                 one.text = '45 Minuten';
                 target.add(one);
 
-                var two = document.createElement('option');
+                let two = document.createElement('option');
                 two.value = '90';
                 two.text = '90 Minuten';
                 target.add(two);
@@ -138,29 +143,29 @@
               case 'GPRESENTATION':
               case 'PRESENTATION':
               {
-                var zero = document.createElement('option');
+                let zero = document.createElement('option');
                 zero.value = 'NULL';
                 zero.text = 'Dauer Auswählen';
-                zero.setAttribute("selected", true);
-                zero.setAttribute("disabled", true);
+                zero.setAttribute("selected", "true");
+                zero.setAttribute("disabled", "true");
                 target.add(zero);
 
-                var one = document.createElement('option');
+                let one = document.createElement('option');
                 one.value = '45';
                 one.text = '45 Minuten';
                 target.add(one);
 
-                var two = document.createElement('option');
+                let two = document.createElement('option');
                 two.value = '90';
                 two.text = '90 Minuten';
                 target.add(two);
 
-                var three = document.createElement('option');
+                let three = document.createElement('option');
                 three.value = '135';
                 three.text = '135 Minuten';
                 target.add(three);
 
-                var four = document.createElement('option');
+                let four = document.createElement('option');
                 four.value = '180';
                 four.text = '180 Minuten';
                 target.add(four);
@@ -169,147 +174,146 @@
             }
         }
       </script>
-      </select>
-      </fieldset>
-    </div>
+                </select>
+            </fieldset>
+        </div>
 
-    <div class="col-md-6">
-      <fieldset id="rightcol" @if (disabled) { <text>disabled</text> }>
-      <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp</label>
-      <select class="form-select" id="type" name="type" asp-for="Type" required onchange="const type = document.getElementById('type'); if (type.value != 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
-      <option selected disabled value="NULL">Veranstaltungstyp Auswählen</option>
-      <option value="PRESENTATION">Vortrag</option>
-      <option value="GPRESENTATION">Gastvortrag</option>
-      <option value="FLANGPRESENTATION">Fremdsprachenvortrag</option>
-      <option value="THESISDEF">Facharbeitsverteidigung</option>
-      <option value="COMPETITION">Wettbewerb</option>
-      <option value="WORKSHOP">Workshop</option>
-      <option value="QF">Q/F</option>
-      <option value="SPORT">Sportveranstaltung</option>
-      <option value="ELMOS">ELMOS</option>
-      </select>
-      <br>
-
-      @{
-        bool admin = false;
-        using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-        {
-          connection.Open();
-          string query = "SELECT is_admin FROM users WHERE username = @username";
-          using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-          {
-            command.Parameters.AddWithValue("@username", HttpContext.User.Identity!.Name);
-            using (var reader = command.ExecuteReader())
-            {
-              if (reader.Read())
-                admin = reader.GetBoolean(0);
-            }
-          }
-          connection.Close();
-        }
-        if (admin)
-        {
-            <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-            <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
-              <option selected disabled value="NULL">Organisator Auswählen</option>
-              @{
-                int _id = -1;
-                string _fname = string.Empty;
-                string _lname = string.Empty;
-
-                configuration = new ConfigurationBuilder()
-                  .AddJsonFile("appsettings.json")
-                  .Build();
-                using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-                {
-                  connection.Open();
-                  string query = "SELECT id,first_name,last_name FROM users";
-                  using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-                  {
-                    using (var reader = command.ExecuteReader())
-                    {
-                      while (reader.Read())
+        <div class="col-md-6">
+            <fieldset id="rightcol"
+                      @if (disabled)
                       {
-                        _id = reader.GetInt32(0);
-                        _fname = reader.GetString(1);
-                        _lname = reader.GetString(2);
-                        <option value="@_id">@_fname @_lname</option>
-                      }
+                          <text>disabled</text>
+                      }>
+                <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp</label>
+                <select class="form-select" id="type" name="type" asp-for="Type" required onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
+                    <option selected disabled value="NULL">Veranstaltungstyp Auswählen</option>
+                    <option value="PRESENTATION">Vortrag</option>
+                    <option value="GPRESENTATION">Gastvortrag</option>
+                    <option value="FLANGPRESENTATION">Fremdsprachenvortrag</option>
+                    <option value="THESISDEF">Facharbeitsverteidigung</option>
+                    <option value="COMPETITION">Wettbewerb</option>
+                    <option value="WORKSHOP">Workshop</option>
+                    <option value="QF">Q/F</option>
+                    <option value="SPORT">Sportveranstaltung</option>
+                    <option value="ELMOS">ELMOS</option>
+                </select>
+                <br>
+
+                @{
+                    var admin = false;
+                    await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+                    {
+                        connection.Open();
+                        const string query = "SELECT is_admin FROM users WHERE username = @username";
+                        await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@username", HttpContext.User.Identity!.Name);
+                            await using (var reader = command.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                    admin = reader.GetBoolean(0);
+                            }
+                        }
+
+                        connection.Close();
                     }
-                  }
+
+                    if (admin)
+                    {
+                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
+                        <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
+                            <option selected disabled value="NULL">Organisator Auswählen</option>
+                            @{
+                                configuration = new ConfigurationBuilder()
+                                    .AddJsonFile("appsettings.json")
+                                    .Build();
+                                await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+                                {
+                                    connection.Open();
+                                    const string query = "SELECT id,first_name,last_name FROM users";
+                                    await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+                                    {
+                                        await using (var reader = command.ExecuteReader())
+                                        {
+                                            while (reader.Read())
+                                            {
+                                                <option value="@reader.GetInt32(0)">@reader.GetString(1) @reader.GetString(2)</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
+                        <input type="text" class="form-control" id="organiser" name="organiser" disabled value="@HttpContext.User.Identity.Name" placeholder="@HttpContext.User.Identity.Name">
+                        <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
+                    }
                 }
-              }
-            </select>
-        }
-        else
-        {
-          <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-          <input type="text" class="form-control" id="organiser" name="organiser" disabled value="@HttpContext.User.Identity.Name" placeholder="@HttpContext.User.Identity.Name">
-          <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
-        }
-      }
-    <br>
+                <br>
 
-    <label for="teacher" class="form-label" asp-for="Teacher">Betreuer</label>
-    <select class="form-select" id="teacher" name="teacher" asp-for="Teacher" required>
-      <option selected disabled value="NULL">Betreuer Auswählen</option>
-      @{
-        int id = -1;
-        string fname = string.Empty;
-        string lname = string.Empty;
-        using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-        {
-          connection.Open();
-          string query = "SELECT id,first_name,last_name FROM users WHERE is_teacher = 1";
-          using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-          {
-            using (var reader = command.ExecuteReader())
-            {
-              while (reader.Read())
-              {
-                id = reader.GetInt32(0);
-                fname = reader.GetString(1);
-                lname = reader.GetString(2);
-                <option value="@id">@fname @lname</option>
-              }
-            }
-          }
-          connection.Close();
-        }
-      }
-    </select>
-    <br style="margin-bottom: 2%;">
+                <label for="teacher" class="form-label" asp-for="Teacher">Betreuer</label>
+                <select class="form-select" id="teacher" name="teacher" asp-for="Teacher" required>
+                    <option selected disabled value="NULL">Betreuer Auswählen</option>
+                    @{
+                        var fname = string.Empty;
+                        var lname = string.Empty;
+                        await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+                        {
+                            connection.Open();
+                            const string query = "SELECT id,first_name,last_name FROM users WHERE is_teacher = 1";
+                            await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+                            {
+                                await using (var reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        var id = reader.GetInt32(0);
+                                        fname = reader.GetString(1);
+                                        lname = reader.GetString(2);
+                                        <option value="@id">@fname @lname</option>
+                                    }
+                                }
+                            }
 
-    <label for="picture" class="form-label" asp-for="Picture">Optionales bild:</label>
-    <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
-    <br style="margin-bottom: 5%;">
+                            connection.Close();
+                        }
+                    }
+                </select>
+                <br style="margin-bottom: 2%;">
 
-    <label class="form-label">Jahrgangsstufen:</label> 
-    <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
-    <label for="grade7" class="form-check-label">7</label>
+                <label for="picture" class="form-label" asp-for="Picture">Optionales bild:</label>
+                <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
+                <br style="margin-bottom: 5%;">
 
-    <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
-    <label for="grade8" class="form-check-label">8</label>
+                <label class="form-label">Jahrgangsstufen:</label>
+                <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
+                <label for="grade7" class="form-check-label">7</label>
 
-    <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
-    <label for="grade9" class="form-check-label">9</label>
+                <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
+                <label for="grade8" class="form-check-label">8</label>
 
-    <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
-    <label for="grade10" class="form-check-label">10</label>
-    
-    <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
-    <label for="grade11" class="form-check-label">11</label>
-    
-    <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
-    <label for="grade12" class="form-check-label">12</label>
-    </div>
+                <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
+                <label for="grade9" class="form-check-label">9</label>
 
-    <div style="margin-bottom: 0.5%;">
-    <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz Für Das GaWo-Team" id="notes" style="height: 100px; resize: none;"></textarea>
-    </fieldset>
-    </div>
-    <div class="d-grid gap-2">
-      <input type="submit" class="btn btn-success" value="Veranstaltung Anmelden">
-    </div>
-  </form>
+                <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
+                <label for="grade10" class="form-check-label">10</label>
+
+                <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
+                <label for="grade11" class="form-check-label">11</label>
+
+                <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
+                <label for="grade12" class="form-check-label">12</label>
+
+                <div style="margin-bottom: 0.5%;">
+                    <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz Für Das GaWo-Team" id="notes" style="height: 100px; resize: none;"></textarea>
+                </div>
+            </fieldset>
+        </div>
+        <div class="d-grid gap-2">
+            <input type="submit" class="btn btn-success" value="Veranstaltung Anmelden">
+        </div>
+    </form>
 </div>

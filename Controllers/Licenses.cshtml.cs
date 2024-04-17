@@ -1,17 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace gawo.Pages;
+namespace GaWo.Controllers;
 
-public class LicenseModel : PageModel
-{
-    private readonly ILogger<LicenseModel> _logger;
-
-    public LicenseModel(ILogger<LicenseModel> logger)
-    {
-        _logger = logger;
-    }
-
-    public void OnGet()
-    {        
-    }
-}
+public class LicenseModel : PageModel;

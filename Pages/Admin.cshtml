@@ -1,42 +1,43 @@
 @page
-@model AdminModel
+@model GaWo.Controllers.AdminModel
 @{
-  ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
 }
 
 <h2 style="font-weight: bold;" class="header">Administrationsbereich</h2>
 <hr class="border border-primary opacity-50">
 
 <div class="content text-wrap">
-  @{
-    int count = -1;
-    var configuration = new ConfigurationBuilder()
-      .AddJsonFile("appsettings.json")
-      .Build();
-    using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-    {
-      connection.Open();
-      string query = "SELECT COUNT(*) FROM events WHERE accepted = false";
-      using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-      {
-        using (var reader = command.ExecuteReader())
+    @{
+        var count = -1;
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+        await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
         {
-          if (reader.Read())
-            count = reader.GetInt32(0);
+            connection.Open();
+            const string query = "SELECT COUNT(*) FROM events WHERE accepted = false";
+            await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
+            {
+                await using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                        count = reader.GetInt32(0);
+                }
+            }
+
+            connection.Close();
         }
-      }
-      connection.Close();
     }
-  }
-  @if (@count > 1)
-  {
-    <pre>@count events pending review</pre>
-  }
-  else
-  {
-    <pre>@count event pending review</pre>
-  }
-  
+    @if (count > 1)
+    {
+        <pre>@count events pending review</pre>
+    }
+    else
+    {
+        <pre>@count event pending review</pre>
+    }
+
 </div>
-    @User.IsInRole("Admin")
-    @Model.IsLucky
+@User.IsInRole("Admin")
+@Model.IsLucky

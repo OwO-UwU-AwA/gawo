@@ -1,17 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace gawo.Pages;
+namespace GaWo.Controllers;
 
-public class SitemapModel : PageModel
-{
-    private readonly ILogger<SitemapModel> _logger;
-
-    public SitemapModel(ILogger<SitemapModel> logger)
-    {
-        _logger = logger;
-    }
-
-    public void OnGet()
-    {        
-    }
-}
+public class SitemapModel : PageModel;
