@@ -50,11 +50,11 @@
                 <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>
                     @if (Context.User.Identity!.IsAuthenticated)
                     {
-                        <i class="fa-solid fa-user icon"></i>
+                        <i class="fa-solid fa-user"></i>
                     }
                     else
                     {
-                        <i class="fa-solid fa-right-to-bracket icon"></i>
+                        <i class="fa-solid fa-right-to-bracket"></i>
                     }
                     Profil
                 </button>

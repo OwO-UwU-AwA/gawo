@@ -59,7 +59,7 @@
                           <text>disabled</text>
                       }>
                 <label for="name" class="form-label" asp-for="Name">Name</label>
-                <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name Der Veranstaltung" required>
+                <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name der Veranstaltung" required>
                 <br>
 
                 <label for="description" class="form-label" asp-for="Description">Beschreibung</label>
@@ -89,7 +89,7 @@
               {
                 let zero = document.createElement('option');
                 zero.value = '';
-                zero.text = 'Dauer Auswählen';
+                zero.text = 'Dauer auswählen';
                 target.add(zero);
 
                 let one = document.createElement('option');
@@ -124,7 +124,7 @@
               {
                 let zero = document.createElement('option');
                 zero.value = '';
-                zero.text = 'Dauer Auswählen';
+                zero.text = 'Dauer auswählen';
                 target.add(zero);
 
                 let one = document.createElement('option');
@@ -145,7 +145,7 @@
               {
                 let zero = document.createElement('option');
                 zero.value = 'NULL';
-                zero.text = 'Dauer Auswählen';
+                zero.text = 'Dauer auswählen';
                 zero.setAttribute("selected", "true");
                 zero.setAttribute("disabled", "true");
                 target.add(zero);
@@ -186,7 +186,7 @@
                       }>
                 <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp</label>
                 <select class="form-select" id="type" name="type" asp-for="Type" required onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
-                    <option selected disabled value="NULL">Veranstaltungstyp Auswählen</option>
+                    <option selected disabled value="NULL">Veranstaltungstyp auswählen</option>
                     <option value="PRESENTATION">Vortrag</option>
                     <option value="GPRESENTATION">Gastvortrag</option>
                     <option value="FLANGPRESENTATION">Fremdsprachenvortrag</option>
@@ -222,7 +222,7 @@
                     {
                         <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
                         <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
-                            <option selected disabled value="NULL">Organisator Auswählen</option>
+                            <option selected disabled value="NULL">Organisator auswählen</option>
                             @{
                                 configuration = new ConfigurationBuilder()
                                     .AddJsonFile("appsettings.json")
@@ -256,7 +256,7 @@
 
                 <label for="teacher" class="form-label" asp-for="Teacher">Betreuer</label>
                 <select class="form-select" id="teacher" name="teacher" asp-for="Teacher" required>
-                    <option selected disabled value="NULL">Betreuer Auswählen</option>
+                    <option selected disabled value="NULL">Betreuer auswählen</option>
                     @{
                         var fname = string.Empty;
                         var lname = string.Empty;
@@ -284,7 +284,7 @@
                 </select>
                 <br style="margin-bottom: 2%;">
 
-                <label for="picture" class="form-label" asp-for="Picture">Optionales bild:</label>
+                <label for="picture" class="form-label" asp-for="Picture">Optionales Bild:</label>
                 <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
                 <br style="margin-bottom: 5%;">
 
@@ -308,12 +308,12 @@
                 <label for="grade12" class="form-check-label">12</label>
 
                 <div style="margin-bottom: 0.5%;">
-                    <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz Für Das GaWo-Team" id="notes" style="height: 100px; resize: none;"></textarea>
+                    <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz das GaWo-Team" id="notes" style="height: 100px; resize: none;"></textarea>
                 </div>
             </fieldset>
         </div>
         <div class="d-grid gap-2">
-            <input type="submit" class="btn btn-success" value="Veranstaltung Anmelden">
+            <input type="submit" class="btn btn-success" value="Veranstaltung anmelden">
         </div>
     </form>
 </div>

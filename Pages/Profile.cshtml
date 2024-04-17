@@ -1,7 +1,7 @@
 @page
 @model GaWo.Controllers.ProfileModel
 @{
-    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+    ViewData["Title"] = $"GaWo Profil";
     Model.UserStruct = Model.FillUser().Result;
 }
 
@@ -133,9 +133,9 @@ Rolle:
 <div class="content text-wrap" style="display: flex; flex-direction: row; align-items: baseline;">
     <form method="post" asp-page-handler="ChangeEmail">
         <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-            <input asp-for="NewEmail" type="email" class="form-control" id="newemail" name="newemail" placeholder="Neue E-Email Adresse" required>
+            <input asp-for="NewEmail" type="email" class="form-control" id="newemail" name="newemail" placeholder="Neue E-Email-Adresse" required>
         </div>
-        <button type="submit" class="btn btn-success" style="width: 100%;">Email Ändern<i class="fas fa-save" style="
+        <button type="submit" class="btn btn-success" style="width: 100%;">Email ändern<i class="fas fa-save" style="
       margin-left: 0.5em"></i></button>
     </form>
 
@@ -159,7 +159,7 @@ Rolle:
                 <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" placeholder="Passwort bestätigen" required>
                 <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')"><i id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
             </div>
-            <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort Ändern <i class="fas fa-save" style="
+            <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort ändern <i class="fas fa-save" style="
       margin-left: 0.5em"></i></button>
         </div>
     </form>

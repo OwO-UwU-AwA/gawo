@@ -42,7 +42,6 @@ builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("
         ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
     });
 
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
         {
