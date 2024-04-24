@@ -1,29 +1,42 @@
-#-------------------------------------------------------------------------------#
-#               Qodana analysis is configured by qodana.yaml file               #
-#             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
-#-------------------------------------------------------------------------------#
 version: "1.0"
-
-#Specify IDE code to run analysis without container (Applied in CI/CD pipeline)
-ide: QDNET
-
-#Specify inspection profile for code analysis
-profile:
-  name: qodana.starter
-
-#Enable inspections
-#include:
-#  - name: <SomeEnabledInspectionId>
-
-#Disable inspections
-#exclude:
-#  - name: <SomeDisabledInspectionId>
-#    paths:
-#      - <path/where/not/run/inspection>
-
-#Execute shell command before Qodana execution (Applied in CI/CD pipeline)
-#bootstrap: sh ./prepare-qodana.sh
-
-#Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
-#plugins:
-#  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
+linter: jetbrains/qodana-dotnet:2023.3
+include:
+  - name: CheckDependencyLicenses
+  - name: HtmlFormInputWithoutLabel
+  - name: HtmlRequiredAltAttribute
+  - name: HtmlRequiredLangAttribute
+  - name: HtmlRequiredSummaryAttribute
+  - name: HtmlRequiredTitleAttribute
+  - name: HtmlRequiredTitleElement
+  - name: ReplaceAssignmentWithOperatorAssignmentJS
+  - name: AssignmentToForLoopParameterJS
+  - name: AssignmentToFunctionParameterJS
+  - name: JSAssignmentUsedAsCondition
+  - name: NestedAssignmentJS
+  - name: AssignmentResultUsedJS
+  - name: SillyAssignmentJS
+  - name: ES6PossiblyAsyncFunction
+  - name: ES6MissingAwait
+  - name: ES6RedundantAwait
+  - name: JSIgnoredPromiseFromCall
+  - name: ES6TopLevelAwaitExpression
+  - name: PointlessBitwiseExpressionJS
+  - name: JSBitwiseOperatorUsage
+  - name: IncompatibleMaskJS
+  - name: ShiftOutOfRangeJS
+  - name: JsCoverageInspection
+  - name: W3CssValidation
+  - name: JSDeclarationsAtScopeStart
+  - name: ChainedEqualityJS
+  - name: ChainedFunctionCallJS
+  - name: ConstantOnLHSOfComparisonJS
+  - name: ConstantOnRHSOfComparisonJS
+  - name: CssMissingSemicolon
+  - name: NestedFunctionCallJS
+  - name: JSArrowFunctionBracesCanBeRemoved
+  - name: CssRedundantUnit
+  - name: NonBlockStatementBodyJS
+  - name: JSUndefinedPropertyAssignment
+  - name: JSRemoveUnnecessaryParentheses
+  - name: UnterminatedStatementJS
+  - name: CppUseAssociativeContains
