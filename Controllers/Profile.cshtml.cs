@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 using Cassandra;
@@ -101,41 +102,53 @@ public class ProfileModel : PageModel
 
         var htmlContent = new StringBuilder();
         var plainContent = new StringBuilder();
-        
+
         htmlContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName}, <br></br>");
-        htmlContent.AppendLine($"Ihre E-Mail-Adresse wurde am <code>{DateTime.Now:dd.MM.yyyy}</code> um <code>{DateTime.Now:HH:mm}</code> von <code style=\"color: #FF6961;\">{UserStruct.Email}</code> auf <code style=\"color: #FF6961;\">{NewEmail}</code> geändert.<br>");
-        htmlContent.AppendLine($"Bestätigen Sie diese Änderung unter <a style=\"color: #A1B8FB;\" href=\"http://localhost:5000/Verify?secret={secret}\">diesem Link</a>.");
-        htmlContent.AppendLine("Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style=\"color: #A1B8FB;\" href=\"mailto:gawo@gauss-gymnasium.de\">GaWo-Team</a> bitte umgehend.<br>");
-        
+        htmlContent.AppendLine(
+            $"Ihre E-Mail-Adresse wurde am <code>{DateTime.Now:dd.MM.yyyy}</code> um <code>{DateTime.Now:HH:mm}</code> von <code style=\"color: #FF6961;\">{UserStruct.Email}</code> auf <code style=\"color: #FF6961;\">{NewEmail}</code> geändert.<br>");
+        htmlContent.AppendLine(
+            $"Bestätigen Sie diese Änderung unter <a style=\"color: #A1B8FB;\" href=\"http://localhost:5000/Verify?secret={secret}\">diesem Link</a>.<br>");
+        htmlContent.AppendLine(
+            "Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style=\"color: #A1B8FB;\" href=\"mailto:gawo@gauss-gymnasium.de\">GaWo-Team</a> bitte umgehend.<br></br>");
+        htmlContent.AppendLine("Mit freundlichen Grüßen, <br></br> Das GaWo-Team.");
+
         plainContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName},");
         plainContent.AppendLine();
-        plainContent.AppendLine($"Ihre E-Mail-Adresse wurde am {DateTime.Now:dd.MM.yyyy} um {DateTime.Now:HH:mm} von `{UserStruct.Email}` auf `{NewEmail}` geändert.");
+        plainContent.AppendLine(
+            $"Ihre E-Mail-Adresse wurde am {DateTime.Now:dd.MM.yyyy} um {DateTime.Now:HH:mm} von `{UserStruct.Email}` auf `{NewEmail}` geändert.");
         plainContent.AppendLine();
         plainContent.AppendLine($"Bestätigen Sie diese Änderung unter http://localhost:5000/Verify?secret={secret} .");
-        plainContent.AppendLine("Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie gawo@gauss-gymnasium.de bitte umgehend.");
-        
+        plainContent.AppendLine(
+            "Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie gawo@gauss-gymnasium.de bitte umgehend.");
+        plainContent.AppendLine();
+        plainContent.AppendLine();
+        plainContent.AppendLine("Mit freundlichen Grüßen,");
+        plainContent.AppendLine();
+        plainContent.AppendLine();
+        plainContent.AppendLine("Das GaWo-Team.");
+
         AlternateView view = AlternateView.CreateAlternateViewFromString(htmlContent.ToString());
         view.ContentType = new System.Net.Mime.ContentType("text/html");
-        
 
-        if (SendNotificationEmail("[ANTWORTEN SIE NICHT AUF DIESE EMAIL]", plainContent.ToString(), UserStruct.Email,
+
+        if (SendNotificationEmail("[NOREPLY] Bestätigen Sie Ihre E-Mail-Adresse", plainContent.ToString(),
+                UserStruct.Email,
                 UserStruct.FirstName + " " + UserStruct.LastName, view) != true)
         {
             Error = (true, "Ein Fehler ist bei dem Senden der E-Mail aufgetreten.");
             return Page();
         }
-        
+
         UserStruct.Email = NewEmail;
-        
+
         await db.Upsert<GawoUser>(UserStruct);
-        
+
         return Redirect("/Profile?e");
     }
 
     // TODO REWRITE THIS IMMEDIATELY
     public async Task<IActionResult> OnPostChangePassword()
     {
-
         if (NewPassword != NewPasswordConf)
         {
             Error = (true, "Passwörter stimmen nicht miteinander überein.");
@@ -148,28 +161,32 @@ public class ProfileModel : PageModel
             return Page();
         }
 
-        if (NewPassword.Length < 8 || !NewPassword.Any(char.IsDigit) || !NewPassword.Any(char.IsUpper) || !NewPassword.Any(char.IsLower))
+        if (NewPassword.Length < 8 || !NewPassword.Any(char.IsDigit) || !NewPassword.Any(char.IsUpper) ||
+            !NewPassword.Any(char.IsLower))
         {
-            Error = (true, "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
+            Error = (true,
+                "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
             return Page();
         }
-        
+
         // Change the password and send an email with a rollback link;
 
         return Redirect("/Profile?p");
     }
-    
+
     public bool SendNotificationEmail(string title, string content, string email, string name, AlternateView alt)
     {
         var x = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetValue<string>("SmtpAddress")!
             .Split(":");
-        SmtpClient client = new(x[0], int.Parse(x[1]))
+        SmtpClient client = new()
         {
-            UseDefaultCredentials = true
+            UseDefaultCredentials = true,
+            Host = x[0],
+            Port = int.Parse(x[1]),
+            // TODO: Change this to true in production
+            EnableSsl = false,
+            Credentials = new NetworkCredential("noreply@gauss-gymnasium.de", "gawo2024"),
         };
-
-        // Doesn't work here
-        //client.EnableSsl = true;
 
         MailAddress from = new("noreply@gauss-gymnasium.de", "[NOREPLY]");
         MailAddress to = new(email, name);
@@ -182,8 +199,10 @@ public class ProfileModel : PageModel
             Body = content,
             BodyEncoding = Encoding.UTF8,
 
+            HeadersEncoding = Encoding.UTF8,
             IsBodyHtml = true,
             AlternateViews = { alt },
+            Priority = MailPriority.High,
         };
 
         try
@@ -192,16 +211,18 @@ public class ProfileModel : PageModel
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException.GetType() ,e.InnerException.Message, new StackTrace(e, true).GetFrame(1).GetMethod());
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException.GetType(),
+                e.InnerException.Message, new StackTrace(e, true).GetFrame(1).GetMethod());
             return false;
         }
+
         return true;
     }
 
     public async Task<IActionResult> OnPostChangeAbsence()
     {
         byte bitfield = 0;
-        
+
         if (Monday != 0) bitfield |= 1 << 0;
         if (Tuesday != 0) bitfield |= 1 << 1;
         if (Wednesday != 0) bitfield |= 1 << 2;
