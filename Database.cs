@@ -1,8 +1,15 @@
 using System.Text.Json.Serialization;
-using gawo.GraphQL;
+using Cassandra;
 using SurrealDb.Net.Models;
 
 namespace GaWo;
+
+public class VerificationLink : Record
+{
+    [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
+    [JsonPropertyName("user")] public Thing User { get; set; } = null!;
+    [JsonPropertyName("secret")] public string Secret { get; set; } = string.Empty;
+}
 
 public class GawoUser : Record
 {
@@ -21,11 +28,11 @@ public class GawoUser : Record
     [JsonPropertyName("class")] public string? Class { get; set; } = string.Empty;
 
     /*
-        Teacher: 0000 0001
-        Admin:   0000 0010
-        Guest:   0000 0100
+        Teacher:        0000 0001
+        Admin:          0000 0010
+        Guest:          0000 0100
 
-        Teacher+Admin: 0000 0011
+        Teacher+Admin:  0000 0011
     */
     [JsonPropertyName("permissions")] public byte Permissions { get; set; }
 
@@ -57,13 +64,13 @@ public class Event : Record
 
     [JsonPropertyName("notes")] public string? Notes { get; set; }
 
-    [JsonPropertyName("organiser")] public User? Organiser { get; set; }
+    [JsonPropertyName("organiser")] public GawoUser? Organiser { get; set; }
 
     [JsonPropertyName("picture")] public string? Picture { get; set; }
 
     [JsonPropertyName("room")] public string? Room { get; set; }
 
-    [JsonPropertyName("teacher")] public User? Teacher { get; set; }
+    [JsonPropertyName("teacher")] public GawoUser? Teacher { get; set; }
 
     [JsonPropertyName("type")] public string? Type { get; set; }
 };

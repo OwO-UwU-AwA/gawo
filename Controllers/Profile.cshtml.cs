@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using System.Net.Mail;
 using System.Text;
+using Cassandra;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 using SurrealDb.Net;
 using SurrealDb.Net.Models;
 using SurrealDb.Net.Models.Auth;
@@ -18,7 +21,6 @@ public class ProfileModel : PageModel
 
     [BindProperty] public string CurrentPassword { get; set; } = string.Empty;
 
-    // (New, Confirmation)
     [BindProperty] public string NewPassword { get; set; } = string.Empty;
 
     [BindProperty] public string NewPasswordConf { get; set; } = string.Empty;
@@ -74,7 +76,60 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostChangeEmail()
     {
-        return RedirectToPage();
+        UserStruct = await FillUser();
+        if (UserStruct.Email == NewEmail)
+        {
+            Error = (true, "Neue E-Mail-Adresse gleicht aktueller.");
+            return Page();
+        }
+
+        TimeUuid secret = TimeUuid.NewId();
+
+        VerificationLink link = new()
+        {
+            Secret = secret.ToString(),
+            Type = "email",
+            User = UserStruct.Id!
+        };
+
+        // Connect to local SurrealDB
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        await db.Use("main", "main");
+
+        await db.Create<VerificationLink>("VerificationLinks", link);
+
+        var htmlContent = new StringBuilder();
+        var plainContent = new StringBuilder();
+        
+        htmlContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName}, <br></br>");
+        htmlContent.AppendLine($"Ihre E-Mail-Adresse wurde am <code>{DateTime.Now:dd.MM.yyyy}</code> um <code>{DateTime.Now:HH:mm}</code> von <code style=\"color: #FF6961;\">{UserStruct.Email}</code> auf <code style=\"color: #FF6961;\">{NewEmail}</code> geändert.<br>");
+        htmlContent.AppendLine($"Bestätigen Sie diese Änderung unter <a style=\"color: #A1B8FB;\" href=\"http://localhost:5000/Verify?secret={secret}\">diesem Link</a>.");
+        htmlContent.AppendLine("Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style=\"color: #A1B8FB;\" href=\"mailto:gawo@gauss-gymnasium.de\">GaWo-Team</a> bitte umgehend.<br>");
+        
+        plainContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName},");
+        plainContent.AppendLine();
+        plainContent.AppendLine($"Ihre E-Mail-Adresse wurde am {DateTime.Now:dd.MM.yyyy} um {DateTime.Now:HH:mm} von `{UserStruct.Email}` auf `{NewEmail}` geändert.");
+        plainContent.AppendLine();
+        plainContent.AppendLine($"Bestätigen Sie diese Änderung unter http://localhost:5000/Verify?secret={secret} .");
+        plainContent.AppendLine("Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie gawo@gauss-gymnasium.de bitte umgehend.");
+        
+        AlternateView view = AlternateView.CreateAlternateViewFromString(htmlContent.ToString());
+        view.ContentType = new System.Net.Mime.ContentType("text/html");
+        
+
+        if (SendNotificationEmail("[ANTWORTEN SIE NICHT AUF DIESE EMAIL]", plainContent.ToString(), UserStruct.Email,
+                UserStruct.FirstName + " " + UserStruct.LastName, view) != true)
+        {
+            Error = (true, "Ein Fehler ist bei dem Senden der E-Mail aufgetreten.");
+            return Page();
+        }
+        
+        UserStruct.Email = NewEmail;
+        
+        await db.Upsert<GawoUser>(UserStruct);
+        
+        return Redirect("/Profile?e");
     }
 
     // TODO REWRITE THIS IMMEDIATELY
@@ -101,17 +156,22 @@ public class ProfileModel : PageModel
         
         // Change the password and send an email with a rollback link;
 
-        return RedirectToPage();
+        return Redirect("/Profile?p");
     }
     
-    public void SendNotificationEmail(string title, string content, string email, string name)
+    public bool SendNotificationEmail(string title, string content, string email, string name, AlternateView alt)
     {
-        SmtpClient client = new("localhost", 1025)
+        var x = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetValue<string>("SmtpAddress")!
+            .Split(":");
+        SmtpClient client = new(x[0], int.Parse(x[1]))
         {
             UseDefaultCredentials = true
         };
 
-        MailAddress from = new("gawo@gauss-gymnasium.de", "GAWO-Team");
+        // Doesn't work here
+        //client.EnableSsl = true;
+
+        MailAddress from = new("noreply@gauss-gymnasium.de", "[NOREPLY]");
         MailAddress to = new(email, name);
 
         MailMessage message = new(from, to)
@@ -122,16 +182,26 @@ public class ProfileModel : PageModel
             Body = content,
             BodyEncoding = Encoding.UTF8,
 
-            IsBodyHtml = true
+            IsBodyHtml = true,
+            AlternateViews = { alt },
         };
 
-        client.Send(message);
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception e)
+        {
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException.GetType() ,e.InnerException.Message, new StackTrace(e, true).GetFrame(1).GetMethod());
+            return false;
+        }
+        return true;
     }
 
     public async Task<IActionResult> OnPostChangeAbsence()
     {
         byte bitfield = 0;
-
+        
         if (Monday != 0) bitfield |= 1 << 0;
         if (Tuesday != 0) bitfield |= 1 << 1;
         if (Wednesday != 0) bitfield |= 1 << 2;

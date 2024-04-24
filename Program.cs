@@ -1,4 +1,3 @@
-using GraphQL.AspNet.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -9,7 +8,8 @@ using OpenTelemetry.Logs;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-
+using Serilog;
+using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +48,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             options.Cookie.Name = "AuthCookie";
             // Change This As Required
             options.ExpireTimeSpan = TimeSpan.FromHours(3);
-            // This Cookies Is Required For Any Kind Of Authentication
+            // This Cookie Is Required For Any Kind Of Authentication
             options.Cookie.IsEssential = true;
             options.LoginPath = "/Login";
             options.LogoutPath = "/Logout";
@@ -77,18 +77,11 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddGraphQL(options =>
-{
-    options.AuthorizationOptions.Method = GraphQL.AspNet.Security.AuthorizationMethod.PerRequest;
-});
-
 var app = builder.Build();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 app.UseRouting();
-
-app.MapGraphQLPlayground("/Playground");
 
 app.UseSession();
 
@@ -108,6 +101,10 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.UseGraphQL();
+await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().WriteTo.Console().CreateLogger();
+
+Log.Logger = log;
+
+Log.Information("Started Meow");
 
 await app.RunAsync();
