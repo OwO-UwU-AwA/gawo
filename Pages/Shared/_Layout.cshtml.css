@@ -1,109 +1,37 @@
-*
-{
-  --light-green: #E0F9CF;
-  --light-black: #1D1F21;
-  --light-red: #FF6961;
-  --light-yellow: #FDFD96;
-  --light-blue: #A1B8FB;
-  --light-magenta: #F49AC2;
-  --light-cyan: #A4D8D8;
-  --light-white: #C5C8C6;
-  --light-beige: #FFFFEF;
+* {
+    --light-green: #E0F9CF;
+    --light-black: #1D1F21;
+    --light-red: #FF6961;
+    --light-yellow: #FDFD96;
+    --light-blue: #A1B8FB;
+    --light-magenta: #F49AC2;
+    --light-cyan: #A4D8D8;
+    --light-white: #C5C8C6;
+    --light-beige: #FFFFEF;
+    --dark-green: #E0F9CF;
+    --dark-black: #1D1F21;
+    --dark-red: #FF6961;
+    --dark-yellow: #F1D113;
+    --dark-blue: #002F57;
+    --dark-magenta: #F49AC2;
+    --dark-cyan: #A4D8D8;
+    --dark-white: #C5C8C6;
+    --dark-background: #000000;
+    margin: 0;
 }
 
-body
-{
-  background-color: var(--light-beige);
+html, body {
+    height: 100%;
 }
 
-@media only screen and (max-width: 1010px)
-{
-  #sidebar
-  {
-    display: none
-  }
-  #footer
-  {
-    left: 0 !important;
-    margin-left: 5% !important;
-  }
+.home {
+    text-decoration: none;
+}
 
-  .content
-  {
-    margin-left: 5% !important;
-    left: 0 !important;
-  }
-  
-  .toggle-sidebar
-  {
+.content {
+    margin-left: 1%;
     position: absolute;
-    display: block !important;
-    top: 0 !important;
-    right: 0 !important;
-  }
-}
-
-@media (prefers-color-scheme: dark)
-{
-  *
-  { 
-  --dark-green: #E0F9CF;
-  --dark-black: #1D1F21;
-  --dark-red: #FF6961;
-  --dark-yellow: #F1D113;
-  --dark-blue: #002F57;
-  --dark-magenta: #F49AC2;
-  --dark-cyan: #A4D8D8;
-  --dark-white: #C5C8C6;
-  --dark-background: #000000;
-  }
-  body
-  {
-    background-color: black !important;
-    color: white !important;
-  }
-}
-
-.sidebar
-{
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 250px;
-  z-index: 1040;
-  overflow-y: auto;
-  outline: 0;
-}
-
-.home
-{
-  color: var(--dark-blue);
-  text-decoration: none;
-}
-
-#sidebar
-{
-  width: 20%;
-}
-
-.content
-{
-  margin-left: 1%;
-  position: absolute;
-  top: 2.25%;
-  left: 20%;
-  width: calc(100% - 22%);
-}
-
-#footer
-{
-  margin-left: 1%;
-  position: absolute;
-  left: 20%;
-}
-
-.toggle-sidebar
-{
-  display: none;
+    top: 2.25%;
+    left: 7%;
+    width: 91%;
 }

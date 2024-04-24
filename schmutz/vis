@@ -1,0 +1,17 @@
+Schmutz
+=======
+
+- [X] Benachrichtigung von Mitveranstaltern und Betreuern bei Abwesenheit + Zurückgabe der Karten für diesen Tag
+- [X] Auth-Cookie läuft nach 3 Stunden ab
+- [X] Bestätigungs-Email nach Änderung dieser (Zurücksetzung der Änderung falls diese nach 3 Stunden nicht bestätigt wurde)
+- [X] Standardpasswort **muss** nach erstem Anmelden geändert werden, ansonsten wird der Account gesperrt und muss von Befugten entsperrt werden
+- [X] Passwort - Mindensten 8 Zeichen, Alphanumerisch Pflicht
+
+Layout
+======
+- [X] (fancy shit) mehr Sachen klappen ein und werden zusammengefasst
+- [X] PDF Plan unter Besuchte Veranstaltungen /VisitedEvents
+- [X] Logos für Veranstaltungen / ((Logos für fachbereiche ?????)) (wenn kein eigenes Bild => Standard Bild)
+- [X] Responsive CSS @media
+- [X] Farben lassen aber mehr Vielfalt und schönerer (Verlauf, Absstimmung, Position, etc.)
+- [X] Dark Mode (und mehr Themes) (via data-bs-theme) Bootstrap Schmutz

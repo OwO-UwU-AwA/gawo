@@ -1,34 +1,75 @@
-﻿@page
-@model LoginModel
+@page
+@model GaWo.Controllers.LoginModel
 @{
-  ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+    ViewData["Title"] = $"GaWo Login";
 }
 
+<script>
+    function TogglePassword()
+    {
+        let passwordInput = document.getElementById("password");
+        let revealer = document.getElementById("revealer");
+        
+        if (passwordInput.getAttribute("type") === "text")
+        {
+            revealer.classList.remove("fa-eye");
+            revealer.classList.add("fa-eye-slash");
+            passwordInput.setAttribute("type", "password");
+        }
+        else
+        {
+            revealer.classList.remove("fa-eye-slash");
+            revealer.classList.add("fa-eye");
+            passwordInput.setAttribute("type", "text");
+        }
+    }
+</script>
+
 <h2 style="font-weight: bold;" class="header">Login</h2>
-<hr>
+<hr class="border border-primary  opacity-50">
 
 @if (!Request.HttpContext.User.Identity!.IsAuthenticated)
 {
-<div class="content text-wrap" style="display: flex;">
+    @* ReSharper disable once RedundantBoolCompare *@
+    if (Model.Error == true)
+    {
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </symbol>
+        </svg>
 
-  <form method="post" asp-page-handler="Login">
-    <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
-      <label asp-for="Username">Benutzername:</label>
-      <input type="text" class="form-control" id="username" name="username" required>
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                <use xlink:href="#exclamation-triangle-fill"/>
+            </svg>
+            <div>
+                Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.
+            </div>
+        </div>
+    }
+
+    <div class="content text-wrap" style="display: flex;">
+
+        <form method="post" asp-page-handler="Login" style="width: 25%">
+            <div class="form-group" style="margin-top: 5%; margin-bottom: 5%;">
+                <input asp-for="Username" type="text" class="form-control" id="username" name="username" placeholder="Benutzername" required autofocus>
+            </div>
+            <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control" id="password" name="password" placeholder="Passwort" required>
+                    <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword()"><i id="revealer" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 5%;">Anmelden<i class="fa-solid fa-circle-arrow-right" style="margin-left: 0.5em"></i></button>
+            </div>
+        </form>
     </div>
-    <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-      <label asp-for="Password">Passwort:</label>
-      <input type="password" class="form-control" id="password" name="password" required>
-      <button type="submit" class="btn btn-success" style="margin-top: 5%;">Anmelden</button>
-    </div>
-  </form>
-</div>
-<h3 class="text-danger">@Model.ValidationErrorMessage</h3>
 }
 else
 {
-<h3 class="text-danger">@(Request.HttpContext.User.Identity.IsAuthenticated ? "Bereits Angemeldet" : "")</h3>
-<button class="btn btn-success" style="width: 250px;" onclick="location.href='/Profile'">Profil</button>
-<br>
-<button class="btn btn-danger" style="width: 250px; margin-top: .5%;" onclick="location.href='/Logout'">Abmelden</button>
+    @* ReSharper disable once StringLiteralTypo *@
+    <h3 class="text-danger">@(Request.HttpContext.User.Identity.IsAuthenticated ? "Bereits angemeldet" : "")</h3>
+    <button class="btn btn-success" style="width: 250px;" onclick="location.href='/Profile'">Profil</button>
+    <br>
+    <button class="btn btn-danger" style="width: 250px; margin-top: .5%;" onclick="location.href='/Logout'">Abmelden</button>
 }

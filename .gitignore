@@ -44,6 +44,8 @@ StyleCopReport.xml
 *.obj
 *.iobj
 *.pch
+obj/*
+bin/*
 *.pdb
 *.ipdb
 *.pgc

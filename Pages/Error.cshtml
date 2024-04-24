@@ -1,26 +1,22 @@
-﻿@page
-@model ErrorModel
+@page
+@model GaWo.Controllers.ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "GaWo Error";
 }
 
-<!--
-VERY IMPORTANT;
-DONT REMOVE!
--->
-<script>NekoType="white"</script>
-<h1 id=nl><script src="https://webneko.net/n20171213.js"></script><a 
-href="https://webneko.net">Neko</a></h1>
 <h1 class="text-danger text-center header">Etwas ist schiefgelaufen :(</h1>
-<hr>
+<hr class="border border-danger opacity-50">
 
-<h3 class="text-center"><a class="text-success" href="/">Home</a></h3>
+<h3 class="text-center">
+    <a href="/"><img alt="krtek" src="img/krtek.jpg" height="302"></a>
+    <!-- <a class="text-success" href="/">Home</a> --->
+</h3>
 @if (Model.ShowRequestId)
 {
     <p style="text-align: center;">
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
         <br>
-        <strong>HTTP Methode:</strong> <code>@Request.Method.ToString()</code>
+        <strong>HTTP Methode:</strong> <code>@Request.Method</code>
         <br>
         <strong>Authentifiziert:</strong> <code>@Request.HttpContext.User.Identity!.IsAuthenticated.ToString()</code>
         <br>

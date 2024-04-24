@@ -1,0 +1,29 @@
+@page
+@model GaWo.Controllers.SitemapModel
+@{
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+}
+
+<h2 style="font-weight: bold;" class="header">Sitemap</h2>
+<hr class="border border-primary opacity-50">
+
+<div class="container text-center">
+    <div class="row align-items-start">
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Index'">Home</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Login'">Login</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Profile'">Mein Profil</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/AddEvent'">Event Hinzufügen</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/MyEvents'">Meine Events</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Points'">Punktetabellen</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Logout'">Logout</button>
+    </div>
+    <br/>
+    <br/>
+
+    <div class="row align-items-start">
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Admin'">Administrationsbereich</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Licenses'">Softwarelizenzattributionen</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Privacy'">Privatsphäre</button>
+        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/SiteMap'">Sitemap</button>
+    </div>
+</div>
