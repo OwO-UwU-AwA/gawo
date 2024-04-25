@@ -2,7 +2,8 @@ name: Qodana
 on:
   workflow_dispatch:
   pull_request:
-    types: [closed]
+    branches:
+      - main
 
 jobs:
   qodana:
