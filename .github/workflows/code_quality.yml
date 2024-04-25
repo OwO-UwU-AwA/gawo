@@ -2,11 +2,11 @@ name: Qodana
 on:
   workflow_dispatch:
   pull_request:
-  push:
-    branches: # Specify your branches here
-      - dev # The development branch
+    types: [closed]
+
 jobs:
   qodana:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
