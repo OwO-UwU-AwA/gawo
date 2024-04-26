@@ -19,8 +19,8 @@ public class VerifyModel : PageModel
         try
         {
             await db.Query(
-                "DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string(secret)).id, 0));",
-                new Dictionary<string, object> { { "secret", HttpContext.Request.Query["secret"] } });
+                "DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string($secret)).id, 0));",
+                new Dictionary<string, object> { { "secret", HttpContext.Request.Query["secret"].ToString() } });
         }
         catch (Exception e)
         {

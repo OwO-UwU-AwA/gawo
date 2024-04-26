@@ -50,142 +50,16 @@
 
     <h3 class="text-danger">@Model.ErrorString</h3>
 
-    <form method="post" asp-page-handler="AddEvent" class="row g-3">
-
-        <div class="col-md-6">
-            <fieldset id="leftcol"
-                      @if (disabled)
-                      {
-                          <text>disabled</text>
-                      }>
-                <label for="name" class="form-label" asp-for="Name">Name</label>
+    <form method="post" asp-page-handler="AddEvent" class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <label for="name" class="form-label" asp-for="Name">Name<sup>*</sup></label>
                 <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name der Veranstaltung" required>
-                <br>
-
-                <label for="description" class="form-label" asp-for="Description">Beschreibung</label>
-                <textarea class="form-control" name="description" id="description" cols="30" rows="5" style="resize: none;" required></textarea>
-                <br>
-
-                <label for="capacity" class="form-label" asp-for="Capacity">Teilnehmeranzahl</label>
-                <input class="form-control" type="number" min="0" max="200" name="capacity" id="capacity" required>
-                <br>
-
-                <label for="duration" class="form-label" asp-for="Duration">Dauer:</label>
-                <select class="form-select" id="duration" name="duration" required disabled>
-                    <script>
-        function durationReload()
-        {
-          // This Is Ugly
-          let selected = document.getElementById('type').value;
-          let target = document.getElementById('duration');
-
-          while (target.options.length > 0)
-            target.remove();
-
-            switch (selected)
-            {
-              case 'WORKSHOP':
-              case 'COMPETITION':
-              {
-                let zero = document.createElement('option');
-                zero.value = '';
-                zero.text = 'Dauer auswählen';
-                target.add(zero);
-
-                let one = document.createElement('option');
-                one.value = '45';
-                one.text = '45 Minuten';
-                target.add(one);
-
-                let two = document.createElement('option');
-                two.value = '90';
-                two.text = '90 Minuten';
-                target.add(two);
-
-                let three = document.createElement('option');
-                three.value = '135';
-                three.text = '135 Minuten';
-                target.add(three);
-
-                let four = document.createElement('option');
-                four.value = '180';
-                four.text = '180 Minuten';
-                target.add(four);
-
-                let five = document.createElement('option');
-                five.value = '240';
-                five.text = '240 Minuten';
-                target.add(five);
-                break;
-              } 
-              case 'ELMOS':
-              case 'THESISDEF':
-              case 'FLANGPRESENTATION':
-              {
-                let zero = document.createElement('option');
-                zero.value = '';
-                zero.text = 'Dauer auswählen';
-                target.add(zero);
-
-                let one = document.createElement('option');
-                one.value = '45';
-                one.text = '45 Minuten';
-                target.add(one);
-
-                let two = document.createElement('option');
-                two.value = '90';
-                two.text = '90 Minuten';
-                target.add(two);
-                break;
-              }
-              case 'SPORT':
-              case 'QF':
-              case 'GPRESENTATION':
-              case 'PRESENTATION':
-              {
-                let zero = document.createElement('option');
-                zero.value = 'NULL';
-                zero.text = 'Dauer auswählen';
-                zero.setAttribute("selected", "true");
-                zero.setAttribute("disabled", "true");
-                target.add(zero);
-
-                let one = document.createElement('option');
-                one.value = '45';
-                one.text = '45 Minuten';
-                target.add(one);
-
-                let two = document.createElement('option');
-                two.value = '90';
-                two.text = '90 Minuten';
-                target.add(two);
-
-                let three = document.createElement('option');
-                three.value = '135';
-                three.text = '135 Minuten';
-                target.add(three);
-
-                let four = document.createElement('option');
-                four.value = '180';
-                four.text = '180 Minuten';
-                target.add(four);
-                break;
-              }
-            }
-        }
-      </script>
-                </select>
-            </fieldset>
-        </div>
-
-        <div class="col-md-6">
-            <fieldset id="rightcol"
-                      @if (disabled)
-                      {
-                          <text>disabled</text>
-                      }>
-                <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp</label>
-                <select class="form-select" id="type" name="type" asp-for="Type" required onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
+            </div>
+            <div class="col">
+                <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp<sup>*</sup></label>
+                <select class="form-select" id="type" name="type" asp-for="Type" required
+                        onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
                     <option selected disabled value="NULL">Veranstaltungstyp auswählen</option>
                     <option value="PRESENTATION">Vortrag</option>
                     <option value="GPRESENTATION">Gastvortrag</option>
@@ -197,8 +71,121 @@
                     <option value="SPORT">Sportveranstaltung</option>
                     <option value="ELMOS">ELMOS</option>
                 </select>
-                <br>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <label for="description" class="form-label" asp-for="Description">Beschreibung<sup>*</sup></label>
+                <textarea placeholder="15 bis 256 Wörter" class="form-control" maxlength="256" minlength="15"
+                          name="description" id="description" rows="5" style="resize: none;" required></textarea>
+            </div>
+            <div class="col">
+                <label for="duration" class="form-label" asp-for="Duration">Dauer<sup>*</sup></label>
+                <select class="form-select mb-4" id="duration" name="duration" required disabled>
+                    <script>
+                        function durationReload() {
+                            // This Is Ugly
+                            let selected = document.getElementById('type').value;
+                            let target = document.getElementById('duration');
 
+                            while (target.options.length > 0)
+                                target.remove();
+
+                            switch (selected) {
+                                case 'WORKSHOP':
+                                case 'COMPETITION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = '';
+                                    zero.text = 'Dauer auswählen';
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = '45';
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = '90';
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+
+                                    let three = document.createElement('option');
+                                    three.value = '135';
+                                    three.text = '135 Minuten';
+                                    target.add(three);
+
+                                    let four = document.createElement('option');
+                                    four.value = '180';
+                                    four.text = '180 Minuten';
+                                    target.add(four);
+
+                                    let five = document.createElement('option');
+                                    five.value = '240';
+                                    five.text = '240 Minuten';
+                                    target.add(five);
+                                    break;
+                                }
+                                case 'ELMOS':
+                                case 'THESISDEF':
+                                case 'FLANGPRESENTATION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = '';
+                                    zero.text = 'Dauer auswählen';
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = '45';
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = '90';
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+                                    break;
+                                }
+                                case 'SPORT':
+                                case 'QF':
+                                case 'GPRESENTATION':
+                                case 'PRESENTATION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = 'NULL';
+                                    zero.text = 'Dauer auswählen';
+                                    zero.setAttribute("selected", "true");
+                                    zero.setAttribute("disabled", "true");
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = '45';
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = '90';
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+
+                                    let three = document.createElement('option');
+                                    three.value = '135';
+                                    three.text = '135 Minuten';
+                                    target.add(three);
+
+                                    let four = document.createElement('option');
+                                    four.value = '180';
+                                    four.text = '180 Minuten';
+                                    target.add(four);
+                                    break;
+                                }
+                            }
+                        }
+                    </script>
+                </select>
+                <label for="capacity" class="form-label" asp-for="Capacity">Teilnehmeranzahl<sup>*</sup></label>
+                <input class="form-control" type="number" min="0" max="200" name="capacity" id="capacity" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
                 @{
                     var admin = false;
                     await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
@@ -220,7 +207,7 @@
 
                     if (admin)
                     {
-                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
+                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator<sup>*</sup></label>
                         <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
                             <option selected disabled value="NULL">Organisator auswählen</option>
                             @{
@@ -252,65 +239,67 @@
                         <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
                     }
                 }
-                <br>
-
-                <label for="teacher" class="form-label" asp-for="Teacher">Betreuer</label>
-                <select class="form-select" id="teacher" name="teacher" asp-for="Teacher" required>
-                    <option selected disabled value="NULL">Betreuer auswählen</option>
+            </div>
+            <div class="col">
+                <label for="subject" class="form-label" asp-for="Subject">Fach<sup>*</sup></label>
+                <select class="form-select" id="subject" name="subject" asp-for="Subject" required>
+                    <option selected disabled value="NULL">Fachbereich auswählen</option>
                     @{
-                        var fname = string.Empty;
-                        var lname = string.Empty;
-                        await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+                        foreach (var line in System.IO.File.ReadLines("/home/fedora/Programming/gawo/wwwroot/subjects"))
                         {
-                            connection.Open();
-                            const string query = "SELECT id,first_name,last_name FROM users WHERE is_teacher = 1";
-                            await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-                            {
-                                await using (var reader = command.ExecuteReader())
-                                {
-                                    while (reader.Read())
-                                    {
-                                        var id = reader.GetInt32(0);
-                                        fname = reader.GetString(1);
-                                        lname = reader.GetString(2);
-                                        <option value="@id">@fname @lname</option>
-                                    }
-                                }
-                            }
-
-                            connection.Close();
+                            <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
                         }
                     }
                 </select>
-                <br style="margin-bottom: 2%;">
-
-                <label for="picture" class="form-label" asp-for="Picture">Optionales Bild:</label>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="picture" class="form-label" asp-for="Picture">Optionales Bild</label>
                 <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
-                <br style="margin-bottom: 5%;">
 
-                <label class="form-label">Jahrgangsstufen:</label>
-                <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
-                <label for="grade7" class="form-check-label">7</label>
+                <div class="row mt-3">
+                    <label class="form-label">Jahrgangsstufen<sup>*</sup></label>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade5" class="form-check-input" id="grade5" name="Grade5">
+                        <label for="grade5" class="form-check-label">5</label>
 
-                <input type="checkbox" asp-for="Grade8" class="form-check-input" id="grade8" name="Grade8">
-                <label for="grade8" class="form-check-label">8</label>
+                        <input type="checkbox" asp-for="Grade6" class="form-check-input" id="grade6" name="Grade6">
+                        <label for="grade6" class="form-check-label">6</label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
+                        <label for="grade7" class="form-check-label">7</label>
 
-                <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
-                <label for="grade9" class="form-check-label">9</label>
-
-                <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
-                <label for="grade10" class="form-check-label">10</label>
-
-                <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
-                <label for="grade11" class="form-check-label">11</label>
-
-                <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
-                <label for="grade12" class="form-check-label">12</label>
-
-                <div style="margin-bottom: 0.5%;">
-                    <textarea asp-for="Notes" class="form-control" placeholder="Optionale Notiz das GaWo-Team" id="notes" style="height: 100px; resize: none;"></textarea>
+                        <input type="checkbox" asp-for="Grade8" class="form-check-input" style="margin-left: 0.58rem;"
+                               id="grade8" name="Grade8">
+                        <label for="grade8" class="form-check-label">8</label>
+                    </div>
                 </div>
-            </fieldset>
+                <div class="row">
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
+                        <label for="grade9" class="form-check-label">9</label>
+
+                        <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
+                        <label for="grade10" class="form-check-label">10</label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
+                        <label for="grade11" class="form-check-label">11</label>
+
+                        <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
+                        <label for="grade12" class="form-check-label">12</label>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col">
+                <label for="notes" class="form-label">Bemerkung</label>
+                <textarea asp-for="Notes" class="form-control" placeholder="Bemerkung für das GaWo-Team" rows="5"
+                          id="notes" style="resize: none;"></textarea>
+            </div>
         </div>
         <div class="d-grid gap-2">
             <input type="submit" class="btn btn-success" value="Veranstaltung anmelden">

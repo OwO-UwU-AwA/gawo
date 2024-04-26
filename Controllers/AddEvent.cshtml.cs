@@ -9,6 +9,9 @@ namespace GaWo.Controllers;
 [Authorize]
 public class AddEventModel : PageModel
 {
+    // ReSharper disable once StringLiteralTypo
+    public IConfigurationRoot Configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+    [BindProperty] public string Subject { get; set; } = string.Empty;
     [BindProperty] public string Name { get; set; } = string.Empty;
     [BindProperty] public string Description { get; set; } = string.Empty;
     [BindProperty] public byte[]? Picture { get; set; } = null;
@@ -19,6 +22,9 @@ public class AddEventModel : PageModel
     [BindProperty] public string Organiser { get; set; } = string.Empty;
     [BindProperty] public string Type { get; set; } = "NULL";
     [BindProperty] public int Teacher { get; set; } = -1;
+
+    [BindProperty] public bool Grade5 { get; set; } = false;
+    [BindProperty] public bool Grade6 { get; set; } = false;
     [BindProperty] public bool Grade7 { get; set; } = false;
     [BindProperty] public bool Grade8 { get; set; } = false;
     [BindProperty] public bool Grade9 { get; set; } = false;
@@ -27,9 +33,6 @@ public class AddEventModel : PageModel
     [BindProperty] public bool Grade12 { get; set; } = false;
 
     public string ErrorString { get; set; } = string.Empty;
-
-    // ReSharper disable once StringLiteralTypo
-    public IConfigurationRoot Configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
     public IActionResult OnPostAddEvent()
     {
