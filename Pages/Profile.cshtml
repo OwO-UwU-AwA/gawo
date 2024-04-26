@@ -1,4 +1,5 @@
 @page
+@using SurrealDb.Net
 @model GaWo.Controllers.ProfileModel
 @{
     ViewData["Title"] = $"GaWo Profil";
@@ -8,6 +9,8 @@
 <script>
     function TogglePassword(id)
     {
+        let passwordInput;
+        let revealer;
         if (id === "button1")
         {
             passwordInput = document.getElementById("currentpassword");
@@ -37,13 +40,29 @@
         }
 
     }
+
 </script>
 
 <h2>@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
 <hr class="border border-primary opacity-50">
 
 Klasse: @Model.UserStruct.Class <br>
-E-Mail-Adresse: @Model.UserStruct.Email <br>
+<span>
+    E-Mail-Adresse: @Model.UserStruct.Email
+    @{
+        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        // Get COUNT VerificationLinks
+        int? query = null;
+        {
+            <span class="badge border border-1 text-danger-emphasis">
+                E-Mail-Adresse nicht verifiziert
+                <i
+                    class="text-danger fa-solid fa-triangle-exclamation">
+                </i>
+            </span>
+        }
+    }
+</span><br>
 Rolle:
 @{
     if ((Model.UserStruct.Permissions & (1 << 0)) != 0)
@@ -160,21 +179,27 @@ Rolle:
         <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
             <div class="input-group">
                 <input asp-for="CurrentPassword" type="password" class="form-control" id="currentpassword" name="currentpassword" placeholder="Derzeitiges Passwort" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button1')"><i id="revealer1" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
+                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button1')">
+                    <i id="revealer1" class="fa-regular fa-eye-slash" aria-hidden="true"></i>
+                </button>
             </div>
-            
+
         </div>
         <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
             <div class="input-group">
                 <input asp-for="NewPassword" type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Neues Passwort" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button2')"><i id="revealer2" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
+                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button2')">
+                    <i id="revealer2" class="fa-regular fa-eye-slash" aria-hidden="true"></i>
+                </button>
             </div>
-            
+
         </div>
         <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
             <div class="input-group">
                 <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" placeholder="Passwort bestätigen" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')"><i id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
+                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')">
+                    <i id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true"></i>
+                </button>
             </div>
             <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort ändern <i class="fas fa-save" style="
       margin-left: 0.5em"></i></button>

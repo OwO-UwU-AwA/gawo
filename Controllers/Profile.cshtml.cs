@@ -161,17 +161,13 @@ public class ProfileModel : PageModel
             return Page();
         }
 
-        if (NewPassword.Length < 8 || !NewPassword.Any(char.IsDigit) || !NewPassword.Any(char.IsUpper) ||
-            !NewPassword.Any(char.IsLower))
-        {
-            Error = (true,
-                "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
-            return Page();
-        }
+        if (NewPassword.Length >= 8 && NewPassword.Any(char.IsDigit) && NewPassword.Any(char.IsUpper) &&
+            NewPassword.Any(char.IsLower)) return Redirect("/Profile?p");
+        Error = (true,
+            "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
+        return Page();
 
         // Change the password and send an email with a rollback link;
-
-        return Redirect("/Profile?p");
     }
 
     public bool SendNotificationEmail(string title, string content, string email, string name, AlternateView alt)
@@ -211,8 +207,8 @@ public class ProfileModel : PageModel
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException.GetType(),
-                e.InnerException.Message, new StackTrace(e, true).GetFrame(1).GetMethod());
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
+                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
             return false;
         }
 

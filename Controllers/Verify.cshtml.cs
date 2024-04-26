@@ -7,10 +7,6 @@ namespace GaWo.Controllers;
 
 public class VerifyModel : PageModel
 {
-    public VerifyModel()
-    {
-    }
-
     public async Task<IActionResult> OnGet()
     {
         // Connect to local SurrealDB
@@ -18,13 +14,20 @@ public class VerifyModel : PageModel
         await db.SignIn(new RootAuth { Username = "root", Password = "root" });
         await db.Use("main", "main");
 
-        if (!HttpContext.Request.Query.ContainsKey("secret")) return RedirectToPage("Index");
+        if (!HttpContext.Request.Query.ContainsKey("secret")) RedirectToPage("Index");
 
-        var query = await db.Query(
-            "DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string(secret)).id, 0));",
-            new Dictionary<string, object> { { "secret", HttpContext.Request.Query["secret"] } });
+        try
+        {
+            await db.Query(
+                "DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string(secret)).id, 0));",
+                new Dictionary<string, object> { { "secret", HttpContext.Request.Query["secret"] } });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
 
-        // Redirect To Profile Again After verifying
         return RedirectToPage("/Profile");
     }
 }
