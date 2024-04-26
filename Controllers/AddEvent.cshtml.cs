@@ -3,14 +3,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
+using SurrealDb.Net;
+using SurrealDb.Net.Models.Auth;
 
 namespace GaWo.Controllers;
 
 [Authorize]
 public class AddEventModel : PageModel
 {
-    // ReSharper disable once StringLiteralTypo
+    public readonly IAuthorizationService AuthorizationService;
     public IConfigurationRoot Configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+    public SurrealDbClient Db;
+
+    public AddEventModel(IAuthorizationService authorizationService)
+    {
+        AuthorizationService = authorizationService;
+        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        Db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        Db.Use("main", "main");
+    }
+
     [BindProperty] public string Subject { get; set; } = string.Empty;
     [BindProperty] public string Name { get; set; } = string.Empty;
     [BindProperty] public string Description { get; set; } = string.Empty;
@@ -32,13 +44,16 @@ public class AddEventModel : PageModel
     [BindProperty] public bool Grade11 { get; set; } = false;
     [BindProperty] public bool Grade12 { get; set; } = false;
 
-    public string ErrorString { get; set; } = string.Empty;
+    public (bool, string) Error { get; set; } = (false, string.Empty);
 
     public IActionResult OnPostAddEvent()
     {
         // Execute Pre-Setup-Steps And Check For Errors
         if (PreSetup() == -1)
-            return Error("Unvollständige Angaben (Standardwert Oder NULL)");
+        {
+            Error = (true, "Unvollständige Angaben (Standardwert Oder NULL)");
+            return Page();
+        }
 
         using (var connection = new SQLiteConnection(Configuration.GetConnectionString("GawoDbContext")))
         {
@@ -114,15 +129,7 @@ public class AddEventModel : PageModel
             // END
         }
 
-        // Reset Old ErrorString Value
-        ErrorString = string.Empty;
         return RedirectToPage();
-    }
-
-    private IActionResult Error(string message)
-    {
-        ErrorString = message;
-        return Page();
     }
 
     private int PreSetup()

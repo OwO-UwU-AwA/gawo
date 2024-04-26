@@ -1,54 +1,32 @@
 @page
+@using Microsoft.AspNetCore.Authorization
 @model GaWo.Controllers.AddEventModel
 @{
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
-}
-
-@{
-    // Are we registration phase yet ?
-
-    var phase = string.Empty;
-    var disabled = false;
-
-    var configuration = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json")
-        .Build();
-    await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-    {
-        connection.Open();
-        const string query = "SELECT register_phase FROM misc";
-        await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-        {
-            await using (var reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    phase = reader.GetString(0);
-                }
-            }
-        }
-
-        connection.Close();
-    }
-
-    phase = phase.Split("=")[0];
-
-    if (DateTime.TryParseExact(phase, "yyyy-MM-ddTHHmm", null, System.Globalization.DateTimeStyles.None, out var firstDate))
-    {
-        var current = DateTime.Now;
-
-        if (DateTime.Compare(firstDate, current) != 0)
-        {
-            disabled = false;
-        }
-    }
 }
 
 <div class="content">
     <h2 class="header">Anmeldung</h2>
     <hr class="border border-primary opacity-50">
 
-    <h3 class="text-danger">@Model.ErrorString</h3>
+    @if (Model.Error.Item1 == true)
+    {
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                    d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </symbol>
+        </svg>
+        <div class="alert alert-danger d-flex align-items-center mb-5" style="margin-top: 1em; margin-bottom: -2em;"
+             role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                <use xlink:href="#exclamation-triangle-fill"/>
+            </svg>
+            <div>
+                @Html.Raw(Model.Error.Item2)
+            </div>
+        </div>
+    }
 
     <form method="post" asp-page-handler="AddEvent" class="container">
         <div class="row mb-3">
@@ -76,7 +54,7 @@
         <div class="row mb-3">
             <div class="col">
                 <label for="description" class="form-label" asp-for="Description">Beschreibung<sup>*</sup></label>
-                <textarea placeholder="15 bis 256 Wörter" class="form-control" maxlength="256" minlength="15"
+                <textarea class="form-control" maxlength="256" minlength="15"
                           name="description" id="description" rows="5" style="resize: none;" required></textarea>
             </div>
             <div class="col">
@@ -187,47 +165,20 @@
         <div class="row mb-3">
             <div class="col">
                 @{
-                    var admin = false;
-                    await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
-                    {
-                        connection.Open();
-                        const string query = "SELECT is_admin FROM users WHERE username = @username";
-                        await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-                        {
-                            command.Parameters.AddWithValue("@username", HttpContext.User.Identity!.Name);
-                            await using (var reader = command.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                    admin = reader.GetBoolean(0);
-                            }
-                        }
+                    // Whether User Is Part Of AdminOnly Policy
+                    var x = await Model.AuthorizationService.AuthorizeAsync(User, "AdminOnly");
 
-                        connection.Close();
-                    }
-
-                    if (admin)
+                    if (x.Succeeded)
                     {
                         <label for="organiser" class="form-label" asp-for="Organiser">Organisator<sup>*</sup></label>
                         <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
                             <option selected disabled value="NULL">Organisator auswählen</option>
                             @{
-                                configuration = new ConfigurationBuilder()
-                                    .AddJsonFile("appsettings.json")
-                                    .Build();
-                                await using (var connection = new System.Data.SQLite.SQLiteConnection(configuration.GetConnectionString("GawoDbContext")))
+                                var options = await Model.Db.Select<GawoUser>("Users");
+
+                                foreach (var option in options)
                                 {
-                                    connection.Open();
-                                    const string query = "SELECT id,first_name,last_name FROM users";
-                                    await using (var command = new System.Data.SQLite.SQLiteCommand(query, connection))
-                                    {
-                                        await using (var reader = command.ExecuteReader())
-                                        {
-                                            while (reader.Read())
-                                            {
-                                                <option value="@reader.GetInt32(0)">@reader.GetString(1) @reader.GetString(2)</option>
-                                            }
-                                        }
-                                    }
+                                    <option value="@option.Id">@option.FirstName @option.LastName</option>
                                 }
                             }
                         </select>
@@ -235,7 +186,8 @@
                     else
                     {
                         <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-                        <input type="text" class="form-control" id="organiser" name="organiser" disabled value="@HttpContext.User.Identity.Name" placeholder="@HttpContext.User.Identity.Name">
+                        <input type="text" class="form-control" id="organiser" name="organiser" disabled
+                               value="@HttpContext.User.Identity!.Name" placeholder="@HttpContext.User.Identity.Name">
                         <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
                     }
                 }
@@ -245,6 +197,7 @@
                 <select class="form-select" id="subject" name="subject" asp-for="Subject" required>
                     <option selected disabled value="NULL">Fachbereich auswählen</option>
                     @{
+                        // TODO: Remove Hardcoded Path
                         foreach (var line in System.IO.File.ReadLines("/home/fedora/Programming/gawo/wwwroot/subjects"))
                         {
                             <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
@@ -302,7 +255,12 @@
             </div>
         </div>
         <div class="d-grid gap-2">
-            <input type="submit" class="btn btn-success" value="Veranstaltung anmelden">
+            <button type="submit" class="btn btn-success">
+                Veranstaltung anmelden
+                <i
+                    class="fa-solid fa-arrow-up-from-bracket">
+                </i>
+            </button>
         </div>
     </form>
 </div>

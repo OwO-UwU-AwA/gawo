@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace gawo.Pages;
+namespace GaWo.Pages;
 
 public class Verify : PageModel
 {
