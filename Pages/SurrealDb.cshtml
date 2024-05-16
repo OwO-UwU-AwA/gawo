@@ -1,0 +1,18 @@
+@page
+@model GaWo.Controllers.SurrealDbModel
+@{
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+}
+
+<div class="content">
+    <h2 class="header">Anmeldung</h2>
+    <hr class="border border-primary opacity-50">
+
+    <form asp-page-handler="OnPost" type="post">
+        <textarea asp-for="Query" class="form-control"></textarea>
+        <button type="submit" class="btn btn-success">Execute!</button>
+    </form>
+    
+    <span>@Model.Result</span>
+    
+</div>

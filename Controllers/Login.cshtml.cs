@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,11 @@ namespace GaWo.Controllers;
 
 public class LoginModel : PageModel
 {
-    [BindProperty] public string Username { get; set; } = string.Empty;
+    [Required]
+    [BindProperty]
+    public string Username { get; set; } = string.Empty;
 
+    [Required]
     [BindProperty] public string Password { get; set; } = string.Empty;
 
     public bool Error { get; set; }
