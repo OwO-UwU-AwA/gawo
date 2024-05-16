@@ -16,7 +16,7 @@ public class Secrets
 
     public static async Task<Secrets> Get()
     {
-        using StreamReader r = new("~/secrets.json");
+        using StreamReader r = new("text/secrets.json");
         var json = await r.ReadToEndAsync();
         var secrets = JsonConvert.DeserializeObject<Secrets>(json)!;
 
