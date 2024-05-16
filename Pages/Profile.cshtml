@@ -1,4 +1,6 @@
 @page
+@using SurrealDb.Net
+@using SurrealDb.Net.Models.Auth
 @model GaWo.Controllers.ProfileModel
 @{
     ViewData["Title"] = $"GaWo Profil";
@@ -8,6 +10,8 @@
 <script>
     function TogglePassword(id)
     {
+        let passwordInput;
+        let revealer;
         if (id === "button1")
         {
             passwordInput = document.getElementById("currentpassword");
@@ -37,81 +41,122 @@
         }
 
     }
+
 </script>
 
-<h2>@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
-<hr class="border border-primary opacity-50">
+<div class="container-fluid">
 
-Klasse: @Model.UserStruct.Class <br>
-E-Mail-Adresse: @Model.UserStruct.Email <br>
-Rolle:
-@{
-    if ((Model.UserStruct.Permissions & (1 << 0)) != 0)
-    {
-        @: Administrator
-    }
-    else if ((Model.UserStruct.Permissions & (1 << 1)) != 0)
-    {
-        @: Lehrer
-    }
-    else if ((Model.UserStruct.Permissions & (1 << 2)) != 0)
-    {
-        @: Gast
-    }
-    else
-    {
-        @: Schüler
-    }
-}
-<br>
+    <div class="row row-cols-1 justify-content-md-start">
+        <div class="col w-100">
+            <h2>@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
+            <hr class="border border-primary opacity-50">
+        </div>
+        <div class="col mb-1">
+            Klasse: @Model.UserStruct.Class
+        </div>
+        <div class="col mb-1">
+            <span>
+                E-Mail-Adresse: @Model.UserStruct.Email
+                @{
+                    var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+                    await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+                    await db.Use("main", "main");
 
-@if (Model.UserStruct.Absence != 0)
-{
-    string[] days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
-    string[] absent = ["", "", "", "", ""];
+                    var query = await db.Query("RETURN COUNT(SELECT COUNT() FROM VerificationLinks WHERE user = $thing AND type = 'email');", new Dictionary<string, object> { { "thing", Model.UserStruct.Id } });
 
-    @: Abgemeldet für :
+                    if (query.GetValue<int>(0) > 0)
+                    {
+                        <span class="badge border border-1 text-danger-emphasis">
+                            E-Mail-Adresse nicht verifiziert
+                            <i
+                                class="text-danger-emphasis fa-solid fa-triangle-exclamation">
+                            </i>
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge border border-1 text-success-emphasis">
+                            E-Mail-Adresse verifiziert
+                            <i
+                                class="text-success-emphasis fa-solid fa-circle-check">
+                            </i>
+                        </span>
+                    }
+                }
+            </span><br>
+        </div>
+        <div class="col">
+            Rolle:
+            @{
+                if ((Model.UserStruct.Permissions & (1 << 0)) != 0)
+                {
+                    @: Administrator
+                }
+                else if ((Model.UserStruct.Permissions & (1 << 1)) != 0)
+                {
+                    @: Lehrer
+                }
+                else if ((Model.UserStruct.Permissions & (1 << 2)) != 0)
+                {
+                    @: Gast
+                }
+                else
+                {
+                    @: Schüler
+                }
+            }
+            <br>
 
-    // TODO: Clean Up This Mess
-    if ((Model.UserStruct.Absence & (1 << 0)) != 0)
-    {
-        absent[0] = days[0];
-    }
+            @if (Model.UserStruct.Absence != 0)
+            {
+                string[] days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
+                string[] absent = ["", "", "", "", ""];
 
-    if ((Model.UserStruct.Absence & (1 << 1)) != 0)
-    {
-        absent[1] = days[1];
-    }
+                @: Abgemeldet für :
 
-    if ((Model.UserStruct.Absence & (1 << 2)) != 0)
-    {
-        absent[2] = days[2];
-    }
+                // TODO: Clean Up This Mess
+                if ((Model.UserStruct.Absence & (1 << 0)) != 0)
+                {
+                    absent[0] = days[0];
+                }
 
-    if ((Model.UserStruct.Absence & (1 << 3)) != 0)
-    {
-        absent[3] = days[3];
-    }
+                if ((Model.UserStruct.Absence & (1 << 1)) != 0)
+                {
+                    absent[1] = days[1];
+                }
 
-    if ((Model.UserStruct.Absence & (1 << 4)) != 0)
-    {
-        absent[4] = days[4];
-    }
+                if ((Model.UserStruct.Absence & (1 << 2)) != 0)
+                {
+                    absent[2] = days[2];
+                }
 
-    // Remove All Days Not Absent
-    absent = absent.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                if ((Model.UserStruct.Absence & (1 << 3)) != 0)
+                {
+                    absent[3] = days[3];
+                }
 
-    // For Every Day Absent: Add A Comma After It And Print It Except For The Last Day Which Does Not Have A Comma Following
-    for (var i = 0; i < absent.Length; i++)
-    {
-        if (i != absent.Length - 1)
-        {
-            absent[i] += ", ";
-        }
+                if ((Model.UserStruct.Absence & (1 << 4)) != 0)
+                {
+                    absent[4] = days[4];
+                }
 
-        @absent[i]
-    }
-}
+                // Remove All Days Not Absent
+                absent = absent.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                // For Every Day Absent: Add A Comma After It And Print It Except For The Last Day Which Does Not Have A Comma Following
+                for (var i = 0; i < absent.Length; i++)
+                {
+                    if (i != absent.Length - 1)
+                    {
+                        absent[i] += ", ";
+                    }
+
+                    @absent[i]
+                }
+            }
+        </div>
+    </div>
+</div>
 
 @if (Model.Error.Item1 == true)
 {
@@ -147,101 +192,91 @@ Rolle:
     </div>
 }
 
-<div class="content text-wrap" style="display: flex; flex-direction: row; align-items: baseline;">
-    <form method="post" asp-page-handler="ChangeEmail">
-        <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-            <input asp-for="NewEmail" type="email" class="form-control" id="newemail" name="newemail" placeholder="Neue E-Email-Adresse" required>
-        </div>
-        <button type="submit" class="btn btn-success" style="width: 100%;">Email ändern<i class="fas fa-save" style="
-      margin-left: 0.5em"></i></button>
-    </form>
+<style>
 
-    <form method="post" asp-page-handler="ChangePassword" style="margin-top: 5%; margin-bottom: 5%; margin-left: 2%;">
-        <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-            <div class="input-group">
-                <input asp-for="CurrentPassword" type="password" class="form-control" id="currentpassword" name="currentpassword" placeholder="Derzeitiges Passwort" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button1')"><i id="revealer1" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
-            </div>
-            
-        </div>
-        <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-            <div class="input-group">
-                <input asp-for="NewPassword" type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Neues Passwort" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button2')"><i id="revealer2" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
-            </div>
-            
-        </div>
-        <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
-            <div class="input-group">
-                <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf" name="newpasswordconf" placeholder="Passwort bestätigen" required>
-                <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')"><i id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
-            </div>
-            <button type="submit" class="btn btn-success" style="margin-top: 5%;">Passwort ändern <i class="fas fa-save" style="
-      margin-left: 0.5em"></i></button>
-        </div>
-    </form>
+</style>
 
-    <style>
-    .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75em;
-      justify-content: space-between;
-      max-width: 400px; /* Adjust the maximum width as needed */
-    }
-
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-    }
-
-    .checkbox-item label {
-      width: 110px; /* Adjust the width as needed */
-    }
-  </style>
-
-    <form asp-page-handler="ChangeAbsence" method="post" id="absentForm" style="margin-top: 5%; margin-bottom: 5%; margin-left: 2%;">
-        <div class="checkbox-group">
-            <div class="checkbox-item">
-                <label asp-for="Monday" for="monday">Montag</label>
-                <input value="1" type="checkbox" class="form-check-input" id="monday" name="monday">
-            </div>
-
-            <div class="checkbox-item">
-                <label asp-for="Tuesday" for="tuesday">Dienstag</label>
-                <input value="2" type="checkbox" class="form-check-input" id="tuesday" name="tuesday">
-            </div>
-
-            <div class="checkbox-item">
-                <label asp-for="Wednesday" for="wednesday">Mittwoch</label>
-                <input value="3" type="checkbox" class="form-check-input" id="wednesday" name="wednesday">
-            </div>
-
-            <div class="checkbox-item">
-                <label asp-for="Thursday" for="thursday">Donnerstag</label>
-                <input value="4" type="checkbox" class="form-check-input" id="thursday" name="thursday">
-            </div>
-
-            <div class="checkbox-item">
-                <label asp-for="Friday" for="friday">Freitag</label>
-                <input value="5" type="checkbox" class="form-check-input" id="friday" name="friday">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success" style="margin-top: 10%; width: 100%;">Abwesenheit speichern<i class="fas fa-save" style="margin-left: 0.5em;"></i></button>
+<div class="container mt-5 row g-3">
+    <form asp-page-handler="ChangeEmail" method="post" class="col">
+        <input asp-for="NewEmail" type="email" class="form-control mb-3" id="newemail" name="newemail"
+               placeholder="Neue E-Email-Adresse" required>
+        <button type="submit" class="btn btn-success w-100">Email ändern<i class="fas fa-save" style="
+margin-left: 0.5em"></i></button>
     </form>
 
 
-    <div class="modal fade" id="errormodal" tabindex="-1" aria-labelledby="errormodallabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="errormodallabel">Fehler</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+    <form asp-page-handler="ChangePassword" method="post" class="col">
+        <div class="input-group mb-3">
+            <input asp-for="CurrentPassword" type="password" class="form-control" id="currentpassword"
+                   name="currentpassword" placeholder="Derzeitiges Passwort" required>
+            <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button1')">
+                <i
+                    id="revealer1" class="fa-regular fa-eye-slash" aria-hidden="true">
+                </i>
+            </button>
+        </div>
+        <div class="input-group mb-3">
+            <input asp-for="NewPassword" type="password" class="form-control" id="newpassword" name="newpassword"
+                   placeholder="Neues Passwort" required>
+            <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button2')">
+                <i
+                    id="revealer2" class="fa-regular fa-eye-slash" aria-hidden="true">
+                </i>
+            </button>
+        </div>
+        <div class="input-group mb-3">
+            <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf"
+                   name="newpasswordconf" placeholder="Passwort bestätigen" required>
+            <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')">
+                <i
+                    id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true">
+                </i>
+            </button>
+        </div>
+        <button type="submit" class="btn btn-success w-100">
+            Passwort ändern
+            <i class="fas fa-save"
+               style="margin-left: 0.5em">
+            </i>
+        </button>
+    </form>
+
+    <form asp-page-handler="ChangeAbsence" method="post" class="col">
+        <div class="checkbox-item form-check form-check-inline">
+            <input value="1" type="checkbox" class="form-check-input" id="monday" name="monday">
+            <label asp-for="Monday" class="form-check-label" for="monday">Montag</label>
+        </div>
+        <div class="checkbox-item form-check form-check-inline">
+            <input value="3" type="checkbox" class="form-check-input" id="wednesday" name="wednesday">
+            <label asp-for="Wednesday" class="form-check-label" for="wednesday">Mittwoch</label>
+        </div>
+        <div class="checkbox-item form-check form-check-inline">
+            <input value="2" type="checkbox" class="form-check-input" id="tuesday" name="tuesday">
+            <label asp-for="Tuesday" class="form-check-label" for="tuesday">Dienstag</label>
+        </div>
+        <div class="checkbox-item form-check form-check-inline">
+            <input value="4" type="checkbox" class="form-check-input" id="thursday" name="thursday">
+            <label asp-for="Thursday" class="form-check-label" for="thursday">Donnerstag</label>
+        </div>
+        <button type="submit" class="btn btn-success w-100 mt-5">
+            Abwesenheit speichern
+            <i class="fas fa-save"
+               style="margin-left: 0.5em;">
+            </i>
+        </button>
+    </form>
+</div>
+
+<div class="modal fade" id="errormodal" tabindex="-1" aria-labelledby="errormodallabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errormodallabel">Fehler</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
