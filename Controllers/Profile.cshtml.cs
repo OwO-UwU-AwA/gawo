@@ -20,9 +20,8 @@ namespace GaWo.Controllers;
 [Authorize]
 public class ProfileModel : PageModel
 {
-    public GawoUser? UserStruct { get; set; }
-
     public (bool, string) Error;
+    public GawoUser? UserStruct { get; set; }
 
     [BindProperty] public byte Monday { get; set; }
 
@@ -54,25 +53,6 @@ public class ProfileModel : PageModel
     [Required(ErrorMessage = "Passwort erforderlich")]
     [BindProperty]
     public string NewPasswordConf { get; set; } = string.Empty;
-
-    public class EmailValidator : AbstractValidator<ProfileModel>
-    {
-        public EmailValidator()
-        {
-            RuleFor(x => x.NewEmail).NotNull().EmailAddress().WithMessage("Ungültige E-Mail-Adresse.");
-        }
-    }
-
-    public class PasswordValidator : AbstractValidator<ProfileModel>
-    {
-        public PasswordValidator()
-        {
-            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8)
-                .WithMessage("Passwort muss mindestens 8 Zeichen lang sein").NotEqual(x => x.CurrentPassword)
-                .WithMessage("Neues Passwort darf nicht dem alten entsprechen.").Equal(x => x.NewPasswordConf)
-                .WithMessage("Passwörter stimmen nicht überein.");
-        }
-    }
 
     public void OnGet()
     {
@@ -213,6 +193,7 @@ public class ProfileModel : PageModel
     {
         var x = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetValue<string>("SmtpAddress")!
             .Split(":");
+        var secrets = Secrets.Get().Result;
         SmtpClient client = new()
         {
             UseDefaultCredentials = true,
@@ -220,7 +201,8 @@ public class ProfileModel : PageModel
             Port = int.Parse(x[1]),
             // TODO: Change this to true in production
             EnableSsl = false,
-            Credentials = new NetworkCredential("noreply@gauss-gymnasium.de", "gawo2024")
+
+            Credentials = new NetworkCredential("noreply@gauss-gymnasium.de", secrets.EmailPassword)
         };
 
         MailAddress from = new("noreply@gauss-gymnasium.de", "[NOREPLY]");
@@ -270,5 +252,24 @@ public class ProfileModel : PageModel
         await SyncDatabase(UserStruct);
 
         return RedirectToPage();
+    }
+
+    public class EmailValidator : AbstractValidator<ProfileModel>
+    {
+        public EmailValidator()
+        {
+            RuleFor(x => x.NewEmail).NotNull().EmailAddress().WithMessage("Ungültige E-Mail-Adresse.");
+        }
+    }
+
+    public class PasswordValidator : AbstractValidator<ProfileModel>
+    {
+        public PasswordValidator()
+        {
+            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8)
+                .WithMessage("Passwort muss mindestens 8 Zeichen lang sein").NotEqual(x => x.CurrentPassword)
+                .WithMessage("Neues Passwort darf nicht dem alten entsprechen.").Equal(x => x.NewPasswordConf)
+                .WithMessage("Passwörter stimmen nicht überein.");
+        }
     }
 }

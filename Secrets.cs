@@ -12,9 +12,11 @@ public class Secrets
 
     [JsonProperty("password")] public string Password { get; private set; } = string.Empty;
 
+    [JsonProperty("emailpassword")] public string EmailPassword { get; private set; } = string.Empty;
+
     public static async Task<Secrets> Get()
     {
-        using StreamReader r = new("/home/fedora/Programming/gawo/secrets.json");
+        using StreamReader r = new("~/secrets.json");
         var json = await r.ReadToEndAsync();
         var secrets = JsonConvert.DeserializeObject<Secrets>(json)!;
 
