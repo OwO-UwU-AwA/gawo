@@ -197,8 +197,7 @@
                 <select class="form-select" id="subject" name="subject" asp-for="Subject" required>
                     <option selected disabled value="NULL">Fachbereich auswählen</option>
                     @{
-                        // TODO: Remove Hardcoded Path
-                        foreach (var line in System.IO.File.ReadLines("/home/fedora/Programming/gawo/wwwroot/subjects"))
+                        foreach (var line in System.IO.File.ReadLines("wwwroot/subjects"))
                         {
                             <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
                         }

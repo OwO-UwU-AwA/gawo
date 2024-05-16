@@ -31,13 +31,13 @@
     }
     @if (count > 1)
     {
-        <pre>@count events pending review</pre>
+        <pre>@count.ToString() events pending review</pre>
     }
     else
     {
-        <pre>@count event pending review</pre>
+        <pre>@count.ToString() event pending review</pre>
     }
 
 </div>
-@User.IsInRole("Admin")
-@Model.IsLucky
+@User.IsInRole("Admin").ToString()
+@Model.IsLucky.ToString()

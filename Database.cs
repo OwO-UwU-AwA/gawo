@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Cassandra;
 using SurrealDb.Net.Models;
 
 namespace GaWo;

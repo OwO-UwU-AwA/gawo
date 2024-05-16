@@ -19,8 +19,14 @@ public class AddEventModel : PageModel
     {
         AuthorizationService = authorizationService;
         Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        Db.SignIn(new RootAuth { Username = "root", Password = "root" });
-        Db.Use("main", "main");
+        var secrets = Secrets.Get().Result;
+        Db.SignIn(new DatabaseAuth
+        {
+            Namespace = secrets.Namespace,
+            Database = secrets.Database,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
     }
 
     [BindProperty] public string Subject { get; set; } = string.Empty;
@@ -109,18 +115,18 @@ public class AddEventModel : PageModel
                 "INSERT INTO events (id, name, description, picture, capacity, duration, grades, notes, organiser, type, accepted) VALUES (@id, @name, @description, @picture, @capacity, @duration, @grades, @notes, @organiser, @type, @accepted)";
             using (var command = new SQLiteCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@id", id.ToString());
                 command.Parameters.AddWithValue("@name", Name);
                 command.Parameters.AddWithValue("@description", Description);
 
                 command.Parameters.AddWithValue("@picture", Picture);
-                command.Parameters.AddWithValue("@capacity", Capacity);
-                command.Parameters.AddWithValue("@duration", Duration);
-                command.Parameters.AddWithValue("@grades", Grades);
+                command.Parameters.AddWithValue("@capacity", Capacity.ToString());
+                command.Parameters.AddWithValue("@duration", Duration.ToString());
+                command.Parameters.AddWithValue("@grades", Grades.ToString());
                 command.Parameters.AddWithValue("@notes", Notes);
                 command.Parameters.AddWithValue("@organiser", Organiser);
                 command.Parameters.AddWithValue("@type", Type);
-                command.Parameters.AddWithValue("@accepted", false);
+                command.Parameters.AddWithValue("@accepted", false.ToString());
 
                 command.ExecuteNonQuery();
             }

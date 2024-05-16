@@ -114,7 +114,7 @@ Log.Information("Started Meow");
 
 var timer = new Timer(state =>
 {
-    // Reset Email changes after 1 hour
+    // TODO: Reset Email changes after 1 hour
 }, null, TimeSpan.Zero, TimeSpan.FromHours(1));
 
 await app.RunAsync();
