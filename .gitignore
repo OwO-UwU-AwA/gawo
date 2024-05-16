@@ -1,3 +1,7 @@
+users.sdb/
+users.db
+temp-keys/
+
 *.rsuser
 *.suo
 *.user

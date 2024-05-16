@@ -1,0 +1,12 @@
+Sehr geehrte/r FIRSTNAME,
+
+Ihre E-Mail-Adresse wurde am DATE um TIME von `OLDEMAIL` auf `NEWEMAIL` geändert.
+
+Bestätigen Sie diese Änderung unter http://localhost:5000/Verify?secret=SECRET .
+Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie gawo@gauss-gymnasium.de bitte umgehend.
+
+
+Mit freundlichen Grüßen,
+
+
+Das GaWo-Team

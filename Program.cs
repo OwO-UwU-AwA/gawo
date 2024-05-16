@@ -1,3 +1,5 @@
+using FluentValidation;
+using GaWo.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -75,6 +77,9 @@ builder.Services.AddSession(options =>
 
 ///////// END AUTH
 
+builder.Services.AddTransient<IValidator<ProfileModel>, ProfileModel.EmailValidator>();
+builder.Services.AddTransient<IValidator<ProfileModel>, ProfileModel.PasswordValidator>();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -106,5 +111,10 @@ await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().Wr
 Log.Logger = log;
 
 Log.Information("Started Meow");
+
+var timer = new Timer(state =>
+{
+    // Reset Email changes after 1 hour
+}, null, TimeSpan.Zero, TimeSpan.FromHours(1));
 
 await app.RunAsync();

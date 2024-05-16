@@ -1,5 +1,0 @@
-Sehr geehrte/r FIRSTNAME, <br></br>
-Ihre E-Mail-Adresse wurde am <code>DATE</code> um <code>TIME</code> von <code style=\"color: #FF6961;\">OLDEMAIL</code> auf <code style=\"color: #FF6961;\">NEWEMAIL</code> geändert.<br>
-Bestätigen Sie diese Änderung unter <a style=\"color: #A1B8FB;\" href=\"http://localhost:5000/Verify?secret=SECRET\">diesem Link</a>.<br>
-Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style=\"color: #A1B8FB;\" href=\"mailto:gawo@gauss-gymnasium.de\">GaWo-Team</a> bitte umgehend.<br></br>
-Mit freundlichen Grüßen, <br></br> Das GaWo-Team.

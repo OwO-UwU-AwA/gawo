@@ -1,8 +1,11 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 using Cassandra;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,6 +13,7 @@ using Serilog;
 using SurrealDb.Net;
 using SurrealDb.Net.Models;
 using SurrealDb.Net.Models.Auth;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace GaWo.Controllers;
 
@@ -18,16 +22,8 @@ public class ProfileModel : PageModel
 {
     public GawoUser? UserStruct { get; set; }
 
-    public (bool, string) Error { get; set; } = (false, string.Empty);
-
-    [BindProperty] public string CurrentPassword { get; set; } = string.Empty;
-
-    [BindProperty] public string NewPassword { get; set; } = string.Empty;
-
-    [BindProperty] public string NewPasswordConf { get; set; } = string.Empty;
-
-    [BindProperty] public string NewEmail { get; set; } = string.Empty;
-
+    public (bool, string) Error;
+    
     [BindProperty] public byte Monday { get; set; }
 
     [BindProperty] public byte Tuesday { get; set; } = 0;
@@ -38,9 +34,42 @@ public class ProfileModel : PageModel
 
     [BindProperty] public byte Friday { get; set; } = 0;
 
-    public void OnGet()
+    [EmailAddress(ErrorMessage = "Ungültige E-Mail-Adresse")]
+    [Required(ErrorMessage = "E-Mail-Adresse erforderlich")]
+    [BindProperty]
+    public string NewEmail { get; set; } = string.Empty;
+
+    [PasswordPropertyText]
+    [Required(ErrorMessage = "Passwort erforderlich")]
+    [BindProperty]
+    public string CurrentPassword { get; set; } = string.Empty;
+
+    [MinLength(8, ErrorMessage = "Passwort muss mindestens 8 Zeichen enthalten")]
+    [Required(ErrorMessage = "Passwort erforderlich")]
+    [BindProperty] public string NewPassword { get; set; } = string.Empty;
+
+    [Compare(nameof(NewPassword), ErrorMessage = "Passwörter stimmen nicht überein")]
+    [MinLength(8, ErrorMessage = "Passwort muss mindestens 8 Zeichen enthalten")]
+    [Required(ErrorMessage = "Passwort erforderlich")]
+    [BindProperty] public string NewPasswordConf { get; set; } = string.Empty;
+
+    public class EmailValidator : AbstractValidator<ProfileModel>
     {
+        public EmailValidator()
+        {
+            RuleFor(x => x.NewEmail).NotNull().EmailAddress().WithMessage("Ungültige E-Mail-Adresse.");
+        }
     }
+
+    public class PasswordValidator : AbstractValidator<ProfileModel>
+    {
+        public PasswordValidator()
+        {
+            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8).WithMessage("Passwort muss mindestens 8 Zeichen lang sein").NotEqual(x => x.CurrentPassword).WithMessage("Neues Passwort darf nicht dem alten entsprechen.").Equal(x => x.NewPasswordConf).WithMessage("Passwörter stimmen nicht überein.");
+        }
+    }
+
+    public void OnGet() {}
 
     public async Task<GawoUser> FillUser()
     {
@@ -77,12 +106,17 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostChangeEmail()
     {
+        EmailValidator validator = new();
         UserStruct = await FillUser();
-        if (UserStruct.Email == NewEmail)
+        
+        ValidationResult result = await validator.ValidateAsync(this);
+
+        if (result.IsValid == false)
         {
-            Error = (true, "Neue E-Mail-Adresse gleicht aktueller.");
+            Error = (true, result.Errors[0].ErrorMessage);
             return Page();
         }
+            
 
         TimeUuid secret = TimeUuid.NewId();
 
@@ -100,43 +134,23 @@ public class ProfileModel : PageModel
 
         await db.Create<VerificationLink>("VerificationLinks", link);
 
-        var htmlContent = new StringBuilder();
-        var plainContent = new StringBuilder();
+        var date = $"{DateTime.Now:dd.MM.yyyyy}";
+        var time = $"{DateTime.Now:HH:mm}";
 
-        htmlContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName}, <br></br>");
-        htmlContent.AppendLine(
-            $"Ihre E-Mail-Adresse wurde am <code>{DateTime.Now:dd.MM.yyyy}</code> um <code>{DateTime.Now:HH:mm}</code> von <code style=\"color: #FF6961;\">{UserStruct.Email}</code> auf <code style=\"color: #FF6961;\">{NewEmail}</code> geändert.<br>");
-        htmlContent.AppendLine(
-            $"Bestätigen Sie diese Änderung unter <a style=\"color: #A1B8FB;\" href=\"http://localhost:5000/Verify?secret={secret}\">diesem Link</a>.<br>");
-        htmlContent.AppendLine(
-            "Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style=\"color: #A1B8FB;\" href=\"mailto:gawo@gauss-gymnasium.de\">GaWo-Team</a> bitte umgehend.<br></br>");
-        htmlContent.AppendLine("Mit freundlichen Grüßen, <br></br> Das GaWo-Team.");
+        var htmlContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailHtml").ReadToEndAsync().Result
+            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time).Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
 
-        plainContent.AppendLine($"Sehr geehrte/r {UserStruct.FirstName},");
-        plainContent.AppendLine();
-        plainContent.AppendLine(
-            $"Ihre E-Mail-Adresse wurde am {DateTime.Now:dd.MM.yyyy} um {DateTime.Now:HH:mm} von `{UserStruct.Email}` auf `{NewEmail}` geändert.");
-        plainContent.AppendLine();
-        plainContent.AppendLine($"Bestätigen Sie diese Änderung unter http://localhost:5000/Verify?secret={secret} .");
-        plainContent.AppendLine(
-            "Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie gawo@gauss-gymnasium.de bitte umgehend.");
-        plainContent.AppendLine();
-        plainContent.AppendLine();
-        plainContent.AppendLine("Mit freundlichen Grüßen,");
-        plainContent.AppendLine();
-        plainContent.AppendLine();
-        plainContent.AppendLine("Das GaWo-Team.");
-
-        AlternateView view = AlternateView.CreateAlternateViewFromString(htmlContent.ToString());
+        var plainContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailPlain").ReadToEndAsync().Result
+            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time).Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
+        
+        AlternateView view = AlternateView.CreateAlternateViewFromString(htmlContent);
         view.ContentType = new System.Net.Mime.ContentType("text/html");
 
 
-        if (SendNotificationEmail("[NOREPLY] Bestätigen Sie Ihre E-Mail-Adresse", plainContent.ToString(),
+        if (SendNotificationEmail("[NOREPLY] Bestätigen Sie Ihre E-Mail-Adresse", plainContent,
                 UserStruct.Email,
                 UserStruct.FirstName + " " + UserStruct.LastName, view) != true)
         {
-            Error = (true, "Ein Fehler ist bei dem Senden der E-Mail aufgetreten.");
-            return Page();
         }
 
         UserStruct.Email = NewEmail;
@@ -151,21 +165,15 @@ public class ProfileModel : PageModel
     {
         if (NewPassword != NewPasswordConf)
         {
-            Error = (true, "Passwörter stimmen nicht miteinander überein.");
             return Page();
         }
 
         if (CurrentPassword == NewPassword)
         {
-            Error = (true, "Neues Passwort identisch zu derzeitigem Passwort.");
             return Page();
         }
 
-        if (NewPassword.Length >= 8 && NewPassword.Any(char.IsDigit) && NewPassword.Any(char.IsUpper) &&
-            NewPassword.Any(char.IsLower)) return Redirect("/Profile?p");
-        Error = (true,
-            "Passwort muss <b>mindestens</b> 8 Zeichen, eine Ziffer und einen Groß- und Kleinbuchstaben enthalten.");
-        return Page();
+        return Redirect("/Profile?p");
 
         // Change the password and send an email with a rollback link;
     }
