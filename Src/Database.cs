@@ -3,6 +3,7 @@ using SurrealDb.Net.Models;
 
 namespace GaWo;
 
+// Class Representation Of Database Tables
 public class VerificationLink : Record
 {
     [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
@@ -27,6 +28,7 @@ public class GawoUser : Record
     [JsonPropertyName("class")] public string Class { get; set; } = string.Empty;
 
     /*
+        Add Other Roles As Required
         Teacher:        0000 0001
         Admin:          0000 0010
         Guest:          0000 0100
@@ -45,6 +47,7 @@ public class GawoUser : Record
     [JsonPropertyName("absence")] public byte Absence { get; set; } = 0;
 }
 
+// No Use Right Now
 public enum Subjects
 {
     Art,
@@ -66,6 +69,7 @@ public enum Subjects
     Studiesconsulting
 }
 
+// No Use Right Now
 public enum Type
 
 {
@@ -100,13 +104,13 @@ public class Event : Record
 
     [JsonPropertyName("notes")] public string? Notes { get; set; } = null;
 
-    [JsonPropertyName("organiser")] public Thing Organiser { get; set; }
+    [JsonPropertyName("organiser")] public Thing Organiser { get; set; } = null!;
 
     [JsonPropertyName("picture")] public string? Picture { get; set; } = string.Empty;
 
     [JsonPropertyName("room")] public string? Room { get; set; } = string.Empty;
 
-    [JsonPropertyName("teacher")] public Thing Teacher { get; set; }
+    [JsonPropertyName("teacher")] public Thing Teacher { get; set; } = null!;
 
     [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
 };

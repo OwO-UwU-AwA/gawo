@@ -1,4 +1,3 @@
-Potentiell neue Website der Gaußwoche des Carl Friedrich Gauß Gymnasiums Frankfurt (Oder)
-=========================================================================================
+Introduction
+============
 
-users.db ist eine Mock-Datenbank.

@@ -21,7 +21,6 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="5.1.0-dev-00943"/>
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00972"/>
         <PackageReference Include="SurrealDb.Net" Version="0.5.0"/>
-        <PackageReference Include="System.Data.SQLite" Version="1.0.118"/>
     </ItemGroup>
     <ItemGroup>
         <_ContentIncludedByDefault Remove="wwwroot\lib\jquery\jquery.min.js"/>

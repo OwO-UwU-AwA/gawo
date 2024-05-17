@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -55,13 +54,6 @@ public class AddEventModel : PageModel
     {
         // Transform Grades Into Bitfield And Set Organiser To Valid Value
         PreSetup();
-
-        foreach (PropertyDescriptor desc in TypeDescriptor.GetProperties(Event))
-        {
-            string name = desc.Name;
-            object value = desc.GetValue(Event)!;
-            Console.WriteLine("{0}={1}", name, value);
-        }
 
         await Db.Create<Event>("Events", @Event);
 

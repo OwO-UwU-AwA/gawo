@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Security.Claims;
+using Serilog;
 using SurrealDb.Net;
 using SurrealDb.Net.Models.Auth;
 
@@ -25,18 +27,27 @@ public class LoginModel : PageModel
     // TODO : MAKE THIS FASTER OwO
     public async Task<IActionResult> OnPostLogin()
     {
-        // Connect to local SurrealDB
-        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
-            configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
-        var secrets = await Secrets.Get();
-
-        await Db.SignIn(new DatabaseAuth
+        try
         {
-            Namespace = secrets.Namespace,
-            Database = secrets.Database,
-            Username = secrets.Username,
-            Password = secrets.Password
-        });
+            // Connect to local SurrealDB
+            Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
+                configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
+            var secrets = await Secrets.Get();
+
+            await Db.SignIn(new DatabaseAuth
+            {
+                Namespace = secrets.Namespace,
+                Database = secrets.Database,
+                Username = secrets.Username,
+                Password = secrets.Password
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
+                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            return Page();
+        }
 
         // First Check if Username Exists; Then If Password Matches User
         if (await VerifyUsername(Username, Db) == false || await VerifyPassword(Password, Username, Db) == false)
@@ -73,8 +84,9 @@ public class LoginModel : PageModel
 
     public void OnGet()
     {
+        // TODO: Figure Out If This is Ugly
         // Ugly Solution Please Fix Somehow
-        // This Is Read On ≈ Line 67
+        // This Is Read On ≈ Line 82
         ReturnUrl = Request.Query["ReturnUrl"];
         TempData["ReturnUrl"] = ReturnUrl;
     }
