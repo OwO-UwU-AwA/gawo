@@ -11,7 +11,14 @@ public class VerifyModel : PageModel
     {
         // Connect to local SurrealDB
         var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        var secrets = await Secrets.Get();
+        await db.SignIn(new DatabaseAuth
+        {
+            Namespace = secrets.Namespace,
+            Database = secrets.Database,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
         await db.Use("main", "main");
 
         if (!HttpContext.Request.Query.ContainsKey("secret")) RedirectToPage("Index");
@@ -19,8 +26,7 @@ public class VerifyModel : PageModel
         try
         {
             await db.Query(
-                "DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string($secret)).id, 0));",
-                new Dictionary<string, object> { { "secret", HttpContext.Request.Query["secret"].ToString() } });
+                $"DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string({HttpContext.Request.Query["secret"].ToString()})).id, 0));");
         }
         catch (Exception e)
         {

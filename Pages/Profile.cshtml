@@ -1,9 +1,10 @@
 @page
 @using SurrealDb.Net
+@using GaWo
 @using SurrealDb.Net.Models.Auth
 @model GaWo.Controllers.ProfileModel
 @{
-    ViewData["Title"] = $"GaWo Profil";
+    ViewData["Title"] = "GaWo Profil";
     Model.UserStruct = Model.FillUser().Result;
 }
 
@@ -39,12 +40,7 @@
             revealer.classList.add("fa-eye");
             passwordInput.setAttribute("type", "text");
         }
-
     }
-
-
-
-
 </script>
 
 <div class="container-fluid">
@@ -62,10 +58,19 @@
                 E-Mail-Adresse: @Model.UserStruct.Email
                 @{
                     var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-                    await db.SignIn(new RootAuth { Username = "root", Password = "root" });
-                    await db.Use("main", "main");
+                    var secrets = await Secrets.Get();
 
-                    var query = await db.Query("RETURN COUNT(SELECT COUNT() FROM VerificationLinks WHERE user = $thing AND type = 'email');", new Dictionary<string, object> { { "thing", Model.UserStruct.Id! } });
+                    Console.WriteLine(secrets.Password);
+
+                    await db.SignIn(new DatabaseAuth
+                    {
+                        Namespace = secrets.Namespace,
+                        Database = secrets.Database,
+                        Username = secrets.Username,
+                        Password = secrets.Password
+                    });
+
+                    var query = await db.Query($"RETURN COUNT(SELECT COUNT() FROM VerificationLinks WHERE user = {Model.UserStruct.Id!} AND type = 'email');");
 
                     if (query.GetValue<int>(0) > 0)
                     {
@@ -276,5 +281,5 @@
 </div>
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }

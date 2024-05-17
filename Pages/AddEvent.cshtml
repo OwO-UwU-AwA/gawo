@@ -9,34 +9,16 @@
     <h2 class="header">Anmeldung</h2>
     <hr class="border border-primary opacity-50">
 
-    @if (Model.Error.Item1 == true)
-    {
-        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                <path
-                    d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            </symbol>
-        </svg>
-        <div class="alert alert-danger d-flex align-items-center mb-5" style="margin-top: 1em; margin-bottom: -2em;"
-             role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                <use xlink:href="#exclamation-triangle-fill"/>
-            </svg>
-            <div>
-                @Html.Raw(Model.Error.Item2)
-            </div>
-        </div>
-    }
-
     <form method="post" asp-page-handler="AddEvent" class="container">
         <div class="row mb-3">
             <div class="col">
-                <label for="name" class="form-label" asp-for="Name">Name<sup>*</sup></label>
-                <input type="text" class="form-control" id="name" name="name" maxlength="64" placeholder="Name der Veranstaltung" required>
+                <label for="name" class="form-label">Name<sup>*</sup></label>
+                <input asp-for="Event.Name" type="text" class="form-control" id="name" maxlength="64"
+                       placeholder="Name der Veranstaltung" required>
             </div>
             <div class="col">
-                <label for="type" class="form-label" asp-for="Type">Veranstaltungstyp<sup>*</sup></label>
-                <select class="form-select" id="type" name="type" asp-for="Type" required
+                <label for="type" class="form-label">Veranstaltungstyp<sup>*</sup></label>
+                <select asp-for="Event.Type" class="form-select" id="type" required
                         onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
                     <option selected disabled value="NULL">Veranstaltungstyp auswählen</option>
                     <option value="PRESENTATION">Vortrag</option>
@@ -53,13 +35,24 @@
         </div>
         <div class="row mb-3">
             <div class="col">
-                <label for="description" class="form-label" asp-for="Description">Beschreibung<sup>*</sup></label>
-                <textarea class="form-control" maxlength="256" minlength="15"
-                          name="description" id="description" rows="5" style="resize: none;" required></textarea>
+                <label for="description" class="form-label">Beschreibung<sup>*</sup></label>
+                <textarea asp-for="Event.Description" class="form-control" maxlength="256" id="description" rows="5"
+                          style="resize: none;" required></textarea>
             </div>
             <div class="col">
-                <label for="duration" class="form-label" asp-for="Duration">Dauer<sup>*</sup></label>
-                <select class="form-select mb-4" id="duration" name="duration" required disabled>
+                <label for="subject" class="form-label">Fach<sup>*</sup></label>
+                <select asp-for="Event.Subject" class="form-select" id="subject" required>
+                    <option selected disabled value="NULL">Fachbereich auswählen</option>
+                    @{
+                        foreach (var line in System.IO.File.ReadLines("text/subjects"))
+                        {
+                            <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
+                        }
+                    }
+                </select>
+
+                <label for="duration" class="form-label mt-4">Dauer<sup>*</sup></label>
+                <select asp-for="Event.Duration" class="form-select" id="duration" required disabled>
                     <script>
                         function durationReload() {
                             // This Is Ugly
@@ -158,8 +151,6 @@
                         }
                     </script>
                 </select>
-                <label for="capacity" class="form-label" asp-for="Capacity">Teilnehmeranzahl<sup>*</sup></label>
-                <input class="form-control" type="number" min="0" max="200" name="capacity" id="capacity" required>
             </div>
         </div>
         <div class="row mb-3">
@@ -170,8 +161,8 @@
 
                     if (x.Succeeded)
                     {
-                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator<sup>*</sup></label>
-                        <select class="form-select" id="organiser" name="organiser" asp-for="Organiser" required>
+                        <label for="organiser" class="form-label">Organisator<sup>*</sup></label>
+                        <select class="form-select" id="organiser" asp-for="Organiser" required>
                             <option selected disabled value="NULL">Organisator auswählen</option>
                             @{
                                 var options = await Model.Db.Select<GawoUser>("Users");
@@ -185,22 +176,26 @@
                     }
                     else
                     {
-                        <label for="organiser" class="form-label" asp-for="Organiser">Organisator:</label>
-                        <input type="text" class="form-control" id="organiser" name="organiser" disabled
+                        <label for="organiser" class="form-label">Organisator:</label>
+                        <input asp-for="Event.Organiser" type="text" class="form-control" id="organiser" disabled
                                value="@HttpContext.User.Identity!.Name" placeholder="@HttpContext.User.Identity.Name">
-                        <input type="hidden" asp-for="Organiser" value="@HttpContext.User.Identity.Name">
+                        <input type="hidden" asp-for="Event.Organiser" value="@HttpContext.User.Identity.Name">
                     }
                 }
             </div>
             <div class="col">
-                <label for="subject" class="form-label" asp-for="Subject">Fach<sup>*</sup></label>
-                <select class="form-select" id="subject" name="subject" asp-for="Subject" required>
-                    <option selected disabled value="NULL">Fachbereich auswählen</option>
+                <label for="teacher" class="form-label">Betreuer<sup>*</sup></label>
+                <select class="form-select" id="teacher" asp-for="Teacher" required>
+                    <option selected disabled value="NULL">Betreuer auswählen</option>
                     @{
-                        // TODO: Remove Hardcoded Path
-                        foreach (var line in System.IO.File.ReadLines("/home/fedora/Programming/gawo/wwwroot/subjects"))
+                        var options = await Model.Db.Select<GawoUser>("Users");
+
+                        foreach (var option in options)
                         {
-                            <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
+                            if (((option.Permissions >> 0) & 1) == 1)
+                            {
+                                <option value="@option.Id">@option.FirstName @option.LastName</option>
+                            }
                         }
                     }
                 </select>
@@ -208,8 +203,9 @@
         </div>
         <div class="row mb-4">
             <div class="col">
-                <label for="picture" class="form-label" asp-for="Picture">Optionales Bild</label>
-                <input type="file" asp-for="Picture" class="form-control custom-file-input" id="picture" name="picture" accept="image/*">
+                <label for="picture" class="form-label">Optionales Bild</label>
+                <input asp-for="Event.Picture" type="file" class="form-control custom-file-input" id="picture"
+                       name="picture" accept="image/*">
 
                 <div class="row mt-3">
                     <label class="form-label">Jahrgangsstufen<sup>*</sup></label>
@@ -247,8 +243,12 @@
                 </div>
             </div>
             <div class="col">
-                <label for="notes" class="form-label">Bemerkung</label>
-                <textarea asp-for="Notes" class="form-control" placeholder="Bemerkung für das GaWo-Team" rows="5"
+                <label for="capacity" class="form-label">Teilnehmeranzahl<sup>*</sup></label>
+                <input asp-for="Event.Capacity" class="form-control" type="number" value="25" min="0" max="200"
+                       id="capacity" required>
+
+                <label for="notes" class="form-label mt-3">Bemerkung</label>
+                <textarea asp-for="Event.Notes" class="form-control" placeholder="Bemerkung für das GaWo-Team" rows="2"
                           id="notes" style="resize: none;"></textarea>
             </div>
         </div>

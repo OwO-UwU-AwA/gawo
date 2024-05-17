@@ -20,10 +20,9 @@ namespace GaWo.Controllers;
 [Authorize]
 public class ProfileModel : PageModel
 {
+    public (bool, string) Error;
     public GawoUser? UserStruct { get; set; }
 
-    public (bool, string) Error;
-    
     [BindProperty] public byte Monday { get; set; }
 
     [BindProperty] public byte Tuesday { get; set; } = 0;
@@ -46,40 +45,34 @@ public class ProfileModel : PageModel
 
     [MinLength(8, ErrorMessage = "Passwort muss mindestens 8 Zeichen enthalten")]
     [Required(ErrorMessage = "Passwort erforderlich")]
-    [BindProperty] public string NewPassword { get; set; } = string.Empty;
+    [BindProperty]
+    public string NewPassword { get; set; } = string.Empty;
 
     [Compare(nameof(NewPassword), ErrorMessage = "Passwörter stimmen nicht überein")]
     [MinLength(8, ErrorMessage = "Passwort muss mindestens 8 Zeichen enthalten")]
     [Required(ErrorMessage = "Passwort erforderlich")]
-    [BindProperty] public string NewPasswordConf { get; set; } = string.Empty;
+    [BindProperty]
+    public string NewPasswordConf { get; set; } = string.Empty;
 
-    public class EmailValidator : AbstractValidator<ProfileModel>
+    public void OnGet()
     {
-        public EmailValidator()
-        {
-            RuleFor(x => x.NewEmail).NotNull().EmailAddress().WithMessage("Ungültige E-Mail-Adresse.");
-        }
     }
-
-    public class PasswordValidator : AbstractValidator<ProfileModel>
-    {
-        public PasswordValidator()
-        {
-            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8).WithMessage("Passwort muss mindestens 8 Zeichen lang sein").NotEqual(x => x.CurrentPassword).WithMessage("Neues Passwort darf nicht dem alten entsprechen.").Equal(x => x.NewPasswordConf).WithMessage("Passwörter stimmen nicht überein.");
-        }
-    }
-
-    public void OnGet() {}
 
     public async Task<GawoUser> FillUser()
     {
         var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
-        await db.Use("main", "main");
+        var secrets = await Secrets.Get();
+
+        await db.SignIn(new DatabaseAuth
+        {
+            Namespace = secrets.Namespace,
+            Database = secrets.Database,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
 
         var query = await db.Query(
-            "RETURN array::at((SELECT id FROM Users WHERE username = type::string($username)).id, 0);",
-            new Dictionary<string, object> { { "username", HttpContext.User.Identity!.Name! } });
+            $"RETURN array::at((SELECT id FROM Users WHERE username = type::string({HttpContext.User.Identity!.Name!})).id, 0);");
 
         var thing = new Thing(query.GetValue<string>(0)!);
 
@@ -90,12 +83,19 @@ public class ProfileModel : PageModel
     {
         // Connect to local SurrealDB
         var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        var secrets = await Secrets.Get();
+
+        await db.SignIn(new DatabaseAuth
+        {
+            Namespace = secrets.Namespace,
+            Database = secrets.Database,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
         await db.Use("main", "main");
 
         var query = await db.Query(
-            "RETURN array::at((SELECT id FROM Users WHERE username = type::string($username)).id, 0);",
-            new Dictionary<string, object> { { "username", user.Username } });
+            $"RETURN array::at((SELECT id FROM Users WHERE username = type::string({user.Username})).id, 0);");
 
         user.Id = new Thing(query.GetValue<string>(0)!);
 
@@ -108,7 +108,7 @@ public class ProfileModel : PageModel
     {
         EmailValidator validator = new();
         UserStruct = await FillUser();
-        
+
         ValidationResult result = await validator.ValidateAsync(this);
 
         if (result.IsValid == false)
@@ -116,7 +116,7 @@ public class ProfileModel : PageModel
             Error = (true, result.Errors[0].ErrorMessage);
             return Page();
         }
-            
+
 
         TimeUuid secret = TimeUuid.NewId();
 
@@ -129,7 +129,14 @@ public class ProfileModel : PageModel
 
         // Connect to local SurrealDB
         var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        await db.SignIn(new RootAuth { Username = "root", Password = "root" });
+        var secrets = await Secrets.Get();
+        await db.SignIn(new DatabaseAuth
+        {
+            Namespace = secrets.Namespace,
+            Database = secrets.Database,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
         await db.Use("main", "main");
 
         await db.Create<VerificationLink>("VerificationLinks", link);
@@ -137,12 +144,16 @@ public class ProfileModel : PageModel
         var date = $"{DateTime.Now:dd.MM.yyyyy}";
         var time = $"{DateTime.Now:HH:mm}";
 
-        var htmlContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailHtml").ReadToEndAsync().Result
-            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time).Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
+        var htmlContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailHtml").ReadToEndAsync()
+            .Result
+            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time)
+            .Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
 
-        var plainContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailPlain").ReadToEndAsync().Result
-            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time).Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
-        
+        var plainContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailPlain")
+            .ReadToEndAsync().Result
+            .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time)
+            .Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
+
         AlternateView view = AlternateView.CreateAlternateViewFromString(htmlContent);
         view.ContentType = new System.Net.Mime.ContentType("text/html");
 
@@ -182,6 +193,7 @@ public class ProfileModel : PageModel
     {
         var x = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetValue<string>("SmtpAddress")!
             .Split(":");
+        var secrets = Secrets.Get().Result;
         SmtpClient client = new()
         {
             UseDefaultCredentials = true,
@@ -189,7 +201,8 @@ public class ProfileModel : PageModel
             Port = int.Parse(x[1]),
             // TODO: Change this to true in production
             EnableSsl = false,
-            Credentials = new NetworkCredential("noreply@gauss-gymnasium.de", "gawo2024"),
+
+            Credentials = new NetworkCredential("noreply@gauss-gymnasium.de", secrets.EmailPassword)
         };
 
         MailAddress from = new("noreply@gauss-gymnasium.de", "[NOREPLY]");
@@ -206,7 +219,7 @@ public class ProfileModel : PageModel
             HeadersEncoding = Encoding.UTF8,
             IsBodyHtml = true,
             AlternateViews = { alt },
-            Priority = MailPriority.High,
+            Priority = MailPriority.High
         };
 
         try
@@ -239,5 +252,24 @@ public class ProfileModel : PageModel
         await SyncDatabase(UserStruct);
 
         return RedirectToPage();
+    }
+
+    public class EmailValidator : AbstractValidator<ProfileModel>
+    {
+        public EmailValidator()
+        {
+            RuleFor(x => x.NewEmail).NotNull().EmailAddress().WithMessage("Ungültige E-Mail-Adresse.");
+        }
+    }
+
+    public class PasswordValidator : AbstractValidator<ProfileModel>
+    {
+        public PasswordValidator()
+        {
+            RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(8)
+                .WithMessage("Passwort muss mindestens 8 Zeichen lang sein").NotEqual(x => x.CurrentPassword)
+                .WithMessage("Neues Passwort darf nicht dem alten entsprechen.").Equal(x => x.NewPasswordConf)
+                .WithMessage("Passwörter stimmen nicht überein.");
+        }
     }
 }

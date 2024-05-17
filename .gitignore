@@ -1,4 +1,6 @@
-users.sdb/
+out/
+secrets.json
+users.sdb
 users.db
 temp-keys/
 

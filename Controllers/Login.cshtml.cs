@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Security.Claims;
+using Serilog;
 using SurrealDb.Net;
 using SurrealDb.Net.Models.Auth;
 
@@ -11,12 +13,9 @@ namespace GaWo.Controllers;
 
 public class LoginModel : PageModel
 {
-    [Required]
-    [BindProperty]
-    public string Username { get; set; } = string.Empty;
+    [Required] [BindProperty] public string Username { get; set; } = string.Empty;
 
-    [Required]
-    [BindProperty] public string Password { get; set; } = string.Empty;
+    [Required] [BindProperty] public string Password { get; set; } = string.Empty;
 
     public bool Error { get; set; }
 
@@ -24,16 +23,31 @@ public class LoginModel : PageModel
 
     public static SurrealDbClient? Db { get; set; }
 
-    
-    
+
     // TODO : MAKE THIS FASTER OwO
     public async Task<IActionResult> OnPostLogin()
     {
-        // Connect to local SurrealDB
-        Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
-            configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
-        await Db.SignIn(new RootAuth { Username = "root", Password = "root" });
-        await Db.Use("main", "main");
+        try
+        {
+            // Connect to local SurrealDB
+            Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
+                configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
+            var secrets = await Secrets.Get();
+
+            await Db.SignIn(new DatabaseAuth
+            {
+                Namespace = secrets.Namespace,
+                Database = secrets.Database,
+                Username = secrets.Username,
+                Password = secrets.Password
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
+                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            return Page();
+        }
 
         // First Check if Username Exists; Then If Password Matches User
         if (await VerifyUsername(Username, Db) == false || await VerifyPassword(Password, Username, Db) == false)
@@ -70,8 +84,9 @@ public class LoginModel : PageModel
 
     public void OnGet()
     {
+        // TODO: Figure Out If This is Ugly
         // Ugly Solution Please Fix Somehow
-        // This Is Read On ≈ Line 67
+        // This Is Read On ≈ Line 82
         ReturnUrl = Request.Query["ReturnUrl"];
         TempData["ReturnUrl"] = ReturnUrl;
     }
@@ -80,8 +95,7 @@ public class LoginModel : PageModel
     {
         // Get Permission Bitfield
         var query = await db.Query(
-            "RETURN array::at((SELECT permissions FROM Users WHERE username = type::string($username)).permissions, 0);",
-            new Dictionary<string, object> { { "username", username } });
+            $"RETURN array::at((SELECT permissions FROM Users WHERE username = type::string({username})).permissions, 0);");
 
         return query.GetValue<int>(0);
     }
@@ -89,8 +103,7 @@ public class LoginModel : PageModel
     public async Task<bool> VerifyPassword(string password, string username, SurrealDbClient db)
     {
         var query = await db.Query(
-            "RETURN array::at((SELECT password FROM Users WHERE username = type::string($username)).password, 0);",
-            new Dictionary<string, object> { { "username", username } });
+            $"RETURN array::at((SELECT password FROM Users WHERE username = type::string({username})).password, 0);");
 
         return BCrypt.Net.BCrypt.Verify(password, query.GetValue<string>(0));
     }
@@ -98,8 +111,7 @@ public class LoginModel : PageModel
     public async Task<bool> VerifyUsername(string username, SurrealDbClient db)
     {
         var query = await db.Query(
-            "RETURN array::at((SELECT count() FROM Users WHERE username = type::string($username)).count, 0);",
-            new Dictionary<string, object> { { "username", username } });
+            $"RETURN array::at((SELECT count() FROM Users WHERE username = type::string({username})).count, 0);");
 
         return query.GetValue<int?>(0) > 0;
     }

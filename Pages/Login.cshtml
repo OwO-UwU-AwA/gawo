@@ -1,7 +1,7 @@
 @page
 @model GaWo.Controllers.LoginModel
 @{
-    ViewData["Title"] = $"GaWo Login";
+    ViewData["Title"] = "GaWo Login";
 }
 
 <script>
@@ -58,7 +58,9 @@
             <div class="form-group" style="margin-bottom: 5%; display: flex; flex-direction: column;">
                 <div class="input-group">
                     <input asp-for="Password" type="password" class="form-control" id="password" name="password" placeholder="Passwort">
-                    <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword()"><i id="revealer" class="fa-regular fa-eye-slash" aria-hidden="true"></i></button>
+                    <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword()">
+                        <i id="revealer" class="fa-regular fa-eye-slash" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <button type="submit" class="btn btn-success" style="margin-top: 5%;">Anmelden<i class="fa-solid fa-circle-arrow-right" style="margin-left: 0.5em"></i></button>
             </div>
