@@ -24,7 +24,7 @@ public class GawoUser : Record
 
     [JsonPropertyName("email")] public string Email { get; set; } = string.Empty;
 
-    [JsonPropertyName("class")] public string? Class { get; set; } = string.Empty;
+    [JsonPropertyName("class")] public string Class { get; set; } = string.Empty;
 
     /*
         Teacher:        0000 0001
@@ -33,7 +33,7 @@ public class GawoUser : Record
 
         Teacher+Admin:  0000 0011
     */
-    [JsonPropertyName("permissions")] public byte Permissions { get; set; }
+    [JsonPropertyName("permissions")] public byte Permissions { get; set; } = 0;
 
     /*
         Monday:     0000 0001
@@ -42,34 +42,71 @@ public class GawoUser : Record
         Thursday:   0000 1000
         Friday:     0001 0000
      */
-    [JsonPropertyName("absence")] public byte Absence { get; set; }
+    [JsonPropertyName("absence")] public byte Absence { get; set; } = 0;
+}
+
+public enum Subjects
+{
+    Art,
+    English,
+    French,
+    German,
+    Latin,
+    Russian,
+    Astronomy,
+    Biology,
+    Computerscience,
+    Maths,
+    Physics,
+    Geography,
+    History,
+    Politics,
+    Misc,
+    Sport,
+    Studiesconsulting
+}
+
+public enum Type
+
+{
+    Presentation,
+    GPresentation,
+    FlangPresentation,
+    ThesisDef,
+    Competition,
+    Workshop,
+    Qf,
+    Sport,
+    Elmos,
 }
 
 public class Event : Record
 {
-    [JsonPropertyName("accepted")] public bool Accepted { get; set; }
+    [JsonPropertyName("subject")] public string Subject { get; set; } = string.Empty;
 
-    [JsonPropertyName("capacity")] public int Capacity { get; set; }
+    [JsonPropertyName("accepted")] public bool Accepted { get; set; } = false;
 
-    [JsonPropertyName("date")] public DateTime Date { get; set; }
+    [JsonPropertyName("capacity")] public int Capacity { get; set; } = -1;
 
-    [JsonPropertyName("description")] public string? Description { get; set; }
+    [JsonPropertyName("date")] public DateTime? Date { get; set; } = DateTime.MinValue;
 
-    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("description")] public string Description { get; set; } = string.Empty;
 
-    [JsonPropertyName("duration")] public int Duration { get; set; }
+    [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("grades")] public int Grades { get; set; }
+    [JsonPropertyName("duration")] public int Duration { get; set; } = -1;
 
-    [JsonPropertyName("notes")] public string? Notes { get; set; }
+    [JsonPropertyName("grades")] public int Grades { get; set; } = -1;
 
-    [JsonPropertyName("organiser")] public GawoUser? Organiser { get; set; }
+    [JsonPropertyName("notes")] public string? Notes { get; set; } = null;
 
-    [JsonPropertyName("picture")] public string? Picture { get; set; }
+    [JsonPropertyName("organiser")] public Thing Organiser { get; set; }
 
-    [JsonPropertyName("room")] public string? Room { get; set; }
+    [JsonPropertyName("picture")] public string? Picture { get; set; } = string.Empty;
 
-    [JsonPropertyName("teacher")] public GawoUser? Teacher { get; set; }
+    [JsonPropertyName("room")] public string? Room { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")] public string? Type { get; set; }
+    [JsonPropertyName("teacher")] public Thing Teacher { get; set; }
+
+    [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
 };
