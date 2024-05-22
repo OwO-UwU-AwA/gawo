@@ -4,21 +4,23 @@ namespace GaWo;
 
 public class Secrets
 {
-    [JsonProperty("namespace")] public string Namespace { get; private set; } = string.Empty;
-
-    [JsonProperty("database")] public string Database { get; private set; } = string.Empty;
-
     [JsonProperty("username")] public string Username { get; private set; } = string.Empty;
 
     [JsonProperty("password")] public string Password { get; private set; } = string.Empty;
 
     [JsonProperty("emailpassword")] public string EmailPassword { get; private set; } = string.Empty;
 
+    // Cannot use constructor because JSON deserialisation would create a new instance causing an endless loop
     public static async Task<Secrets> Get()
     {
-        using StreamReader r = new("text/secrets.json");
-        var json = await r.ReadToEndAsync();
-        var secrets = JsonConvert.DeserializeObject<Secrets>(json)!;
+        // Read secrets from text/secrets.json into attributes
+        using StreamReader r = new(Constants.SecretsPath);
+        var secrets = JsonConvert.DeserializeObject<Secrets>(await r.ReadToEndAsync());
+
+        if (secrets is null)
+        {
+            throw new Exception($"Failed to read secrets from {Constants.SecretsPath}");
+        }
 
         return secrets;
     }

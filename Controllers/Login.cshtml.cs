@@ -30,14 +30,14 @@ public class LoginModel : PageModel
         try
         {
             // Connect to local SurrealDB
-            Db = new SurrealDbClient("ws://127.0.0.1:8000/rpc",
+            Db = new SurrealDbClient(Constants.SurrealDbUrl,
                 configureJsonSerializerOptions: options => { options.PropertyNameCaseInsensitive = true; });
             var secrets = await Secrets.Get();
 
             await Db.SignIn(new DatabaseAuth
             {
-                Namespace = secrets.Namespace,
-                Database = secrets.Database,
+                Namespace = Constants.SurrealDbNameSpace,
+                Database = Constants.SurrealDbDatabase,
                 Username = secrets.Username,
                 Password = secrets.Password
             });
@@ -49,7 +49,7 @@ public class LoginModel : PageModel
             return Page();
         }
 
-        // First Check if Username Exists; Then If Password Matches User
+        // First Check if Username Exists Then If Password Matches User
         if (await VerifyUsername(Username, Db) == false || await VerifyPassword(Password, Username, Db) == false)
         {
             Error = true;
@@ -113,6 +113,6 @@ public class LoginModel : PageModel
         var query = await db.Query(
             $"RETURN array::at((SELECT count() FROM Users WHERE username = type::string({username})).count, 0);");
 
-        return query.GetValue<int?>(0) > 0;
+        return query.GetValue<int>(0) > 0;
     }
 }

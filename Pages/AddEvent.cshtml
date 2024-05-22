@@ -44,7 +44,7 @@
                 <select asp-for="Event.Subject" class="form-select" id="subject" required>
                     <option selected disabled value="NULL">Fachbereich auswählen</option>
                     @{
-                        foreach (var line in System.IO.File.ReadLines("text/subjects"))
+                        foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
                         {
                             <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
                         }
@@ -55,7 +55,7 @@
                 <select asp-for="Event.Duration" class="form-select" id="duration" required disabled>
                     <script>
                         function durationReload() {
-                            // This Is Ugly
+                            // TODO: This Is Ugly
                             let selected = document.getElementById('type').value;
                             let target = document.getElementById('duration');
 

@@ -20,18 +20,18 @@ namespace GaWo.Controllers;
 [Authorize]
 public class ProfileModel : PageModel
 {
-    public (bool, string) Error;
+    public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
 
     [BindProperty] public byte Monday { get; set; }
 
-    [BindProperty] public byte Tuesday { get; set; } = 0;
+    [BindProperty] public byte Tuesday { get; set; }
 
-    [BindProperty] public byte Wednesday { get; set; } = 0;
+    [BindProperty] public byte Wednesday { get; set; }
 
-    [BindProperty] public byte Thursday { get; set; } = 0;
+    [BindProperty] public byte Thursday { get; set; }
 
-    [BindProperty] public byte Friday { get; set; } = 0;
+    [BindProperty] public byte Friday { get; set; }
 
     [EmailAddress(ErrorMessage = "Ungültige E-Mail-Adresse")]
     [Required(ErrorMessage = "E-Mail-Adresse erforderlich")]
@@ -54,52 +54,49 @@ public class ProfileModel : PageModel
     [BindProperty]
     public string NewPasswordConf { get; set; } = string.Empty;
 
-    public void OnGet()
+    public async void OnGet()
     {
+        var db = new SurrealDbClient(Constants.SurrealDbUrl);
+        var secrets = await Secrets.Get();
+
+        await db.SignIn(new DatabaseAuth
+        {
+            Namespace = Constants.SurrealDbNameSpace,
+            Database = Constants.SurrealDbDatabase,
+            Username = secrets.Username,
+            Password = secrets.Password
+        });
     }
 
     public async Task<GawoUser> FillUser()
     {
-        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        Db = new SurrealDbClient(Constants.SurrealDbUrl);
         var secrets = await Secrets.Get();
 
-        await db.SignIn(new DatabaseAuth
+        await Db.SignIn(new DatabaseAuth
         {
-            Namespace = secrets.Namespace,
-            Database = secrets.Database,
+            Namespace = Constants.SurrealDbNameSpace,
+            Database = Constants.SurrealDbDatabase,
             Username = secrets.Username,
             Password = secrets.Password
         });
 
-        var query = await db.Query(
+        var query = await Db.Query(
             $"RETURN array::at((SELECT id FROM Users WHERE username = type::string({HttpContext.User.Identity!.Name!})).id, 0);");
 
         var thing = new Thing(query.GetValue<string>(0)!);
 
-        return (await db.Select<GawoUser>(thing))!;
+        return (await Db.Select<GawoUser>(thing))!;
     }
 
     public async Task<IActionResult> SyncDatabase(GawoUser user)
     {
-        // Connect to local SurrealDB
-        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        var secrets = await Secrets.Get();
-
-        await db.SignIn(new DatabaseAuth
-        {
-            Namespace = secrets.Namespace,
-            Database = secrets.Database,
-            Username = secrets.Username,
-            Password = secrets.Password
-        });
-        await db.Use("main", "main");
-
-        var query = await db.Query(
+        var query = await Db.Query(
             $"RETURN array::at((SELECT id FROM Users WHERE username = type::string({user.Username})).id, 0);");
 
         user.Id = new Thing(query.GetValue<string>(0)!);
 
-        await db.Upsert(user);
+        await Db.Upsert(user);
 
         return RedirectToPage();
     }
@@ -113,7 +110,7 @@ public class ProfileModel : PageModel
 
         if (result.IsValid == false)
         {
-            Error = (true, result.Errors[0].ErrorMessage);
+            // TODO: Add error message
             return Page();
         }
 
@@ -127,29 +124,17 @@ public class ProfileModel : PageModel
             User = UserStruct.Id!
         };
 
-        // Connect to local SurrealDB
-        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
-        var secrets = await Secrets.Get();
-        await db.SignIn(new DatabaseAuth
-        {
-            Namespace = secrets.Namespace,
-            Database = secrets.Database,
-            Username = secrets.Username,
-            Password = secrets.Password
-        });
-        await db.Use("main", "main");
-
-        await db.Create<VerificationLink>("VerificationLinks", link);
+        await Db.Create("VerificationLinks", link);
 
         var date = $"{DateTime.Now:dd.MM.yyyyy}";
         var time = $"{DateTime.Now:HH:mm}";
 
-        var htmlContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailHtml").ReadToEndAsync()
+        var htmlContent = new StreamReader(Constants.VerificationEmailHtmlPath).ReadToEndAsync()
             .Result
             .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time)
             .Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
 
-        var plainContent = new StreamReader("/home/fedora/Programming/gawo/text/verificationEmailPlain")
+        var plainContent = new StreamReader(Constants.VerificationEmailPlainPath)
             .ReadToEndAsync().Result
             .Replace("FIRSTNAME", UserStruct.FirstName).Replace("DATE", date).Replace("TIME", time)
             .Replace("OLDEMAIL", UserStruct.Email).Replace("NEWEMAIL", NewEmail).Replace("SECRET", secret.ToString());
@@ -166,7 +151,7 @@ public class ProfileModel : PageModel
 
         UserStruct.Email = NewEmail;
 
-        await db.Upsert<GawoUser>(UserStruct);
+        await Db.Upsert(UserStruct);
 
         return Redirect("/Profile?e");
     }
