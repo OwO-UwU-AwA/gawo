@@ -8,5 +8,9 @@
 <hr class="border border-primary opacity-50">
 
 <div class="content text-wrap">
+    @{
+        var query = await Model.Db!.Query($"RETURN array::at(SELECT count() FROM Events WHERE accepted = false, 0).count;");
+        Model.NotAccepted = query.GetValue<int>(0);
+    }
+    Nicht Akzeptierte Veranstaltungen: @Model.NotAccepted
 </div>
-@User.IsInRole("Admin").ToString()

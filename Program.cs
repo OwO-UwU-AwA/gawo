@@ -1,4 +1,6 @@
+using System.IO.Compression;
 using FluentValidation;
+using GaWo;
 using GaWo.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -12,6 +14,8 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Exceptions;
+using Serilog.Sinks.File.GzArchive;
+using RollingInterval = Serilog.Sinks.FileEx.RollingInterval;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +76,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(3);
     options.Cookie.IsEssential = true;
     // Change This To Match The Actual Domain
-    options.Cookie.Domain = "gauss-gymnasium.de/gawo";
+    options.Cookie.Domain = Constants.Url;
 });
 
 // Register FluentValidation Validators
@@ -106,8 +110,10 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-// TODO: Change To Log File
-await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().WriteTo.Console().CreateLogger();
+await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().WriteTo.FileEx(Constants.LogFilePath,
+    rollingInterval: RollingInterval.Hour,
+    hooks: new FileArchiveRollingHooks(CompressionLevel.SmallestSize, targetDirectory: Constants.ArchivedLogFilePath),
+    retainedFileCountLimit: 1).CreateLogger();
 
 // Create Global Logger
 Log.Logger = log;
@@ -118,6 +124,10 @@ var timer = new Timer(state =>
 {
     // TODO: Reset Email changes after 1 hour
     // Will Run Every Hour
-}, null, TimeSpan.Zero, TimeSpan.FromHours(1));
+}, null, TimeSpan.Zero, TimeSpan.FromHours(5));
 
+// Will Block As Long As The Application Is Running
 await app.RunAsync();
+
+// Must Be Called Before The Application Ends
+await Log.CloseAndFlushAsync();

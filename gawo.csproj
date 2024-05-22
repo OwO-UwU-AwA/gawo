@@ -20,6 +20,8 @@
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="5.1.0-dev-00943"/>
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00972"/>
+        <PackageReference Include="Serilog.Sinks.File.GzArchive" Version="1.1.10"/>
+        <PackageReference Include="Serilog.Sinks.FileEx" Version="5.1.8"/>
         <PackageReference Include="SurrealDb.Net" Version="0.5.0"/>
     </ItemGroup>
     <ItemGroup>
@@ -438,6 +440,13 @@
         <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\test\methods.js"/>
         <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\test\rules.js"/>
         <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation\test\test.js"/>
+        <_ContentIncludedByDefault Remove="out\web.config"/>
+        <_ContentIncludedByDefault Remove="out\appsettings.Development.json"/>
+        <_ContentIncludedByDefault Remove="out\appsettings.json"/>
+        <_ContentIncludedByDefault Remove="out\gawo.deps.json"/>
+        <_ContentIncludedByDefault Remove="out\gawo.runtimeconfig.json"/>
+        <_ContentIncludedByDefault Remove="out\text\secrets.json"/>
+        <_ContentIncludedByDefault Remove="out\text\secrets_template.json"/>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="wwwroot\lib\"/>

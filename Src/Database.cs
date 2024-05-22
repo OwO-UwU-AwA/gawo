@@ -35,7 +35,7 @@ public class GawoUser : Record
 
         Teacher+Admin:  0000 0011
     */
-    [JsonPropertyName("permissions")] public byte Permissions { get; set; } = 0;
+    [JsonPropertyName("permissions")] public byte Permissions { get; set; }
 
     /*
         Monday:     0000 0001
@@ -44,7 +44,7 @@ public class GawoUser : Record
         Thursday:   0000 1000
         Friday:     0001 0000
      */
-    [JsonPropertyName("absence")] public byte Absence { get; set; } = 0;
+    [JsonPropertyName("absence")] public byte Absence { get; set; }
 }
 
 // No Use Right Now
@@ -102,7 +102,7 @@ public class Event : Record
 
     [JsonPropertyName("grades")] public int Grades { get; set; } = -1;
 
-    [JsonPropertyName("notes")] public string? Notes { get; set; } = null;
+    [JsonPropertyName("notes")] public string? Notes { get; set; }
 
     [JsonPropertyName("organiser")] public Thing Organiser { get; set; } = null!;
 
@@ -114,3 +114,11 @@ public class Event : Record
 
     [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
 };
+
+public class Gawo
+{
+    [JsonPropertyName("gawophase")] public Duration GawoPhase { get; set; }
+    [JsonPropertyName("registrationphase")] public Duration RegistrationPhase { get; set; }
+    [JsonPropertyName("reservationphase")] public Duration ReservationPhase { get; set; }
+    [JsonPropertyName("searchphase")] public Duration SearchPhase { get; set; }
+}

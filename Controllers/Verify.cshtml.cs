@@ -10,21 +10,22 @@ public class VerifyModel : PageModel
     public async Task<IActionResult> OnGet()
     {
         // Connect to local SurrealDB
-        var db = new SurrealDbClient("ws://127.0.0.1:8000/rpc");
+        var db = new SurrealDbClient(Constants.SurrealDbUrl);
         var secrets = await Secrets.Get();
         await db.SignIn(new DatabaseAuth
         {
-            Namespace = secrets.Namespace,
-            Database = secrets.Database,
+            Namespace = Constants.SurrealDbNameSpace,
+            Database = Constants.SurrealDbDatabase,
             Username = secrets.Username,
             Password = secrets.Password
         });
-        await db.Use("main", "main");
 
+        // Check if parameter is in the query, if not redirect to index
         if (!HttpContext.Request.Query.ContainsKey("secret")) RedirectToPage("Index");
 
         try
         {
+            // Delete entry from VerificationLinks which matches the secret
             await db.Query(
                 $"DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string({HttpContext.Request.Query["secret"].ToString()})).id, 0));");
         }
