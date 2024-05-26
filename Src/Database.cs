@@ -81,7 +81,7 @@ public enum Type
     Workshop,
     Qf,
     Sport,
-    Elmos,
+    Elmos
 }
 
 public class Event : Record
@@ -102,7 +102,9 @@ public class Event : Record
 
     [JsonPropertyName("grades")] public int Grades { get; set; } = -1;
 
-    [JsonPropertyName("notes")] public string? Notes { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("notes")]
+    public string? Notes { get; set; }
 
     [JsonPropertyName("organiser")] public Thing Organiser { get; set; } = null!;
 
@@ -113,12 +115,17 @@ public class Event : Record
     [JsonPropertyName("teacher")] public Thing Teacher { get; set; } = null!;
 
     [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
+
+    [JsonPropertyName("created")] public DateTime Created { get; set; }
 };
 
 public class Gawo
 {
     [JsonPropertyName("gawophase")] public Duration GawoPhase { get; set; }
-    [JsonPropertyName("registrationphase")] public Duration RegistrationPhase { get; set; }
+
+    [JsonPropertyName("registrationphase")]
+    public Duration RegistrationPhase { get; set; }
+
     [JsonPropertyName("reservationphase")] public Duration ReservationPhase { get; set; }
     [JsonPropertyName("searchphase")] public Duration SearchPhase { get; set; }
 }

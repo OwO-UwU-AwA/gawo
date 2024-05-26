@@ -2,28 +2,37 @@
 @model GaWo.Controllers.ErrorModel
 @{
     ViewData["Title"] = "GaWo Error";
+    var date = $"{DateTime.Now:yyyy-MM-ddTHH:mm:sszz}";
 }
 
-<h1 class="text-danger text-center header">Etwas ist schiefgelaufen :(</h1>
+
+<div class="row mt-3">
+    <div class="col d-flex flex-row">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <h2 class="fw-bold text-danger text-center">Etwas ist schiefgelaufen :(</h2>
+    </div>
+</div>
 <hr class="border border-danger opacity-50">
 
-<h3 class="text-center">
-    <a href="/">
-        <img alt="krtek" src="img/krtek.jpg" height="302">
-    </a>
-    <!-- <a class="text-success" href="/">Home</a> --->
-</h3>
-@if (Model.ShowRequestId)
-{
-    <p style="text-align: center;">
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-        <br>
-        <strong>HTTP Methode:</strong> <code>@Request.Method</code>
-        <br>
-        <strong>Authentifiziert:</strong> <code>@Request.HttpContext.User.Identity!.IsAuthenticated.ToString()</code>
-        <br>
-        <strong>User-Agent:</strong> <code>@Request.Headers["User-Agent"].ToString()</code>
-        <br>
-        <strong>Datum:</strong> <code>@DateTime.Now.ToString("yyyy-MM-dd-THH:mm:sszz")</code>
-    </p>
-}
+<div class="text-center">
+    <div>
+        <a href="/">
+            <img alt="krtek" src="img/krtek_error.png" height="299">
+        </a>
+    </div>
+
+    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    <br>
+    <strong>HTTP Methode:</strong> <code>@Request.Method</code>
+    <br>
+    <strong>Query:</strong> <code>@Request.Path.ToString()@Request.QueryString.ToString()</code>
+    <br>
+    <strong>Authentifiziert:</strong> <code>@Request.HttpContext.User.Identity!.IsAuthenticated.ToString()</code>
+    <br>
+    <strong>User-Agent:</strong> <code>@Request.Headers["User-Agent"].ToString()</code>
+    <br>
+    <strong>Datum:</strong> <code>@date</code>
+</div>

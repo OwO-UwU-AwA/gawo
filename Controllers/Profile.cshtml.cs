@@ -145,7 +145,8 @@ public class ProfileModel : PageModel
 
         if (SendNotificationEmail("[NOREPLY] Bestätigen Sie Ihre E-Mail-Adresse", plainContent,
                 UserStruct.Email,
-                UserStruct.FirstName + " " + UserStruct.LastName, view) != true)
+                new StringBuilder().AppendFormat($"{UserStruct.FirstName} {UserStruct.LastName}").ToString(), view) !=
+            true)
         {
         }
 

@@ -1,12 +1,7 @@
-@font-family
-{
-    font-family "BlexMono Nerd Font"
-    src: local('/ttf/BlexMonoNerdFontMono-Regular.ttf');
-    font-weight: normal;
-}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 * {
-    font-family: 'BlexMono Nerd Font';
+    font-family: 'IBM Plex Mono', monospace !important;
 }
 
 .points_table {
@@ -46,7 +41,7 @@
 
 .points_table .tg-baqh {
     text-align: center;
-    vertical-align: top
+    vertical-align: top;
 }
 
 
@@ -102,7 +97,7 @@
 
 .org_points_table .tg-baqh {
     text-align: center;
-    vertical-align: top
+    vertical-align: top;
 }
 
 @media screen and (max-width: 1010px) {
@@ -120,6 +115,6 @@
     }
 }
 
-.header {
-    font-weight: bold;
+.menu-button {
+    width: 7.5%;
 }

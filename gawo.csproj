@@ -22,6 +22,7 @@
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00972"/>
         <PackageReference Include="Serilog.Sinks.File.GzArchive" Version="1.1.10"/>
         <PackageReference Include="Serilog.Sinks.FileEx" Version="5.1.8"/>
+        <PackageReference Include="Stripe.Net" Version="44.9.0-beta.1"/>
         <PackageReference Include="SurrealDb.Net" Version="0.5.0"/>
     </ItemGroup>
     <ItemGroup>
@@ -447,8 +448,10 @@
         <_ContentIncludedByDefault Remove="out\gawo.runtimeconfig.json"/>
         <_ContentIncludedByDefault Remove="out\text\secrets.json"/>
         <_ContentIncludedByDefault Remove="out\text\secrets_template.json"/>
+        <_ContentIncludedByDefault Remove="Pages\ChartAPI\CreatedPerDay.cshtml"/>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="wwwroot\lib\"/>
+        <Folder Include="wwwroot\ttf\"/>
     </ItemGroup>
 </Project>

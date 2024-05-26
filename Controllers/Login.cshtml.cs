@@ -113,6 +113,8 @@ public class LoginModel : PageModel
         var query = await db.Query(
             $"RETURN array::at((SELECT count() FROM Users WHERE username = type::string({username})).count, 0);");
 
-        return query.GetValue<int>(0) > 0;
+        var res = query.GetValue<int?>(0) ?? -1;
+
+        return res > 0;
     }
 }
