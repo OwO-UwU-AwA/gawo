@@ -41,10 +41,18 @@
 </script>
 
 <div class="container-fluid">
-
     <div class="row row-cols-1 justify-content-md-start">
         <div class="col w-100">
-            <h2>@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
+
+            <div class="row mt-3">
+                <div class="col d-flex flex-row">
+                    <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <h2 class="fw-bold">@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
+                </div>
+            </div>
             <hr class="border border-primary opacity-50">
         </div>
         <div class="col mb-1">
@@ -152,12 +160,12 @@
 
 @if (HttpContext.Request.Query.ContainsKey("e") == true || HttpContext.Request.Query.ContainsKey("p") == true)
 {
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
         </symbol>
     </svg>
-    <div class="alert alert-success alert-dismissible fade show active d-flex align-items-center" style="margin-top: 1em; margin-bottom: -2em;" role="alert">
+    <div class="alert alert-success alert-dismissible fade show active d-flex align-items-center mt-3" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger">
             <use xlink:href="#exclamation-triangle-fill"/>
         </svg>
@@ -213,7 +221,7 @@
         </div>
         <div class="col">
             <form asp-page-handler="ChangeAbsence" method="post" class="container">
-                <div style="display: flex; flex-wrap: wrap;">
+                <div class="d-flex flex-wrap">
                     <div style="flex: 50%;">
                         <input value="1" type="checkbox" class="form-check-input" id="monday" name="monday">
                         <label asp-for="Monday" for="monday">Montag</label>
