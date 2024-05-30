@@ -1,3 +1,4 @@
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -123,9 +124,18 @@ public class AddEventModel : PageModel
                        (Grade9 ? 1 << 4 : 0) | (Grade10 ? 1 << 5 : 0) |
                        (Grade11 ? 1 << 4 : 0) | (Grade12 ? 1 << 6 : 0);
 
+        // Set Organiser And Teacher To Correct Values
         Event.Organiser = new Thing(Organiser);
         Event.Teacher = new Thing(Teacher);
 
+        // Set Even Creation Time To Current Time
         Event.Created = DateTime.Now;
+
+        // Sanitize Description
+
+        var sanitizer = new HtmlSanitizer();
+        Event.Description = sanitizer.Sanitize(Event.Description, "http://localhost:5000");
+
+        Console.WriteLine(Event.Description);
     }
 }

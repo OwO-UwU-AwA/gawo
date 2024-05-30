@@ -1,9 +1,0 @@
-@media only screen and (max-width: 600px) {
-    .toggle-sidebar {
-        display: none;
-    }
-}
-
-.icon {
-    margin-right: 0.5em;
-}

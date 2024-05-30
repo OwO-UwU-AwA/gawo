@@ -14,6 +14,7 @@
         {
             revealer.classList.remove("fa-eye");
             revealer.classList.add("fa-eye-slash");
+
             passwordInput.setAttribute("type", "password");
         }
         else
@@ -26,12 +27,16 @@
 </script>
 
 <div class="row mt-3">
-    <div class="col d-flex flex-row">
+    <div class="col d-flex flex-row justify-content-between">
         <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-            <i class="fa-solid fa-bars"></i>
+            <i class="fad fa-bars"></i>
         </button>
 
         <h2 class="header fw-bold">Login</h2>
+
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+            <i class="fad fa-bars"></i>
+        </button>
     </div>
 </div>
 <hr class="border border-primary opacity-50">
@@ -66,10 +71,12 @@
                 <div class="input-group">
                     <input asp-for="Password" type="password" class="form-control" id="password" name="password" placeholder="Passwort">
                     <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword()">
-                        <i id="revealer" class="fa-regular fa-eye-slash" aria-hidden="true"></i>
+                        <i id="revealer" class="fad fa-eye-slash" aria-hidden="true"></i>
                     </button>
                 </div>
-                <button type="submit" class="btn btn-success mt-3">Anmelden <i class="fa-solid fa-circle-arrow-right"></i></button>
+                <button type="submit" class="btn btn-success mt-3">
+                    Anmelden <i class="fad fa-circle-arrow-right"></i>
+                </button>
             </div>
         </form>
     </div>

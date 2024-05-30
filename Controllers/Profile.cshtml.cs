@@ -20,6 +20,13 @@ namespace GaWo.Controllers;
 [Authorize]
 public class ProfileModel : PageModel
 {
+    public readonly IAuthorizationService AuthorizationService;
+
+    public ProfileModel(IAuthorizationService authorizationService)
+    {
+        AuthorizationService = authorizationService;
+    }
+
     public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
 
