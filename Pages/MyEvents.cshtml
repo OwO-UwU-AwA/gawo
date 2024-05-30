@@ -4,12 +4,16 @@
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 <div class="row mt-3">
-    <div class="col d-flex flex-row">
+    <div class="col d-flex flex-row justify-content-between">
         <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-            <i class="fa-solid fa-bars"></i>
+            <i class="fad fa-bars"></i>
         </button>
 
         <h2 class="fw-bold">@Model.Request.HttpContext.User.Identity!.Name</h2>
+
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+            <i class="fad fa-bars"></i>
+        </button>
     </div>
 </div>
 <hr class="border border-primary opacity-50">

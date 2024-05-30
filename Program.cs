@@ -131,3 +131,17 @@ await app.RunAsync();
 
 // Must Be Called Before The Application Ends
 await Log.CloseAndFlushAsync();
+
+
+class Y
+{
+    int a;
+    int b;
+
+
+    public Y(int a, int b)
+    {
+        this.a = a;
+        this.b = b;
+    }
+}
