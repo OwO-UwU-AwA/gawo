@@ -15,7 +15,7 @@
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.8.0-rc.1"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.8.1"/>
-        <PackageReference Include="Serilog" Version="4.0.0-dev-02174"/>
+        <PackageReference Include="Serilog" Version="4.0.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.2-dev-00338"/>
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="5.1.0-dev-00943"/>
