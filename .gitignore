@@ -2,8 +2,7 @@ docs/
 .direnv/
 out/
 secrets.json
-users.sdb
-users.db
+gawo.db/
 temp-keys/
 
 *.rsuser
@@ -311,7 +310,6 @@ FodyWeavers.xsd
 
 # globs
 Makefile.in
-*.userprefs
 *.usertasks
 config.make
 config.status
