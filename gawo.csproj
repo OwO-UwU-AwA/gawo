@@ -10,13 +10,14 @@
         <PackageReference Include="FluentValidation" Version="11.9.1"/>
         <PackageReference Include="Grafana.OpenTelemetry" Version="0.8.1-beta"/>
         <PackageReference Include="HtmlSanitizer" Version="8.1.866-beta"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.5"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.5"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6"/>
+        <PackageReference Include="HtmlSanitizer" Version="8.1.866-beta"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.8.0-rc.1"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.8.1"/>
-        <PackageReference Include="Serilog" Version="4.0.0-dev-02174"/>
+        <PackageReference Include="Serilog" Version="4.0.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="8.0.2-dev-00338"/>
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="5.1.0-dev-00943"/>
