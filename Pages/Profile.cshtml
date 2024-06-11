@@ -1,4 +1,5 @@
 @page
+@using Microsoft.AspNetCore.Authorization
 @model GaWo.Controllers.ProfileModel
 @{
     ViewData["Title"] = "GaWo Profil";
@@ -12,17 +13,17 @@
         let revealer;
         if (id === "button1")
         {
-            passwordInput = document.getElementById("currentpassword");
+            passwordInput = document.getElementById("currentPassword");
             revealer = document.getElementById("revealer1");
         }
         else if (id === "button2")
         {
-            passwordInput = document.getElementById("newpassword");
+            passwordInput = document.getElementById("newPassword");
             revealer = document.getElementById("revealer2");
         }
         else if (id === "button3")
         {
-            passwordInput = document.getElementById("newpasswordconf");
+            passwordInput = document.getElementById("newPasswordConf");
             revealer = document.getElementById("revealer3");
         }
         if (passwordInput.getAttribute("type") === "text")
@@ -41,10 +42,32 @@
 </script>
 
 <div class="container-fluid">
-
     <div class="row row-cols-1 justify-content-md-start">
         <div class="col w-100">
-            <h2>@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
+
+            <div class="row mt-3">
+                <div class="col d-flex flex-row justify-content-between">
+                    <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                        <i class="fad fa-bars"></i>
+                    </button>
+
+                    <h2 class="fw-bold">@Model.UserStruct.FirstName @Model.UserStruct.LastName</h2>
+
+                    @if (Model.AuthorizationService.AuthorizeAsync(User, "AdminOnly").Result.Succeeded)
+                    {
+                        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas"
+                                data-bs-target="#adminbar">
+                            <i class="fad fa-bars"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="menu-button btn btn-outline-primary me-3 invisible">
+                            <i class="fad fa-bars"></i>
+                        </button>
+                    }
+                </div>
+            </div>
             <hr class="border border-primary opacity-50">
         </div>
         <div class="col mb-1">
@@ -61,7 +84,7 @@
                         <span class="badge border border-1 text-danger-emphasis">
                             E-Mail-Adresse nicht verifiziert
                             <i
-                                class="text-danger-emphasis fa-solid fa-triangle-exclamation">
+                                class="text-danger-emphasis fad fa-triangle-exclamation">
                             </i>
                         </span>
                     }
@@ -70,7 +93,7 @@
                         <span class="badge border border-1 text-success-emphasis">
                             E-Mail-Adresse verifiziert
                             <i
-                                class="text-success-emphasis fa-solid fa-circle-check">
+                                class="text-success-emphasis fad fa-circle-check">
                             </i>
                         </span>
                     }
@@ -152,12 +175,12 @@
 
 @if (HttpContext.Request.Query.ContainsKey("e") == true || HttpContext.Request.Query.ContainsKey("p") == true)
 {
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
         </symbol>
     </svg>
-    <div class="alert alert-success alert-dismissible fade show active d-flex align-items-center" style="margin-top: 1em; margin-bottom: -2em;" role="alert">
+    <div class="alert alert-success alert-dismissible fade show active d-flex align-items-center mt-3" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger">
             <use xlink:href="#exclamation-triangle-fill"/>
         </svg>
@@ -171,49 +194,54 @@
 <div class="container mt-5">
     <div class="row mb-3">
         <div class="col d-flex flex-column justify-content-between">
-            <form asp-page-handler="ChangeEmail" method="post" id="changeemail">
+            <form asp-page-handler="ChangeEmail" method="post" id="changeEmail">
                 <input asp-for="NewEmail" type="text" class="form-control" id="newemail" placeholder="Neue E-Email-Adresse">
                 <span asp-validation-for="NewEmail" class="text-danger-emphasis small"></span>
-                <button type="submit" class="btn btn-success w-100 mt-3">Email ändern <i class="fas fa-save"></i></button>
+                <button type="submit" class="btn btn-success w-100 mt-3">
+                    Email ändern <i class="fad fa-save"></i>
+                </button>
             </form>
         </div>
         <div class="col">
             <form asp-page-handler="ChangePassword" method="post" class="col">
                 <div class="input-group">
-                    <input asp-for="CurrentPassword" type="password" class="form-control" id="currentpassword" placeholder="Derzeitiges Passwort">
+                    <input asp-for="CurrentPassword" type="password" class="form-control" id="currentPassword"
+                           placeholder="Derzeitiges Passwort">
                     <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button1')">
                         <i
-                            id="revealer1" class="fa-regular fa-eye-slash" aria-hidden="true">
+                            id="revealer1" class="fad fa-eye-slash" aria-hidden="true">
                         </i>
                     </button>
                 </div>
                 <span asp-validation-for="CurrentPassword" class="text-danger-emphasis small text-nowrap"></span>
                 <div class="input-group mt-3">
-                    <input asp-for="NewPassword" type="password" class="form-control" id="newpassword" placeholder="Neues Passwort">
+                    <input asp-for="NewPassword" type="password" class="form-control" id="newPassword"
+                           placeholder="Neues Passwort">
                     <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button2')">
                         <i
-                            id="revealer2" class="fa-regular fa-eye-slash" aria-hidden="true">
+                            id="revealer2" class="fad fa-eye-slash" aria-hidden="true">
                         </i>
                     </button>
                 </div>
                 <span asp-validation-for="NewPassword" class="text-danger-emphasis small text-nowrap"></span>
                 <div class="input-group mt-3">
-                    <input asp-for="NewPasswordConf" type="password" class="form-control" id="newpasswordconf" placeholder="Passwort bestätigen">
+                    <input asp-for="NewPasswordConf" type="password" class="form-control" id="newPasswordConf"
+                           placeholder="Passwort bestätigen">
                     <button tabindex="-1" type="button" class="btn btn-outline-secondary" onclick="TogglePassword('button3')">
                         <i
-                            id="revealer3" class="fa-regular fa-eye-slash" aria-hidden="true">
+                            id="revealer3" class="fad fa-eye-slash" aria-hidden="true">
                         </i>
                     </button>
                 </div>
                 <span asp-validation-for="NewPasswordConf" class="text-danger-emphasis small text-nowrap"></span>
                 <button type="submit" class="btn btn-success w-100 mt-3">
-                    Passwort ändern <i class="fas fa-save"></i>
+                    Passwort ändern <i class="fad fa-save"></i>
                 </button>
             </form>
         </div>
         <div class="col">
             <form asp-page-handler="ChangeAbsence" method="post" class="container">
-                <div style="display: flex; flex-wrap: wrap;">
+                <div class="d-flex flex-wrap">
                     <div style="flex: 50%;">
                         <input value="1" type="checkbox" class="form-check-input" id="monday" name="monday">
                         <label asp-for="Monday" for="monday">Montag</label>
@@ -240,7 +268,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-success w-100 mt-5">
-                    Abwesenheit speichern <i class="fas fa-save"></i>
+                    Abwesenheit speichern <i class="fad fa-save"></i>
                 </button>
             </form>
         </div>

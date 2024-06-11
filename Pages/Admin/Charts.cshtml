@@ -1,0 +1,189 @@
+@page
+@model GaWo.Controllers.AdminModel
+@{
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
+}
+
+<div class="row mt-3">
+    <div class="col d-flex flex-row justify-content-between">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
+
+        <h2 class="header fw-bold">Statistiken</h2>
+
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+            <i class="fad fa-bars"></i>
+        </button>
+    </div>
+</div>
+<hr class="border border-primary opacity-50">
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<div class="container content">
+
+    <div class="scichart-root"></div>
+
+    <div class="row">
+        <div class="col d-flex flex-column justify-content-between">
+            <div id="chart1"></div>
+        </div>
+        <div class="col d-flex flex-column justify-content-between">
+            <div id="chart2"></div>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col d-flex flex-column justify-content-between">
+            <div id="chart3"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const options1 = {
+            theme: {
+                palette: 'palette2',
+            },
+            series: [{
+                name: 'Veranstaltungen angemeldet',
+                data: [],
+            }],
+            tooltip: {
+                enabled: false,
+            },
+            chart: {
+                toolbar: {
+                    show: false,
+                },
+                height: 350,
+                type: 'area',
+            },
+            title: {
+                text: 'Veranstaltungen angemeldet pro Tag',
+                floating: true,
+            },
+            dropShadow: {
+                enabled: true,
+                top: 0,
+                left: 3,
+                blur: 3,
+                opacity: 0.5,
+            },
+            dataLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    fontFamily: 'IBM Plex Mono',
+                },
+                background: {
+                    enabled: true,
+                    foreColor: '#FF6961',
+                    borderRadius: 20,
+                    padding: 4,
+                    opacity: 0.5,
+                    borderWidth: 0,
+                    dropShadow: {
+                        enabled: true,
+                        top: 0,
+                        left: 3,
+                        blur: 3,
+                        opacity: 0.5,
+                        color: '#FF6961',
+                    },
+                },
+            },
+            label: {
+                borderColor: '#FF6961',
+                text: 'Veranstaltungen',
+            },
+            stroke: {
+                curve: 'smooth',
+            },
+            xaxis: {
+                categories: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'],
+            },
+            yaxis: {
+                title: {
+                    text: 'Anzahl',
+                },
+            },
+        };
+        
+        // Copy options1 and change title
+        let options2 = $.extend(true, {}, options1);
+        options2.title.text = 'Veranstaltungen angemeldet für Tag';
+        
+        let options3 = $.extend(true, {}, options1);
+        options3.title.text = 'Veranstaltungen je Typ';
+        options3.xaxis.categories = ['Vortrag', 'Gastvortag', 'Fremdsprachenvortrag', 'Facharbeitsverteidigung', 'Wettbewerb', 'Workshop', 'QF', 'Sport', 'ELMOS', 'Sonstiges'];
+        options3.theme.palette = 'palette2';
+        options3.chart.type = 'bar';
+
+        let createdPerDay = new ApexCharts(document.querySelector('#chart1'), options1);
+        let onDay = new ApexCharts(document.querySelector('#chart2'), options2);
+        let perType = new ApexCharts(document.querySelector('#chart3'), options3);
+        updateCharts();
+        createdPerDay.render();
+        onDay.render();
+        perType.render();
+
+        function updateCharts() {
+            $.ajax({
+                url: '/ChartAPI/CreatedPerDay',
+                method: 'GET',
+                headers: {
+                    'From': 'Code',
+                },
+                success: function(data) {
+                    createdPerDay.updateSeries([{
+                        name: '',
+                        data: data,
+                    }]);
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error retrieving data: " + error);
+                }
+            });
+            $.ajax({
+                url: '/ChartAPI/OnDay',
+                method: 'GET',
+                headers: {
+                    'From': 'Code',
+                },
+                success: function(data) {
+                    onDay.updateSeries([{
+                        name: '',
+                        data: data,
+                    }]);
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error retrieving data: " + error);
+                }
+            });
+            $.ajax({
+                url: '/ChartAPI/PerType',
+                method: 'GET',
+                headers: {
+                    'From': 'Code',
+                },
+                success: function(data) {
+                    perType.updateSeries([{
+                        name: '',
+                        data: data,
+                    }]);
+                },
+                error: function (xhr, status, error) {
+                    console.log("Error retrieving data: " + error);
+                }
+            });
+        }
+        
+        window.setInterval(function(){
+            updateCharts();
+        }, 3000);
+    });
+</script>

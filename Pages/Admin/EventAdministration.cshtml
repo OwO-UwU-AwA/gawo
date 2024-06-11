@@ -1,0 +1,112 @@
+@page
+@using Microsoft.IdentityModel.Tokens
+@model GaWo.Controllers.Admin.EventAdministrationModel
+@{
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
+}
+
+<div class="row mt-3">
+    <div class="col d-flex flex-row justify-content-between">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
+
+        <h2 class="header fw-bold">Veranstaltungsadministration</h2>
+
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+            <i class="fad fa-bars"></i>
+        </button>
+    </div>
+</div>
+<hr class="border border-primary opacity-50">
+
+
+<div class="container">
+    <div class="d-flex row justify-content-between">
+        @{
+            var query = @Model.Get().Result;
+            foreach (var ev in query)
+            {
+                <div class="accordion" id='@(ev.Id!.Id)Parent'>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button text-break" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#@ev.Id.ToString()" aria-expanded="true" aria-controls="@ev.Id.ToString()">
+                                <div class="d-flex row-mt3">
+                                    <i>@Html.Raw(ev.Name)&nbsp;</i>
+
+                                    @{
+                                        foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
+                                        {
+                                            if (line.Split(",")[0] == ev.Subject)
+                                            {
+                                                <text>@line.Split(",")[1]</text>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="@ev.Id.ToString()" class="accordion-collapse collapse" data-bs-parent="#@(ev.Id.Id)Parent">
+                            <div class="accordion-body">
+
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="mb-1">Beschreibung:</label>
+                                            <div class="border border-secondary-subtle rounded ps-3 py-3">
+                                                <div class="text-break lh-sm fs-6">
+                                                    @Html.Raw(ev.Description)
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="mb-1">Veranstalter:</div>
+                                            <div>
+                                                @{ 
+                                                    var res = await Model.GetUser(ev.Organiser);
+                                                    <text>@res.LastName, @res.FirstName</text>
+                                                }
+                                            </div>
+                                            <label class="mb-1 mt-3">Dauer:</label>
+                                            <div>
+                                                @ev.Duration Minuten
+                                            </div>
+
+                                            <button class="btn btn-warning mt-5 w-50" type="button"
+                                                    onclick="window.open('/EditEvent?id=@ev.Id.Id', '_blank');">
+                                                Bearbeiten
+                                            </button>
+                                        </div>
+                                        <div class="col">
+                                            <label class="mb-1">Betreuer</label>
+                                            <div>
+                                                @{
+                                                    res = await Model.GetUser(ev.Teacher);
+                                                    <text>@res.LastName</text>
+                                                }
+                                            </div>
+
+                                            <label class="mb-1 mt-3">Raum:</label>
+                                            <div>
+                                                @if (ev.Room.IsNullOrEmpty())
+                                                {
+                                                    <text>Keiner</text>
+                                                }
+                                            </div>
+
+                                            <button class="btn btn-danger mt-5 w-50" type="button"
+                                                    onclick="window.open('/Admin/DeleteEvent?id=@ev.Id.Id', '_blank');">
+                                                Löschen
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

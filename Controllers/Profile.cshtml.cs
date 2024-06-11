@@ -20,6 +20,13 @@ namespace GaWo.Controllers;
 [Authorize]
 public class ProfileModel : PageModel
 {
+    public readonly IAuthorizationService AuthorizationService;
+
+    public ProfileModel(IAuthorizationService authorizationService)
+    {
+        AuthorizationService = authorizationService;
+    }
+
     public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
 
@@ -145,7 +152,8 @@ public class ProfileModel : PageModel
 
         if (SendNotificationEmail("[NOREPLY] Bestätigen Sie Ihre E-Mail-Adresse", plainContent,
                 UserStruct.Email,
-                UserStruct.FirstName + " " + UserStruct.LastName, view) != true)
+                new StringBuilder().AppendFormat($"{UserStruct.FirstName} {UserStruct.LastName}").ToString(), view) !=
+            true)
         {
         }
 

@@ -4,11 +4,31 @@
 @{
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
+<div class="row mt-3">
+    <div class="col d-flex flex-row justify-content-between">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
+
+        <h2 class="header fw-bold">Anmeldung</h2>
+
+        @if (Model.AuthorizationService.AuthorizeAsync(User, "AdminOnly").Result.Succeeded)
+        {
+            <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+                <i class="fad fa-bars"></i>
+            </button>
+        }
+        else
+        {
+            <button class="menu-button btn btn-outline-primary me-3 invisible">
+                <i class="fad fa-bars"></i>
+            </button>
+        }
+    </div>
+</div>
+<hr class="border border-primary opacity-50">
 
 <div class="content">
-    <h2 class="header">Anmeldung</h2>
-    <hr class="border border-primary opacity-50">
-
     <form method="post" asp-page-handler="AddEvent" class="container">
         <div class="row mb-3">
             <div class="col">
@@ -59,8 +79,10 @@
                             let selected = document.getElementById('type').value;
                             let target = document.getElementById('duration');
 
-                            while (target.options.length > 0)
+                            while (0 < target.options.length)
+                            {
                                 target.remove();
+                            }
 
                             switch (selected) {
                                 case 'WORKSHOP':
@@ -254,7 +276,7 @@
         </div>
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-success">
-                Veranstaltung anmelden <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                Veranstaltung anmelden <i class="fad fa-arrow-up-from-bracket"></i>
             </button>
         </div>
     </form>

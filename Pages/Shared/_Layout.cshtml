@@ -1,115 +1,183 @@
 @{
     var currentPage = Context.Request.Path;
 }
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/font-awesome-6-pro/css/all.css"/>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/css/gawo.styles.css" asp-append-version="true"/>
 </head>
+<!--suppress JSCheckFunctionSignatures -->
 <script>
-    function setTheme()
-    {
-      const dm = document.cookie.replace(/(?:^|.*;\s*)theme\s*=\s*([^;]*).*$|^.*$/, "$1");
-      const html = document.querySelector("html");
-      html.setAttribute("data-bs-theme", dm === "dark" ? "dark" : "light");
-    }
-    function toggleTheme()
-    {
-      const dm = document.cookie.replace(/(?:^|.*;\s*)theme\s*=\s*([^;]*).*$|^.*$/, "$1");
-      
-      const newDm = dm === "dark" ? "light" : "dark";
-      document.cookie = `theme=${newDm}; path=/;`;
+        function setTheme()
+        {
+            const dm = document.cookie.replace(/(?:^|.*;\s*)theme\s*=\s*([^;]*).*$|^.*$/, "$1");
+            const html = document.querySelector("html");
+            html.setAttribute("data-bs-theme", dm === "dark" ? "dark" : "light");
+        }
 
-      setTheme();
-    }
+        function toggleTheme()
+        {
+            const dm = document.cookie.replace(/(?:^|.*;\s*)theme\s*=\s*([^;]*).*$|^.*$/, "$1");
 
-    window.addEventListener("load", setTheme());
-  </script>
+            const newDm = dm === "dark" ? "light" : "dark";
+            
+            if (newDm === "dark")
+            {
+
+                document.querySelector("#themeIcon").classList.add("fa-sun");
+                document.querySelector("#themeIcon").classList.remove("fa-moon");
+            }
+            else
+            {
+                
+                document.querySelector("#themeIcon").classList.remove("fa-sun");
+                document.querySelector("#themeIcon").classList.add("fa-moon");
+            }
+            
+            document.cookie = `theme=${newDm}; path=/;`;
+
+            setTheme();
+        }
+
+        window.addEventListener("load", setTheme());
+    </script>
 
 <body class="overflow-scroll">
-<button class="toggle-sidebar btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#sidebar" style="z-index: 1025;">
-    <i class="fa-solid fa-bars"></i>
-</button>
 <div class="container">
-
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">
                 <a class="home" href="/">Gaußwoche @DateTime.Now.Year.ToString()</a>
             </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
         </div>
         <div class="offcanvas-body">
             <div class="d-grid gap-2">
-                <button type="button" onclick="window.location.href='/';" class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'><i class="fa-solid fa-house icon"></i>Home</button>
-                <button type="button" onclick="window.location.href='/Profile';" class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>
+                <button type="button" onclick="window.location.href='/';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/" ? "active" : "")'>
+                    <i
+                        class="fad fa-house">
+                    </i> Home
+                </button>
+                <button type="button" onclick="window.location.href='/Profile';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/Profile" ? "active" : "")'>
                     @if (Context.User.Identity!.IsAuthenticated)
                     {
-                        <i class="fa-solid fa-user"></i>
+                        <i class="fad fa-user"></i>
                     }
                     else
                     {
-                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <i class="fad fa-right-to-bracket"></i>
                     }
                     Profil
                 </button>
-                <button type="button" onclick="window.location.href='/Points';" class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'><i class="fa-solid fa-table icon"></i>Punkte</button>
-                <button type="button" onclick="window.location.href='/AddEvent';" class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'><i class="fa-solid fa-file-pen icon"></i>Veranstaltung Anmelden</button>
-                <button type="button" onclick="window.location.href='/MyEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'><i class="fa-solid fa-calendar-days icon"></i>Meine Veranstaltungen</button>
-                <button type="button" onclick="window.location.href='/VisitedEvents';" class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'><i class="fa-solid fa-list-check icon"></i>Besuchte Veranstaltungen</button>
-                <button type="button" onclick="window.location.href='/SiteMap';" class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'><i class="fa-solid fa-map icon"></i>Sitemap</button>
-                <button type="button" onclick="window.location.href='/Logout';" class="btn btn-outline-danger btn-block"><i class="fa-solid fa-right-from-bracket icon"></i>Abmelden</button>
-                <button type="button" onclick="toggleTheme();location.reload()" class="btn btn-outline-primary btn-block">
+                <button type="button" onclick="window.location.href='/Points';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/Points" ? "active" : "")'>
+                    <i
+                        class="fad fa-table">
+                    </i> Punkte
+                </button>
+                <button type="button" onclick="window.location.href='/AddEvent';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'>
+                    <i
+                        class="fad fa-file-pen">
+                    </i> Veranstaltung Anmelden
+                </button>
+                <button type="button" onclick="window.location.href='/MyEvents';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>
+                    <i
+                        class="fad fa-calendar-days">
+                    </i> Meine Veranstaltungen
+                </button>
+                <button type="button" onclick="window.location.href='/VisitedEvents';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>
+                    <i
+                        class="fad fa-list-check">
+                    </i> Besuchte Veranstaltungen
+                </button>
+                <button type="button" onclick="window.location.href='/SiteMap';"
+                        class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'>
+                    <i
+                        class="fad fa-map">
+                    </i> Sitemap
+                </button>
+                <button type="button" onclick="window.location.href='/Logout';"
+                        class="btn btn-outline-danger btn-block">
+                    <i class="fad fa-right-from-bracket"></i> Abmelden
+                </button>
+                <button type="button" onclick="toggleTheme()"
+                        class="btn btn-outline-primary btn-block">
                     @if (Context.Request.Cookies["theme"] == "dark")
                     {
-                        <i class="fa-solid fa-sun icon"></i>
+                        <i id="themeIcon" class="fad fa-sun"></i>
                     }
                     else
                     {
-                        <i class="fa-solid fa-moon icon"></i>
+                        <i id="themeIcon" class="fad fa-moon"></i>
                     }
                     Thema-Switch
                 </button>
             </div>
         </div>
     </div>
+
+    <div class="offcanvas offcanvas-end" id="adminbar" tabindex="-1">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">
+                <a class="home" href="/">Adminpanel</a>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="d-grid gap-2">
+                <button type="button" onclick="window.location.href='/Admin';"
+                        class="btn btn-outline-primary btn-block">
+                    <i class="fad fa-user-tie"></i> Admin
+                </button>
+
+                <button type="button" onclick="window.location.href='/Admin/Charts';"
+                        class="btn btn-outline-primary btn-block">
+                    <i class="fad fa-chart-line"></i> Statistiken
+                </button>
+                <button type="button" onclick="window.location.href='/Admin/EventAdministration';"
+                        class="btn btn-outline-primary btn-block">
+                    <i class="fad fa-chart-line"></i> Veranstaltungsadministration
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="content">
-        <main role="main">
+        <main role="main" style="margin-top: -1em;">
             @RenderBody()
         </main>
     </div>
 </div>
 
 <script>
-      let sidebar = document.getElementById("sidebar");
-      let toggle = 0;
+        let sidebar = document.getElementById("sidebar");
+        let toggle = 0;
 
-      function toggleSidebar()
-      {
-        if (toggle === 1)
-        {
-          sidebar.style.display = "none";
-          toggle = 0;
+        function toggleSidebar() {
+            if (toggle === 1) {
+                sidebar.style.display = "none";
+                toggle = 0;
+            } else {
+                sidebar.style.display = "block";
+                sidebar.style.width = "100vw";
+                sidebar.style.zIndex = "1024";
+                toggle = 1;
+            }
         }
-        else
-        {
-          sidebar.style.display = "block";
-          sidebar.style.width = "100vw";
-          sidebar.style.zIndex = "1024";
-          toggle = 1;
-        }
-      }
     </script>
 
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script src="https://kit.fontawesome.com/30e7a8a3a1.js" crossorigin="anonymous"></script>
-
 @await RenderSectionAsync("Scripts", false)
 </body>
 </html>

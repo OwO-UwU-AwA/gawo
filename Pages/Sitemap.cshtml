@@ -4,7 +4,15 @@
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
 }
 
-<h2 style="font-weight: bold;" class="header">Sitemap</h2>
+<div class="row mt-3">
+    <div class="col d-flex flex-row">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
+
+        <h2 class="fw-bold">Sitemap</h2>
+    </div>
+</div>
 <hr class="border border-primary opacity-50">
 
 <div class="container text-center">
@@ -22,8 +30,6 @@
 
     <div class="row align-items-start">
         <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Admin'">Administrationsbereich</button>
-        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Licenses'">Softwarelizenzattributionen</button>
-        <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/Privacy'">Privatsphäre</button>
         <button type="button" class="btn btn-outline-primary btn-block mb-2" onclick="window.location.href='/SiteMap'">Sitemap</button>
     </div>
 </div>

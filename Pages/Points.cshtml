@@ -3,11 +3,22 @@
 @{
     ViewData["Title"] = "GaWo Punktetabelle";
 }
+<div class="row mt-3">
+    <div class="col d-flex flex-row justify-content-between">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
 
-<h2 class="header">Punktetabelle</h2>
+        <h2 class="fw-bold">Punktetabelle</h2>
+
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+            <i class="fad fa-bars"></i>
+        </button>
+    </div>
+</div>
 <hr class="border border-primary opacity-50">
 
-<div class="content text-wrap" style="display: flex; flex-direction: column;">
+<div class="content text-wrap d-flex flex-column">
 
     <table class="table table-striped table-hover">
         <thead>

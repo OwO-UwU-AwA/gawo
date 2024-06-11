@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             options.Cookie.IsEssential = true;
             options.LoginPath = "/Login";
             options.LogoutPath = "/Logout";
-            options.AccessDeniedPath = "/Error";
+            options.AccessDeniedPath = "/";
         }
     );
 
@@ -67,7 +67,6 @@ builder.Services.AddAuthorizationBuilder()
         policy.RequireRole("Admin");
         policy.RequireAuthenticatedUser();
     });
-
 
 // Add Session-Based Authentication
 builder.Services.AddSession(options =>
@@ -83,7 +82,10 @@ builder.Services.AddSession(options =>
 builder.Services.AddTransient<IValidator<ProfileModel>, ProfileModel.EmailValidator>();
 builder.Services.AddTransient<IValidator<ProfileModel>, ProfileModel.PasswordValidator>();
 
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Admin", "AdminOnly");
+});
 
 var app = builder.Build();
 
