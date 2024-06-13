@@ -112,7 +112,7 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().WriteTo.FileEx(Constants.LogFilePath,
+await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().Enrich.FromLogContext().WriteTo.FileEx(Constants.LogFilePath,
     rollingInterval: RollingInterval.Hour,
     hooks: new FileArchiveRollingHooks(CompressionLevel.SmallestSize, targetDirectory: Constants.ArchivedLogFilePath),
     retainedFileCountLimit: 1).CreateLogger();

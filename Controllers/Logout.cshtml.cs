@@ -10,6 +10,6 @@ public class LogoutModel : PageModel
     public async Task<ActionResult> OnGet()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return RedirectPermanent("/");
+        return RedirectToPage("/Index");
     }
 }

@@ -18,14 +18,9 @@ using ValidationResult = FluentValidation.Results.ValidationResult;
 namespace GaWo.Controllers;
 
 [Authorize]
-public class ProfileModel : PageModel
+public class ProfileModel(IAuthorizationService authorizationService) : PageModel
 {
-    public readonly IAuthorizationService AuthorizationService;
-
-    public ProfileModel(IAuthorizationService authorizationService)
-    {
-        AuthorizationService = authorizationService;
-    }
+    public readonly IAuthorizationService AuthorizationService = authorizationService;
 
     public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
@@ -61,18 +56,28 @@ public class ProfileModel : PageModel
     [BindProperty]
     public string NewPasswordConf { get; set; } = string.Empty;
 
-    public async void OnGet()
+    public async Task<IActionResult> OnGet()
     {
-        var db = new SurrealDbClient(Constants.SurrealDbUrl);
-        var secrets = await Secrets.Get();
-
-        await db.SignIn(new DatabaseAuth
+        try
         {
-            Namespace = Constants.SurrealDbNameSpace,
-            Database = Constants.SurrealDbDatabase,
-            Username = secrets.Username,
-            Password = secrets.Password
-        });
+            var db = new SurrealDbClient(Constants.SurrealDbUrl);
+            var secrets = await Secrets.Get();
+
+            await db.SignIn(new DatabaseAuth
+            {
+                Namespace = Constants.SurrealDbNameSpace,
+                Database = Constants.SurrealDbDatabase,
+                Username = secrets.Username,
+                Password = secrets.Password
+            });
+        }
+        catch (Exception e)
+        {
+            Log.Error(e.ToString());
+            return RedirectToPage("/Error");
+        }
+
+        return Page();
     }
 
     public async Task<GawoUser> FillUser()
