@@ -83,24 +83,41 @@
                         class="fad fa-table">
                     </i> Punkte
                 </button>
-                <button type="button" onclick="window.location.href='/AddEvent';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'>
-                    <i
-                        class="fad fa-file-pen">
-                    </i> Veranstaltung Anmelden
+
+                <button type="button" class="btn btn-outline-primary btn-block" data-bs-toggle="collapse"
+                        href="#collapse">
+                    Veranstaltung <i class="fad fa-caret-down"></i>
                 </button>
-                <button type="button" onclick="window.location.href='/MyEvents';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>
-                    <i
-                        class="fad fa-calendar-days">
-                    </i> Meine Veranstaltungen
-                </button>
-                <button type="button" onclick="window.location.href='/VisitedEvents';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>
-                    <i
-                        class="fad fa-list-check">
-                    </i> Besuchte Veranstaltungen
-                </button>
+                <div class="collapse" id="collapse">
+                    <button type="button" onclick="window.location.href='/AddEvent';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/AddEvent" ? "active" : "")'>
+                        <i
+                            class="fad fa-file-pen">
+                        </i> Veranstaltung Anmelden
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/MyEvents';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/MyEvents" ? "active" : "")'>
+                        <i
+                            class="fad fa-calendar-days">
+                        </i> Meine Veranstaltungen
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/VisitedEvents';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/VisitedEvents" ? "active" : "")'>
+                        <i
+                            class="fad fa-list-check">
+                        </i> Besuchte Veranstaltungen
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/EditEvent';"
+                            class='btn btn-outline-secondary btn-block w-100 @(currentPage == "/EditEvent" ? "active" : "")'>
+                        <i
+                            class="fad fa-pen-to-square">
+                        </i> Veranstaltung Bearbeiten
+                    </button>
+                </div>
+
                 <button type="button" onclick="window.location.href='/SiteMap';"
                         class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'>
                     <i
@@ -159,6 +176,10 @@
         </main>
     </div>
 </div>
+
+<footer class="align-self-end">
+    MAKE FOOTER
+</footer>
 
 <script>
         let sidebar = document.getElementById("sidebar");
