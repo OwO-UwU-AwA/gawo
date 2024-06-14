@@ -22,6 +22,11 @@ public class ProfileModel(IAuthorizationService authorizationService) : PageMode
 {
     public readonly IAuthorizationService AuthorizationService = authorizationService;
 
+    public ProfileModel(IAuthorizationService authorizationService)
+    {
+        AuthorizationService = authorizationService;
+    }
+
     public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
 

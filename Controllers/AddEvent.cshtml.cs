@@ -87,7 +87,7 @@ public class AddEventModel : PageModel
     /// </summary>
     [BindProperty]
     public bool Grade9 { get; set; }
-
+    
     /// <summary>
     /// Grade Selection Booleans For Each Grade/Checkbox
     /// </summary>
