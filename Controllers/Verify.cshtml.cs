@@ -29,6 +29,7 @@ public class VerifyModel : PageModel
                 Password = secrets.Password
             });
             
+
             // Delete Entry From VerificationLinks Which Matches The Secret
             await db.Query(
                 $"DELETE (RETURN array::at((SELECT id FROM VerificationLinks WHERE secret = type::string({HttpContext.Request.Query["secret"].ToString()})).id, 0));");
@@ -42,7 +43,6 @@ public class VerifyModel : PageModel
                 e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
             return RedirectToPage("/Error");
         }
-                
         // Redirect Back To Profile After Verifying Email
         return RedirectToPage("/Profile");
     }
