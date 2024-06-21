@@ -1,5 +1,4 @@
 @page
-@using Microsoft.IdentityModel.Tokens
 @model GaWo.Controllers.Admin.EventAdministrationModel
 @{
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
@@ -24,7 +23,7 @@
 <div class="container">
     <div class="d-flex row justify-content-between">
         @{
-            var query = @Model.Get().Result;
+            var query = await @Model.Get();
             foreach (var ev in query)
             {
                 <div class="accordion" id='@(ev.Id!.Id)Parent'>
@@ -52,53 +51,42 @@
 
                                 <div class="container">
                                     <div class="row">
-                                        <div class="col">
+                                        <div class="col" style="margin-left: -1em">
                                             <label class="mb-1">Beschreibung:</label>
                                             <div class="border border-secondary-subtle rounded ps-3 py-3">
-                                                <div class="text-break lh-sm fs-6">
+                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
                                                     @Html.Raw(ev.Description)
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col">
-                                            <div class="mb-1">Veranstalter:</div>
-                                            <div>
-                                                @{ 
-                                                    var res = await Model.GetUser(ev.Organiser);
-                                                    <text>@res.LastName, @res.FirstName</text>
-                                                }
-                                            </div>
-                                            <label class="mb-1 mt-3">Dauer:</label>
-                                            <div>
-                                                @ev.Duration Minuten
+                                            <label class="mb-1">Veranstalter:</label>
+                                            <div class="border border-secondary-subtle rounded ps-3 py-3 mb-3">
+                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
+                                                    @{
+                                                        var res = await Model.GetName(ev.Organiser);
+
+                                                        @res.ToArray()[1]@:, @res.ToArray()[0]
+                                                    }
+                                                </div>
                                             </div>
 
-                                            <button class="btn btn-warning mt-5 w-50" type="button"
-                                                    onclick="window.open('/EditEvent?id=@ev.Id.Id', '_blank');">
-                                                Bearbeiten
-                                            </button>
+                                            <label class="mb-1">Betreuer:</label>
+                                            <div class="border border-secondary-subtle rounded ps-3 py-3 mt-3">
+                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
+                                                    @{
+                                                        res = await Model.GetName(ev.Teacher);
+
+                                                        @res.ToArray()[1]@:, @res.ToArray()[0]
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col">
-                                            <label class="mb-1">Betreuer</label>
-                                            <div>
-                                                @{
-                                                    res = await Model.GetUser(ev.Teacher);
-                                                    <text>@res.LastName</text>
-                                                }
-                                            </div>
-
-                                            <label class="mb-1 mt-3">Raum:</label>
-                                            <div>
-                                                @if (ev.Room.IsNullOrEmpty())
-                                                {
-                                                    <text>Keiner</text>
-                                                }
-                                            </div>
-
-                                            <button class="btn btn-danger mt-5 w-50" type="button"
-                                                    onclick="window.open('/Admin/DeleteEvent?id=@ev.Id.Id', '_blank');">
-                                                Löschen
-                                            </button>
+                                            @{
+                                                // Tag, Uhrzeit, Raum
+                                                // Karten
+                                            }
                                         </div>
                                     </div>
                                 </div>

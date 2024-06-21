@@ -48,7 +48,7 @@
         window.addEventListener("load", setTheme());
     </script>
 
-<body class="overflow-scroll">
+<body class="overflow-scroll min-vh-100 position-relative d-grid">
 <div class="container">
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
@@ -171,14 +171,25 @@
     </div>
 
     <div class="content">
-        <main role="main" style="margin-top: -1em;">
+        <main role="main" style="margin-top: -1em; margin-bottom: 4em;">
             @RenderBody()
         </main>
     </div>
 </div>
 
-<footer class="align-self-end">
-    MAKE FOOTER
+<footer class="d-inline-flex justify-content-evenly w-100" style="position: absolute; bottom: 0;">
+    <a href="https://github.com/OwO-Uwu-AwA">
+        GaWo © @DateTime.Now.Year
+    </a>
+    <a href="mailto:gawo@gauss-gymasium.de">
+        Kontakt
+    </a>
+    <a href="/About">
+        Impressum
+    </a>
+    <p>
+        Made with <i class="fad fa-heart-crack"></i> By Winterer, Mathis Aaron
+    </p>
 </footer>
 
 <script>

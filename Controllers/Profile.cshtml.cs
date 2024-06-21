@@ -22,23 +22,18 @@ public class ProfileModel(IAuthorizationService authorizationService) : PageMode
 {
     public readonly IAuthorizationService AuthorizationService = authorizationService;
 
-    public ProfileModel(IAuthorizationService authorizationService)
-    {
-        AuthorizationService = authorizationService;
-    }
-
     public required SurrealDbClient Db { get; set; }
     public GawoUser? UserStruct { get; set; }
 
-    [BindProperty] public byte Monday { get; set; }
+    [Range(0, 1)] [BindProperty] public byte Monday { get; set; }
 
-    [BindProperty] public byte Tuesday { get; set; }
+    [Range(0, 1)] [BindProperty] public byte Tuesday { get; set; }
 
-    [BindProperty] public byte Wednesday { get; set; }
+    [Range(0, 1)] [BindProperty] public byte Wednesday { get; set; }
 
-    [BindProperty] public byte Thursday { get; set; }
+    [Range(0, 1)] [BindProperty] public byte Thursday { get; set; }
 
-    [BindProperty] public byte Friday { get; set; }
+    [Range(0, 1)] [BindProperty] public byte Friday { get; set; }
 
     [EmailAddress(ErrorMessage = "Ungültige E-Mail-Adresse")]
     [Required(ErrorMessage = "E-Mail-Adresse erforderlich")]
