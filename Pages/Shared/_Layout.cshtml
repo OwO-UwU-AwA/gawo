@@ -48,7 +48,7 @@
         window.addEventListener("load", setTheme());
     </script>
 
-<body class="overflow-scroll">
+<body class="overflow-scroll min-vh-100 position-relative d-grid">
 <div class="container">
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
         <div class="offcanvas-header">
@@ -83,24 +83,41 @@
                         class="fad fa-table">
                     </i> Punkte
                 </button>
-                <button type="button" onclick="window.location.href='/AddEvent';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/AddEvent" ? "active" : "")'>
-                    <i
-                        class="fad fa-file-pen">
-                    </i> Veranstaltung Anmelden
+
+                <button type="button" class="btn btn-outline-primary btn-block" data-bs-toggle="collapse"
+                        href="#collapse">
+                    Veranstaltung <i class="fad fa-caret-down"></i>
                 </button>
-                <button type="button" onclick="window.location.href='/MyEvents';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/MyEvents" ? "active" : "")'>
-                    <i
-                        class="fad fa-calendar-days">
-                    </i> Meine Veranstaltungen
-                </button>
-                <button type="button" onclick="window.location.href='/VisitedEvents';"
-                        class='btn btn-outline-primary btn-block @(currentPage == "/VisitedEvents" ? "active" : "")'>
-                    <i
-                        class="fad fa-list-check">
-                    </i> Besuchte Veranstaltungen
-                </button>
+                <div class="collapse" id="collapse">
+                    <button type="button" onclick="window.location.href='/AddEvent';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/AddEvent" ? "active" : "")'>
+                        <i
+                            class="fad fa-file-pen">
+                        </i> Veranstaltung Anmelden
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/MyEvents';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/MyEvents" ? "active" : "")'>
+                        <i
+                            class="fad fa-calendar-days">
+                        </i> Meine Veranstaltungen
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/VisitedEvents';"
+                            class='btn btn-outline-secondary btn-block w-100 mb-3 @(currentPage == "/VisitedEvents" ? "active" : "")'>
+                        <i
+                            class="fad fa-list-check">
+                        </i> Besuchte Veranstaltungen
+                    </button>
+
+                    <button type="button" onclick="window.location.href='/EditEvent';"
+                            class='btn btn-outline-secondary btn-block w-100 @(currentPage == "/EditEvent" ? "active" : "")'>
+                        <i
+                            class="fad fa-pen-to-square">
+                        </i> Veranstaltung Bearbeiten
+                    </button>
+                </div>
+
                 <button type="button" onclick="window.location.href='/SiteMap';"
                         class='btn btn-outline-primary btn-block @(currentPage == "/SiteMap" ? "active" : "")'>
                     <i
@@ -154,11 +171,26 @@
     </div>
 
     <div class="content">
-        <main role="main" style="margin-top: -1em;">
+        <main role="main" style="margin-top: -1em; margin-bottom: 4em;">
             @RenderBody()
         </main>
     </div>
 </div>
+
+<footer class="d-inline-flex justify-content-evenly w-100" style="position: absolute; bottom: 0;">
+    <a href="https://github.com/OwO-Uwu-AwA">
+        GaWo © @DateTime.Now.Year
+    </a>
+    <a href="mailto:gawo@gauss-gymasium.de">
+        Kontakt
+    </a>
+    <a href="/About">
+        Impressum
+    </a>
+    <p>
+        Made with <i class="fad fa-heart-crack"></i> By Winterer, Mathis Aaron
+    </p>
+</footer>
 
 <script>
         let sidebar = document.getElementById("sidebar");

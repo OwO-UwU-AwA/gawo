@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 using SurrealDb.Net;
 using SurrealDb.Net.Models;
 using SurrealDb.Net.Models.Auth;
@@ -21,7 +23,7 @@ public class AddEventModel : PageModel
     /// <summary>
     /// Create New Instance Of The Page Model
     /// </summary>
-    /// <param name="authorizationService">Verifies Whether Current User Has The <c>AdminOnly</c> Role</param>
+    /// <param name="authorizationService">Verifies Whether The Current User Has The <c>AdminOnly</c> Role</param>
     public AddEventModel(IAuthorizationService authorizationService)
     {
         AuthorizationService = authorizationService;
@@ -85,7 +87,7 @@ public class AddEventModel : PageModel
     /// </summary>
     [BindProperty]
     public bool Grade9 { get; set; }
-
+    
     /// <summary>
     /// Grade Selection Booleans For Each Grade/Checkbox
     /// </summary>
@@ -110,10 +112,18 @@ public class AddEventModel : PageModel
     /// <returns><cref>Microsoft.AspNetCore.Mvc.IActionResult</cref></returns>
     public async Task<IActionResult> OnPostAddEvent()
     {
-        PreSetup();
-
-        await Db.Create("Events", Event);
-
+        try
+        {
+            PreSetup();
+            await Db.Create("Events", Event);
+        }
+        catch (Exception e)
+        {
+            
+            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
+                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            return RedirectToPage("/Error");
+        }
         return RedirectToPage();
     }
 
@@ -135,7 +145,5 @@ public class AddEventModel : PageModel
 
         var sanitizer = new HtmlSanitizer();
         Event.Description = sanitizer.Sanitize(Event.Description, "http://localhost:5000");
-
-        Console.WriteLine(Event.Description);
     }
 }

@@ -1,5 +1,23 @@
-Sehr geehrte/r FIRSTNAME, <br></br>
-Ihre E-Mail-Adresse wurde am <code>DATE</code> um <code>TIME</code> von <code style="color: #FF6961;">OLDEMAIL</code> auf <code style="color: #FF6961;">NEWEMAIL</code> geändert.<br>
-Bestätigen Sie diese Änderung unter <a style="color: #A1B8FB;" href="http://localhost:5000/Verify?secret=SECRET">diesem Link</a>.<br>
-Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style="color: #A1B8FB;" href="mailto:gawo@gauss-gymnasium.de">GaWo-Team</a> bitte umgehend.<br></br>
-Mit freundlichen Grüßen, <br></br> Das GaWo-Team
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  </head>
+  <body>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+     @import url('https://fonts.googleapis.com/css2?family=Playwrite+DE+LA:wght@100..400&family=Playwrite+DE+VA:wght@100..400&display=swap');
+      html
+      {
+        font-family: IBM Plex Mono;
+      }
+    </style>
+    <div style="width: 100%; height:100%; background-color: #333333; color: #FFFFEF;">
+      <p style="font-weight: bold; font-family: Playwrite DE VA;">Sehr geehrte/r FIRSTNAME,</p> <br></br>
+      Ihre E-Mail-Adresse wurde am <code style="color: #FF6961;">DATE</code> um <code style="color: #FF6961;">TIME</code> von <code style="color: #FF6961;">OLDEMAIL</code> auf <code style="color: #FF6961">NEWEMAIL</code> geändert.<br>
+      Bestätigen Sie diese Änderung unter <a style="color: #A1B8FB;" href="http://localhost:5000/Verify?secret=SECRET">diesem Link</a>.<br>
+      Falls Sie diese Änderung nicht veranlasst haben, kontaktieren Sie das <a style="color: #A1B8FB;" href="mailto:gawo@gauss-gymnasium.de">GaWo-Team</a> bitte umgehend.<br></br>
+      <p style="font-family: Playwrite DE VA;">Mit freundlichen Grüßen, <br><br>Das GaWo-Team</p>
+    </div>
+  </body>
+</html>
