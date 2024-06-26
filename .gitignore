@@ -3,7 +3,7 @@ gawo.db/
 .direnv/
 out/
 secrets.json
-gawo.db/
+gawo.db/*
 temp-keys/
 
 *.rsuser
