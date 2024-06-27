@@ -5,6 +5,7 @@ out/
 secrets.json
 gawo.db/*
 temp-keys/
+gawo.db/CURRENT
 
 *.rsuser
 *.suo

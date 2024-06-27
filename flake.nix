@@ -18,6 +18,7 @@
   	    surrealdb
 	    docker
   	    graphviz-nox
+ 	    jq
           ];
         };
       });
