@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +20,7 @@ public class AddEventModel : PageModel
     public SurrealDbClient Db;
 
     /// <summary>
-    /// Create New Instance Of The Page Model
+    /// Create A New Instance Of The Page Model
     /// </summary>
     /// <param name="authorizationService">Verifies Whether The Current User Has The <c>AdminOnly</c> Role</param>
     public AddEventModel(IAuthorizationService authorizationService)
@@ -37,11 +36,16 @@ public class AddEventModel : PageModel
             Password = secrets.Password
         });
         // Pre-Initialise Event For Frontend To Use
-        Event = new Event();
+        Event = new Event
+        {
+            Organiser = null!,
+            Teacher = null!,
+            Type = null!
+        };
     }
 
     /// <summary>
-    /// <cref>Event</cref> Object For All Attributes That Can Be Inserted Into The Database Without Any Additional Processing
+    /// Event Object For All Attributes That Can Be Inserted Into The Database Without Any Additional Processing
     /// </summary>
     [BindProperty]
     public Event Event { get; set; }
@@ -120,8 +124,7 @@ public class AddEventModel : PageModel
         catch (Exception e)
         {
             
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return RedirectToPage("/Error");
         }
         return RedirectToPage();
@@ -129,6 +132,7 @@ public class AddEventModel : PageModel
 
     public void PreSetup()
     {
+        Event.Picture = default;
         // Encode Grades Into Bitfield
         Event.Grades = (Grade5 ? 1 << 0 : 0) | (Grade6 ? 1 << 1 : 0) | (Grade7 ? 1 << 2 : 0) | (Grade8 ? 1 << 3 : 0) |
                        (Grade9 ? 1 << 4 : 0) | (Grade10 ? 1 << 5 : 0) |

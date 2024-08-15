@@ -5,14 +5,15 @@
 }
 
 <div class="row mt-3">
-    <div class="col d-flex flex-row justify-content-between">
+    <div class="col d-flex flex-row justify-content-between mt-3">
         <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
             <i class="fad fa-bars"></i>
         </button>
 
         <h2 class="header fw-bold">Veranstaltungsadministration</h2>
 
-        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas"
+                data-bs-target="#adminbar">
             <i class="fad fa-bars"></i>
         </button>
     </div>
@@ -32,7 +33,16 @@
                             <button class="accordion-button text-break" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#@ev.Id.ToString()" aria-expanded="true" aria-controls="@ev.Id.ToString()">
                                 <div class="d-flex row-mt3">
-                                    <i>@Html.Raw(ev.Name)&nbsp;</i>
+                                    <i>@Html.Raw(ev.Name) @{
+                                                              if (!ev.Accepted)
+                                                              {
+                                                                  <i class="fad fa-xmark text-danger"></i>
+                                                              }
+                                                              else
+                                                              {
+                                                                  <i class="fad fa-check text-success"></i>
+                                                              }
+                                                          }</i>
 
                                     @{
                                         foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
@@ -50,45 +60,6 @@
                             <div class="accordion-body">
 
                                 <div class="container">
-                                    <div class="row">
-                                        <div class="col" style="margin-left: -1em">
-                                            <label class="mb-1">Beschreibung:</label>
-                                            <div class="border border-secondary-subtle rounded ps-3 py-3">
-                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
-                                                    @Html.Raw(ev.Description)
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <label class="mb-1">Veranstalter:</label>
-                                            <div class="border border-secondary-subtle rounded ps-3 py-3 mb-3">
-                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
-                                                    @{
-                                                        var res = await Model.GetName(ev.Organiser);
-
-                                                        @res.ToArray()[1]@:, @res.ToArray()[0]
-                                                    }
-                                                </div>
-                                            </div>
-
-                                            <label class="mb-1">Betreuer:</label>
-                                            <div class="border border-secondary-subtle rounded ps-3 py-3 mt-3">
-                                                <div class="text-break lh-sm fs-6 text-secondary-emphasis">
-                                                    @{
-                                                        res = await Model.GetName(ev.Teacher);
-
-                                                        @res.ToArray()[1]@:, @res.ToArray()[0]
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            @{
-                                                // Tag, Uhrzeit, Raum
-                                                // Karten
-                                            }
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

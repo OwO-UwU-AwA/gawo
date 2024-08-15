@@ -1,0 +1,297 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@model GaWo.Controllers.AddEventModel
+@{
+    ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year}";
+}
+<div class="row mt-3">
+    <div class="col d-flex flex-row justify-content-between mt-3">
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fad fa-bars"></i>
+        </button>
+
+        <h2 class="header fw-bold">Anmeldung</h2>
+
+        @if (Model.AuthorizationService.AuthorizeAsync(User, "AdminOnly").Result.Succeeded)
+        {
+            <button class="menu-button btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+                <i class="fad fa-bars"></i>
+            </button>
+        }
+        else
+        {
+            <button class="menu-button btn btn-outline-primary invisible">
+                <i class="fad fa-bars"></i>
+            </button>
+        }
+    </div>
+</div>
+<hr class="border border-primary opacity-50">
+
+<div class="content">
+    <form method="post" asp-page-handler="AddEvent" class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <label for="name" class="form-label">Name<sup>*</sup></label>
+                <input asp-for="Event.Name" type="text" class="form-control" id="name" placeholder="Name der Veranstaltung" required>
+            </div>
+            <div class="col">
+                <label for="type" class="form-label">Veranstaltungstyp<sup>*</sup></label>
+                <select asp-for="Event.Type" class="form-select" id="type" required
+                        onchange="const type = document.getElementById('type'); if (type.value !== 'NULL') { document.getElementById('duration').removeAttribute('disabled') } else { document.getElementById('duration').toggleAttribute('disabled') } durationReload()">
+                    <option selected disabled value="NULL">Veranstaltungstyp auswählen</option>
+                    <option value="PRESENTATION">Vortrag</option>
+                    <option value="GPRESENTATION">Gastvortrag</option>
+                    <option value="FLANGPRESENTATION">Fremdsprachenvortrag</option>
+                    <option value="THESISDEF">Facharbeitsverteidigung</option>
+                    <option value="COMPETITION">Wettbewerb</option>
+                    <option value="WORKSHOP">Workshop</option>
+                    <option value="QF">Q/F</option>
+                    <option value="SPORT">Sportveranstaltung</option>
+                    <option value="ELMOS">ELMOS</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <label for="description" class="form-label">Beschreibung<sup>*</sup></label>
+                <textarea asp-for="Event.Description" class="form-control" maxlength="256" id="description" rows="5"
+                          style="resize: none;" required></textarea>
+            </div>
+            <div class="col">
+                <label for="subject" class="form-label">Fach<sup>*</sup></label>
+                <select asp-for="Event.Subject" class="form-select" id="subject" required>
+                    <option selected disabled value="NULL">Fachbereich auswählen</option>
+                    @{
+                        foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
+                        {
+                            <option value="@line.Split(",")[0]">@line.Split(",")[1]</option>
+                        }
+                    }
+                </select>
+
+                <label for="duration" class="form-label mt-4">Dauer<sup>*</sup></label>
+                <select asp-for="Event.Duration" class="form-select" id="duration" required disabled>
+                    <script>
+                        function durationReload() {
+                            // TODO: This Is Ugly
+                            let selected = document.getElementById('type').value;
+                            let target = document.getElementById('duration');
+
+                            // Clear Options On Every Change And Recreate Them For Reach Type Again Afterwards
+                            // Maybe Have All of Them All The Time But Invisible Or Disabled If Unavailable?
+                            while (target.options.length > 0)
+                            {
+                                target.remove(0);
+                            }
+                            
+                            switch (selected) {
+                                case 'WORKSHOP':
+                                case 'COMPETITION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = -1;
+                                    zero.text = 'Dauer auswählen';
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = 45;
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = 90;
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+
+                                    let three = document.createElement('option');
+                                    three.value = 135;
+                                    three.text = '135 Minuten';
+                                    target.add(three);
+
+                                    let four = document.createElement('option');
+                                    four.value = 180;
+                                    four.text = '180 Minuten';
+                                    target.add(four);
+
+                                    let five = document.createElement('option');
+                                    five.value = 240;
+                                    five.text = '240 Minuten';
+                                    target.add(five);
+                                    break;
+                                }
+                                case 'ELMOS':
+                                case 'THESISDEF':
+                                case 'FLANGPRESENTATION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = -1;
+                                    zero.text = 'Dauer auswählen';
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = 45;
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = 90;
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+                                    break;
+                                }
+                                case 'SPORT':
+                                case 'QF':
+                                case 'GPRESENTATION':
+                                case 'PRESENTATION': {
+                                    let zero = document.createElement('option');
+                                    zero.value = -1;
+                                    zero.text = 'Dauer auswählen';
+                                    zero.setAttribute("selected", "true");
+                                    zero.setAttribute("disabled", "true");
+                                    target.add(zero);
+
+                                    let one = document.createElement('option');
+                                    one.value = 45;
+                                    one.text = '45 Minuten';
+                                    target.add(one);
+
+                                    let two = document.createElement('option');
+                                    two.value = 90;
+                                    two.text = '90 Minuten';
+                                    target.add(two);
+
+                                    let three = document.createElement('option');
+                                    three.value = 135;
+                                    three.text = '135 Minuten';
+                                    target.add(three);
+
+                                    let four = document.createElement('option');
+                                    four.value = 180;
+                                    four.text = '180 Minuten';
+                                    target.add(four);
+                                    break;
+                                }
+                            }
+                        }
+                    </script>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                @{
+                    // Whether User Is Part Of AdminOnly Policy
+                    var x = await Model.AuthorizationService.AuthorizeAsync(User, "AdminOnly");
+
+                    if (x.Succeeded)
+                    {
+                        <label for="organiser" class="form-label">Organisator<sup>*</sup></label>
+                        <select class="form-select" id="organiser" asp-for="Organiser" required>
+                            <option selected disabled value="NULL">Organisator auswählen</option>
+                            @{
+                                var options = await Model.Db.Select<GawoUser>("Users");
+
+                                foreach (var option in options)
+                                {
+                                    <option value="@option.Id">@option.FirstName @option.LastName</option>
+                                }
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <label for="organiser" class="form-label">Organisator:</label>
+                        <input asp-for="Event.Organiser" type="text" class="form-control" id="organiser" disabled
+                               value="@HttpContext.User.Identity!.Name" placeholder="@HttpContext.User.Identity.Name">
+                        <input type="hidden" asp-for="Event.Organiser" value="@HttpContext.User.Identity.Name">
+                    }
+                }
+            </div>
+            <div class="col">
+                <label for="teacher" class="form-label">Betreuer<sup>*</sup></label>
+                <select class="form-select" id="teacher" asp-for="Teacher" required>
+                    <option selected disabled value="NULL">Betreuer auswählen</option>
+                    @{
+                        var options = await Model.Db.Select<GawoUser>("Users");
+
+                        foreach (var option in options)
+                        {
+                            if (((option.Permissions >> 0) & 1) == 1)
+                            {
+                                <option value="@option.Id">@option.FirstName @option.LastName</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <label for="picture" class="form-label">Optionales Bild</label>
+                <input asp-for="Event.Picture" type="file" class="form-control custom-file-input" id="picture"
+                       name="picture" accept="image/*">
+
+                <script>
+                    function gradesReload()
+                    {
+                        let g5 = document.getElementById('grade5');
+                        let g6 = document.getElementById('grade6');
+                        let g7 = document.getElementById('grade7');
+                        let g8 = document.getElementById('grade8');
+                        let g9 = document.getElementById('grade9');
+                        let g10 = document.getElementById('grade10');
+                        let g11 = document.getElementById('grade11');
+                        let g12 = document.getElementById('grade12');
+                    }
+                </script>
+                
+                <div class="row mt-3">
+                    <label class="form-label">Jahrgangsstufen<sup>*</sup></label>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade5" class="form-check-input" id="grade5" name="Grade5">
+                        <label for="grade5" class="form-check-label">5</label>
+
+                        <input type="checkbox" asp-for="Grade6" class="form-check-input" id="grade6" name="Grade6">
+                        <label for="grade6" class="form-check-label">6</label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade7" class="form-check-input" id="grade7" name="Grade7">
+                        <label for="grade7" class="form-check-label">7</label>
+
+                        <input type="checkbox" asp-for="Grade8" class="form-check-input" style="margin-left: 0.58rem;"
+                               id="grade8" name="Grade8">
+                        <label for="grade8" class="form-check-label">8</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade9" class="form-check-input" id="grade9" name="Grade9">
+                        <label for="grade9" class="form-check-label">9</label>
+
+                        <input type="checkbox" asp-for="Grade10" class="form-check-input" id="grade10" name="Grade10">
+                        <label for="grade10" class="form-check-label">10</label>
+                    </div>
+                    <div class="col">
+                        <input type="checkbox" asp-for="Grade11" class="form-check-input" id="grade11" name="Grade11">
+                        <label for="grade11" class="form-check-label">11</label>
+
+                        <input type="checkbox" asp-for="Grade12" class="form-check-input" id="grade12" name="Grade12">
+                        <label for="grade12" class="form-check-label">12</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <label for="capacity" class="form-label">Teilnehmeranzahl<sup>*</sup></label>
+                <input asp-for="Event.Capacity" class="form-control" type="number" value="25" min="0" max="200"
+                       id="capacity" required>
+
+                <label for="notes" class="form-label mt-3">Bemerkung</label>
+                <textarea asp-for="Event.Notes" class="form-control" placeholder="Bemerkung für das GaWo-Team" rows="2"
+                          id="notes" style="resize: none;"></textarea>
+            </div>
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">
+                Veranstaltung anmelden <i class="fad fa-arrow-up-from-bracket"></i>
+            </button>
+        </div>
+    </form></div>

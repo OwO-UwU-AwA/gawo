@@ -40,7 +40,7 @@ public class PerDayModel : PageModel
         /*
            res.Count(x => x == value)) returns the number of elements inside res that are equal to value where value is one of each of the values from values.Select(value => ....) returning an array of numbers
          */
-        var array = values.Select(value => res.Count(x => x == value)).ToArray();
+        var array = values.Select(value => res!.Count(x => x == value)).ToArray();
 
         return new JsonResult(array);
     }

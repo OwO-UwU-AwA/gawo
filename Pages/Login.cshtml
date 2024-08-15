@@ -4,64 +4,53 @@
     ViewData["Title"] = "GaWo Login";
 }
 
-<script>
-    function TogglePassword()
-    {
-        let passwordInput = document.getElementById("password");
-        let revealer = document.getElementById("revealer");
-        
-        if (passwordInput.getAttribute("type") === "text")
-        {
-            revealer.classList.remove("fa-eye");
-            revealer.classList.add("fa-eye-slash");
-
-            passwordInput.setAttribute("type", "password");
-        }
-        else
-        {
-            revealer.classList.remove("fa-eye-slash");
-            revealer.classList.add("fa-eye");
-            passwordInput.setAttribute("type", "text");
-        }
-    }
-</script>
-
 <div class="row mt-3">
-    <div class="col d-flex flex-row justify-content-between">
+    <div class="col d-flex flex-row justify-content-between mt-3">
         <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
             <i class="fad fa-bars"></i>
         </button>
 
-        <h2 class="header fw-bold">Login</h2>
+        <h2 class="header fw-bold align-bottom">Login</h2>
 
-        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas" data-bs-target="#adminbar">
+        @if (Model.AuthorizationService.AuthorizeAsync(User, null, "AdminOnly").Result.Succeeded)
+        {
+        <button class="menu-button btn btn-outline-primary me-3" data-bs-toggle="offcanvas"
+                data-bs-target="#adminbar">
             <i class="fad fa-bars"></i>
         </button>
+        }
+        else
+        {
+        <button class="menu-button btn btn-outline-primary me-3 invisible">
+            <i class="fad fa-bars"></i>
+        </button>
+        }
     </div>
 </div>
 <hr class="border border-primary opacity-50">
 
 @if (!Request.HttpContext.User.Identity!.IsAuthenticated)
 {
-    @* ReSharper disable once RedundantBoolCompare *@
-    if (Model.Error == true)
-    {
-        <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-            <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            </symbol>
-        </svg>
-
-        <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warnung:">
-                <use xlink:href="#exclamation-triangle-fill"/>
+    @if (Model.Error.Length > 0)
+    { 
+        <div id="error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+                <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </symbol>
             </svg>
-            <div>
-                Anmeldung fehlgeschlagen. Benutzername oder Passwort falsch.
+
+            <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warnung:">
+                    <use xlink:href="#exclamation-triangle-fill"/>
+                </svg>
+                <div id="errorMessage">
+                    @Model.Error
+                </div>
             </div>
         </div>
     }
-
+    
     <div class="content text-wrap d-flex">
         <form method="post" asp-page-handler="Login">
             <div class="form-group mt-3 mb-3">
@@ -99,5 +88,27 @@ else
     </div>
     <button class="btn btn-success mt-3 mb-3 w-25" onclick="location.href='/Profile'">Profil</button>
     <br>
-    <button class="btn btn-danger w-25" onclick="location.href='/Logout'">Abmelden</button>
+    <button class="btn btn-danger w-25" id="submitButton" onclick="location.href='/Logout'">Abmelden</button>
 }
+
+<script>
+    function TogglePassword()
+    {
+        let passwordInput = document.getElementById("password");
+        let revealer = document.getElementById("revealer");
+
+        if (passwordInput.getAttribute("type") === "text")
+        {
+            revealer.classList.remove("fa-eye");
+            revealer.classList.add("fa-eye-slash");
+
+            passwordInput.setAttribute("type", "password");
+        }
+        else
+        {
+            revealer.classList.remove("fa-eye-slash");
+            revealer.classList.add("fa-eye");
+            passwordInput.setAttribute("type", "text");
+        }
+    }
+</script>

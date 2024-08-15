@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Change Back
-PORT="5001"
-FILE="test.db"
+PORT="8000"
+FILE="gawo.db"
 
 # Start Database With Default Credentials
 surreal start -A -u root -p root -b 0.0.0.0:"${PORT}" file:"${FILE}" &

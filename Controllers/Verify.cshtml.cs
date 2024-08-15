@@ -39,8 +39,7 @@ public class VerifyModel : PageModel
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return RedirectToPage("/Error");
         }
         // Redirect Back To Profile After Verifying Email

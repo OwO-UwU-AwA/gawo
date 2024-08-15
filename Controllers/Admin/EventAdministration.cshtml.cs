@@ -8,7 +8,7 @@ using SurrealDb.Net.Models.Auth;
 
 namespace GaWo.Controllers.Admin;
 
-public class EventAdministrationModel(IAuthorizationService authorizationService) : PageModel
+public class EventAdministrationModel : PageModel
 {
     public async Task<IEnumerable<string>> GetName(Thing id)
     {
@@ -32,8 +32,7 @@ public class EventAdministrationModel(IAuthorizationService authorizationService
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return [null!, null!];
         }
     }
@@ -58,8 +57,7 @@ public class EventAdministrationModel(IAuthorizationService authorizationService
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return null!;
         }
     }
@@ -84,8 +82,7 @@ public class EventAdministrationModel(IAuthorizationService authorizationService
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return null!;
         }
     }

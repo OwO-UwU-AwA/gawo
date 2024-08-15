@@ -1,10 +1,8 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using Cassandra;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -127,7 +125,7 @@ public class ProfileModel(IAuthorizationService authorizationService) : PageMode
         }
 
 
-        TimeUuid secret = TimeUuid.NewId();
+        Guid secret = new();
 
         VerificationLink link = new()
         {
@@ -226,8 +224,7 @@ public class ProfileModel(IAuthorizationService authorizationService) : PageMode
         }
         catch (Exception e)
         {
-            Log.Error("{ExceptionName} {ExceptionDescription} - {ExceptionSource}", e.InnerException?.GetType(),
-                e.InnerException?.Message, new StackTrace(e, true).GetFrame(1)?.GetMethod());
+            Log.Error($"{e}");
             return false;
         }
 

@@ -1,18 +1,18 @@
-ENGLISH,Englisch
-FRENCH,Französisch
-GERMAN,Deutsch
-LATIN,Latein
-RUSSIAN,Russisch
 ASTRONOMY,Astronomie
 BIOLOGY,Biologie
 CHEMISTRY,Chemie
-COMPUTERSCIENCE,Informatik
-MATHS,Mathematik
-PHYSICS,Physik
-ART,Kunst
+GERMAN,Deutsch
+ENGLISH,Englisch
+FRENCH,Franzözisch
 GEOGRAPHY,Geographie
 HISTORY,Geschichte
+COMPUTERSCIENCE,Informatik
+ART,Kunst
+LATIN,Latein
+MATHS,Mathematik
+PHYSICS,Physik
 POLITICS,Politische Bildung
+RUSSIAN,Russisch
 MISC,Sonstiges
 SPORT,Sport
 STUDIESCONSULTING,Studienberatung

@@ -14,11 +14,11 @@
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           packages = with pkgs; [
-   	    doxygen
-  	    surrealdb
-	    docker
-  	    graphviz-nox
- 	    jq
+   	        doxygen
+  	        surrealdb
+	          docker
+  	        graphviz-nox
+ 	          jq
           ];
         };
       });

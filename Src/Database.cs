@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using SurrealDb.Net.Models;
 
@@ -92,7 +93,7 @@ public class Event : Record
 
     [JsonPropertyName("capacity")] public int Capacity { get; set; } = -1;
 
-    [JsonPropertyName("date")] public DateTime? Date { get; set; } = DateTime.MinValue;
+    [JsonPropertyName("date")] public DateTime Date { get; set; }
 
     [JsonPropertyName("description")] public string Description { get; set; } = string.Empty;
 
@@ -106,15 +107,20 @@ public class Event : Record
     [JsonPropertyName("notes")]
     public string? Notes { get; set; }
 
-    [JsonPropertyName("organiser")] public Thing Organiser { get; set; } = null!;
+    [JsonPropertyName("organiser")] public required Thing Organiser { get; set; }
 
-    [JsonPropertyName("picture")] public string? Picture { get; set; } = string.Empty;
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("picturnewe")]
+    public string? Picture { get; set; }
 
-    [JsonPropertyName("room")] public string? Room { get; set; } = string.Empty;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("room")]
+    public string? Room { get; set; }
 
-    [JsonPropertyName("teacher")] public Thing Teacher { get; set; } = null!;
+    [JsonPropertyName("teacher")] public required Thing Teacher { get; set; }
 
-    [JsonPropertyName("type")] public string Type { get; set; } = string.Empty;
+    [JsonPropertyName("type")] public required string Type { get; set; }
 
     [JsonPropertyName("created")] public DateTime Created { get; set; }
 };

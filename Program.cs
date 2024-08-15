@@ -1,39 +1,23 @@
 using System.IO.Compression;
+using Elastic.Channels;
+using Elastic.Ingest.Elasticsearch;
+using Elastic.Ingest.Elasticsearch.DataStreams;
+using Elastic.Serilog.Sinks;
+using Elastic.Transport;
 using FluentValidation;
 using GaWo;
 using GaWo.Controllers;
+using IO.Ably.Realtime;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.ResourceDetectors.Container;
-using OpenTelemetry.ResourceDetectors.Host;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.File.GzArchive;
 using RollingInterval = Serilog.Sinks.FileEx.RollingInterval;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-// OpenTelemetry Configuration To Export To Prometheus
-Action<ResourceBuilder> appResourceBuilder = resource =>
-    resource.AddDetector(new ContainerResourceDetector()).AddDetector(new HostDetector());
-
-builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithTracing(tracerBuilder =>
-    tracerBuilder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddGrpcClientInstrumentation()
-        .AddOtlpExporter());
-
-builder.Services.AddOpenTelemetry().ConfigureResource(appResourceBuilder).WithMetrics(meterBuilder =>
-    meterBuilder.AddProcessInstrumentation().AddRuntimeInstrumentation().AddAspNetCoreInstrumentation()
-        .AddOtlpExporter().AddPrometheusExporter());
-
-builder.Logging.AddOpenTelemetry(options => options.AddOtlpExporter());
-
 
 // Needed If Running In A Docker Container Because Encryption Keys Are Not Persistent Otherwise
 builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("temp-keys")).UseCryptographicAlgorithms(
@@ -89,9 +73,6 @@ builder.Services.AddRazorPages(options =>
 
 var app = builder.Build();
 
-// Add Scraping Endpoint For Prometheus To Use
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
 app.UseRouting();
 
 app.UseSession();
@@ -99,7 +80,6 @@ app.UseSession();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
 app.MapRazorPages();
 
 if (!app.Environment.IsDevelopment())
@@ -112,7 +92,7 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().Enrich.FromLogContext().WriteTo.FileEx(Constants.LogFilePath,
+await using var log = new LoggerConfiguration().MinimumLevel.Debug().Enrich.WithExceptionDetails().Enrich.FromLogContext().WriteTo.FileEx(Constants.LogFilePath,
     rollingInterval: RollingInterval.Hour,
     hooks: new FileArchiveRollingHooks(CompressionLevel.SmallestSize, targetDirectory: Constants.ArchivedLogFilePath),
     retainedFileCountLimit: 1).CreateLogger();
@@ -121,12 +101,6 @@ await using var log = new LoggerConfiguration().Enrich.WithExceptionDetails().En
 Log.Logger = log;
 
 Log.Information("Started Meow");
-
-var timer = new Timer(state =>
-{
-    // TODO: Reset Email changes after 1 hour
-    // Will Run Every Hour
-}, null, TimeSpan.Zero, TimeSpan.FromHours(5));
 
 // Will Block As Long As The Application Is Running
 await app.RunAsync();
