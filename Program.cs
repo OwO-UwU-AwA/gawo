@@ -1,13 +1,8 @@
+using System.Globalization;
 using System.IO.Compression;
-using Elastic.Channels;
-using Elastic.Ingest.Elasticsearch;
-using Elastic.Ingest.Elasticsearch.DataStreams;
-using Elastic.Serilog.Sinks;
-using Elastic.Transport;
 using FluentValidation;
 using GaWo;
 using GaWo.Controllers;
-using IO.Ably.Realtime;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
@@ -99,6 +94,8 @@ await using var log = new LoggerConfiguration().MinimumLevel.Debug().Enrich.With
 
 // Create Global Logger
 Log.Logger = log;
+
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
 
 Log.Information("Started Meow");
 

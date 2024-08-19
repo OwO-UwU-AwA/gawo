@@ -3,6 +3,7 @@ namespace GaWo;
 public static class Constants
 {
     public const string SecretsPath = "text/secrets.json";
+    public const string TypesPath = "text/types";
     public const string RoomsPath = "text/rooms";
     public const string SubjectsPath = "text/subjects";
     public const string VerificationEmailPlainPath = "text/verificationEmailPlain";

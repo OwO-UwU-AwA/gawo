@@ -1,4 +1,5 @@
 @page
+@using System.Globalization
 @model GaWo.Controllers.Admin.EventAdministrationModel
 @{
     ViewData["Title"] = $"Gaußwoche {DateTime.Now.Year} Administrationsbereich";
@@ -20,47 +21,99 @@
 </div>
 <hr class="border border-primary opacity-50">
 
+<div class="container d-flex">
+    <div class="col">
+        <div class="row">
+            <form onsubmit="return false;">
+                <input type="text" class="form-control" id="searchBar" onkeyup="if (this.keyCode !== 13) search(this)" placeholder="Suchterm eingeben"/>
+            </form>
+        </div>
+        <div class="row mt-3 mb-3">
+            <div class="col">
+                <button class="btn btn-success" onclick="document.querySelectorAll('.collapse').forEach((x) => { x.classList.add('show') })">Alle ausklappen</button>
+                <button class="btn btn-success" onclick="document.querySelectorAll('.collapse').forEach((x) => { x.classList.remove('show') })">Alle einklappen</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="container">
-    <div class="d-flex row justify-content-between">
+<div class="container mt-3">
+    <div class="d-flex row justify-content-between" id="accordion-container">
         @{
             var query = await @Model.Get();
             foreach (var ev in query)
             {
-                <div class="accordion" id='@(ev.Id!.Id)Parent'>
+                <div class="accordion mb-3" style="display: inline-block !important;" id='@(ev.Id!.Id)Parent'>
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button text-break" type="button" data-bs-toggle="collapse"
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#@ev.Id.ToString()" aria-expanded="true" aria-controls="@ev.Id.ToString()">
-                                <div class="d-flex row-mt3">
-                                    <i>@Html.Raw(ev.Name) @{
-                                                              if (!ev.Accepted)
-                                                              {
-                                                                  <i class="fad fa-xmark text-danger"></i>
-                                                              }
-                                                              else
-                                                              {
-                                                                  <i class="fad fa-check text-success"></i>
-                                                              }
-                                                          }</i>
-
-                                    @{
-                                        foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
-                                        {
-                                            if (line.Split(",")[0] == ev.Subject)
+                                <div class="row-mt3 text-truncate">
+                                    <i><abbr title="@Html.Raw(ev.Name)" style="text-decoration: none;">@Html.Raw(ev.Name)</abbr>
+                                        @{
+                                            foreach (var line in System.IO.File.ReadLines(Constants.SubjectsPath))
                                             {
-                                                <text>@line.Split(",")[1]</text>
+                                                if (line.Split(",")[0] == ev.Subject)
+                                                {
+                                                    ev.Subject = line.Split(",")[1];
+                                                    <text>(@ev.Subject)</text>
+                                                }
                                             }
                                         }
-                                    }
+                                        @{
+                                            if (!ev.Accepted)
+                                            {
+                                                <i class="fad fa-xmark text-danger"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fad fa-check text-success"></i>
+                                            }
+                                        }
+                                    </i>
                                 </div>
                             </button>
                         </h2>
                         <div id="@ev.Id.ToString()" class="accordion-collapse collapse" data-bs-parent="#@(ev.Id.Id)Parent">
                             <div class="accordion-body">
-
-                                <div class="container">
-                                </div>
+                                <form>
+                                    <fieldset disabled>
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <label for="description" class="form-label">Beschreibung:</label>
+                                                <textarea class="form-control mb-3 text-truncate" rows="1" style="resize: none;" id="description">@ev.Description asdlkjsdsdf kjfkjsdf sdfjlsdf ljsdf kjhsdf kjlsdfkjsdfkjlds</textarea>
+                                                
+                                                <label for="subject" class="form-label">Fach:</label>
+                                                <input type="text" class="form-control" id="subject" placeholder="@ev.Subject"/>
+                                            </div>
+                                            <div class="col">
+                                                <label for="organiser" class="form-label">Organisator:</label>
+                                                <input type="text" class="form-control mb-3" id="organiser" placeholder="@ev.Organiser"/>
+                                                
+                                                <label for="teacher" class="form-label">Betreuer:</label>
+                                                <input type="text" class="form-control" id="teacher" placeholder="@ev.Teacher"/>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <label for="date" class="form-label">Zeit:</label>
+                                                <input type="text" class="form-control" id="date" placeholder="@DateTimeFormatInfo.CurrentInfo.GetDayName(ev.Date.DayOfWeek), @ev.Date.ToString("HH:mm")-@ev.Date.AddMinutes(@ev.Duration).ToString("HH:mm")"/>
+                                                
+                                                <label for="type" class="form-label">Typ:</label>
+                                                <input type="text" class="form-control" id="type" placeholder="@{
+                                                                                                                   foreach (var line in System.IO.File.ReadLines(Constants.TypesPath)) 
+                                                                                                                   {
+                                                                                                                       if (line.Split(",")[0] == ev.Type) 
+                                                                                                                       { 
+                                                                                                                           ev.Type = line.Split(",")[1]; 
+                                                                                                                           <text>@ev.Type</text>
+                                                                                                                       }
+                                                                                                                   }
+                                                                                                               }"/>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -69,3 +122,24 @@
         }
     </div>
 </div>
+
+<script>
+    function search(s) {
+        var search = s.value.toLowerCase();
+        var accordions = document.querySelectorAll('.accordion-item');
+
+        accordions.forEach((accordion) => {
+            var button = accordion.querySelector('.accordion-button');
+            var body = accordion.querySelector('.accordion-body');
+
+            if (button.innerHTML.toLowerCase().includes(search) || body.innerHTML.toLowerCase().includes(search)) {
+                accordion.parentElement.style.display = 'block';
+                accordion.parentElement.classList.add('mb-3');
+            } else {
+                accordion.parentElement.style.display = 'none';
+                accordion.parentElement.classList.remove('mb-3');
+            }
+        });
+    }
+</script>
+
