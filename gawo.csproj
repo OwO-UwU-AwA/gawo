@@ -11,7 +11,7 @@
         <PackageReference Include="Grafana.OpenTelemetry" Version="0.8.1-beta"/>
         <PackageReference Include="HtmlSanitizer" Version="8.1.866-beta"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-preview.5.24306.3"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0-preview.7.24405.3"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0-preview.5.24306.3"/>
         <PackageReference Include="HtmlSanitizer" Version="8.1.866-beta"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0-preview.5.24306.7"/>
